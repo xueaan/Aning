@@ -1,0 +1,147 @@
+/* Rich Editor 专用样式 */
+
+.rich-editor-container {
+  /* 自定义滚动条 */
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--border-secondary)) transparent;
+}
+
+.rich-editor-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.rich-editor-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.rich-editor-container::-webkit-scrollbar-thumb {
+  background: rgb(var(--border-secondary));
+  border-radius: 3px;
+}
+
+.rich-editor-container::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--text-tertiary));
+}
+
+/* 工具栏按钮动画 */
+.rich-editor-toolbar button {
+  position: relative;
+  overflow: hidden;
+}
+
+.rich-editor-toolbar button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s ease, height 0.3s ease;
+}
+
+.rich-editor-toolbar button:hover::before {
+  width: 100%;
+  height: 100%;
+}
+
+/* 编辑器内容区域样式增强 */
+.rich-editor-content {
+  /* Novel Editor 内容区域的特殊样式 */
+}
+
+.rich-editor-content .ProseMirror {
+  padding: 2rem;
+  min-height: 300px;
+  outline: none;
+  border: none;
+  background: transparent;
+  color: rgb(var(--text-primary));
+}
+
+.rich-editor-content .ProseMirror h1,
+.rich-editor-content .ProseMirror h2,
+.rich-editor-content .ProseMirror h3 {
+  color: rgb(var(--text-primary));
+  font-weight: 600;
+  margin: 1.5rem 0 1rem 0;
+}
+
+.rich-editor-content .ProseMirror h1 {
+  font-size: 2rem;
+}
+
+.rich-editor-content .ProseMirror h2 {
+  font-size: 1.5rem;
+}
+
+.rich-editor-content .ProseMirror h3 {
+  font-size: 1.25rem;
+}
+
+.rich-editor-content .ProseMirror p {
+  margin: 0.75rem 0;
+  line-height: 1.7;
+}
+
+.rich-editor-content .ProseMirror blockquote {
+  border-left: 4px solid rgb(var(--accent) / 0.5);
+  padding-left: 1rem;
+  margin: 1rem 0;
+  font-style: italic;
+  color: rgb(var(--text-secondary));
+}
+
+.rich-editor-content .ProseMirror code {
+  background: rgb(var(--bg-tertiary));
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.875em;
+  color: rgb(var(--accent));
+}
+
+.rich-editor-content .ProseMirror pre {
+  background: rgb(var(--bg-card));
+  border: 1px solid rgb(var(--border-primary));
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.rich-editor-content .ProseMirror pre code {
+  background: transparent;
+  padding: 0;
+  color: rgb(var(--text-primary));
+}
+
+.rich-editor-content .ProseMirror ul,
+.rich-editor-content .ProseMirror ol {
+  padding-left: 1.5rem;
+  margin: 1rem 0;
+}
+
+.rich-editor-content .ProseMirror li {
+  margin: 0.5rem 0;
+}
+
+/* Placeholder 样式 */
+.rich-editor-content .ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: rgb(var(--text-muted));
+  pointer-events: none;
+  height: 0;
+  font-style: italic;
+}
+
+/* 选中文本样式 */
+.rich-editor-content .ProseMirror ::selection {
+  background: rgb(var(--accent) / 0.3);
+}
+
+
+/* 主题兼容性 - 文本样式通过CSS变量自动适配，响应式由Tailwind处理 */

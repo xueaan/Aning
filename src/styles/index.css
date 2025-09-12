@@ -1,0 +1,305 @@
+/* =============================================================================
+   Anning 主题系统 - 主入口文件
+   Index - 统一导入所有模块化样式
+   
+   重构说明：
+   - 原有的 globals.css 和 theme.css 已拆分为模块化结构
+   - 每个模块独立维护，便于管理和维护
+   - 导入顺序很重要：基础 → 组件 → 模块 → 工具类
+============================================================================= */
+
+/* =================
+   基础层 - Base Layer
+   最基础的样式，包括变量定义和重置样式
+   @import 必须在所有其他规则之前
+   ================= */
+
+/* CSS 变量定义 - 必须最先导入 */
+@import './base/variables.css';
+
+/* 🔥 主题系统 - 包含所有 theme-* 类，修复关键遗漏 */
+@import './theme.css';
+
+/* 全局重置样式 */
+@import './base/reset.css';
+
+/* =================
+   组件层 - Components Layer
+   可重用的 UI 组件样式
+   ================= */
+
+/* 按钮组件样式 */
+@import './components/buttons.css';
+
+/* 卡片组件样式 */
+@import './components/cards.css';
+
+/* 输入框组件样式 */
+@import './components/inputs.css';
+
+/* 毛玻璃效果组件样式 */
+@import './components/glass.css';
+
+/* 标题栏组件样式 */
+@import './components/titlebar.css';
+
+/* =================
+   模块层 - Modules Layer
+   特定功能模块的专用样式
+   ================= */
+
+
+/* 知识库模块样式 */
+@import './modules/knowledge.css';
+
+
+/* 编辑器模块样式 */
+@import './modules/editor.css';
+
+/* =================
+   工具类层 - Utilities Layer
+   通用工具类和辅助样式
+   ================= */
+
+/* 动画工具类 */
+@import './utilities/animations.css';
+
+/* 状态工具类 */
+@import './utilities/states.css';
+
+/* 过渡工具类 */
+@import './utilities/transitions.css';
+
+/* =================
+   第三方库样式 - Vendors Layer (如需要)
+   外部库的样式定制
+   ================= */
+
+/* 富文本编辑器样式 - 保持兼容性 */
+@import './rich-editor.css';
+
+/* =================
+   Tailwind CSS 基础导入
+   所有 @import 语句之后再导入 Tailwind
+   ================= */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =================
+   Tailwind 自定义层 - Custom Layers
+   使用 Tailwind 的层系统添加自定义样式
+   ================= */
+
+@layer base {
+  /* 自定义基础样式可以在这里添加 */
+}
+
+@layer components {
+  /* 自定义组件样式可以在这里添加 */
+}
+
+@layer utilities {
+  /* 自定义工具类可以在这里添加 */
+  
+  /* 滚动条隐藏工具类 - 已移除重复定义，参见theme.css */
+  
+  /* 移除与theme.css重复的样式定义 - 保持单一源原则 */
+  
+  /* 所有主题类定义已移至theme.css，遵循单一源原则 */
+}
+
+/* =================
+   兼容性和降级支持
+   ================= */
+
+/* 不支持 CSS 变量的浏览器降级 */
+@supports not (color: rgba(var(--text-primary), 1)) {
+  :root {
+    --text-primary: #1e293b;
+    --bg-primary: #ffffff;
+    --border-primary: #e2e8f0;
+  }
+  
+  [data-theme="dark"] {
+    --text-primary: #f8fafc;
+    --bg-primary: #0f172a;
+    --border-primary: #475569;
+  }
+}
+
+/* 不支持 backdrop-filter 的浏览器降级 */
+@supports not (backdrop-filter: blur(1px)) {
+  .glass,
+  .theme-ai-message-glass,
+  .glass-modern,
+  .glass-card-modern {
+    background: rgba(var(--bg-primary), 0.95) !important;
+  }
+}
+
+/* =================
+   性能优化
+   ================= */
+
+/* 减少动画的媒体查询 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* =================
+   语法高亮样式 - hljs
+   ================= */
+
+/* 基础代码块样式 */
+.hljs {
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  font-family: 'Fira Code', 'Cascadia Code', 'JetBrains Mono', Consolas, 'Courier New', monospace;
+}
+
+/* 语法高亮颜色 - 浅色主题 */
+.hljs-keyword, .hljs-selector-tag, .hljs-literal, .hljs-section, .hljs-link {
+  color: #c586c0;
+}
+
+.hljs-string, .hljs-regexp, .hljs-template-string {
+  color: #ce9178;
+}
+
+.hljs-comment, .hljs-quote {
+  color: #6a9955;
+  font-style: italic;
+}
+
+.hljs-number, .hljs-symbol {
+  color: #b5cea8;
+}
+
+.hljs-function, .hljs-title {
+  color: #dcdcaa;
+}
+
+.hljs-variable, .hljs-template-variable {
+  color: #9cdcfe;
+}
+
+.hljs-type, .hljs-class {
+  color: #4ec9b0;
+}
+
+.hljs-built_in, .hljs-builtin-name {
+  color: #569cd6;
+}
+
+.hljs-attribute, .hljs-name {
+  color: #92c5f1;
+}
+
+.hljs-tag {
+  color: #569cd6;
+}
+
+.hljs-operator, .hljs-punctuation {
+  color: #d4d4d4;
+}
+
+/* 深色主题下的语法高亮 */
+.dark .hljs-keyword, .dark .hljs-selector-tag, .dark .hljs-literal, .dark .hljs-section, .dark .hljs-link {
+  color: #c586c0;
+}
+
+.dark .hljs-string, .dark .hljs-regexp, .dark .hljs-template-string {
+  color: #ce9178;
+}
+
+.dark .hljs-comment, .dark .hljs-quote {
+  color: #6a9955;
+  font-style: italic;
+}
+
+.dark .hljs-number, .dark .hljs-symbol {
+  color: #b5cea8;
+}
+
+.dark .hljs-function, .dark .hljs-title {
+  color: #dcdcaa;
+}
+
+.dark .hljs-variable, .dark .hljs-template-variable {
+  color: #9cdcfe;
+}
+
+.dark .hljs-type, .dark .hljs-class {
+  color: #4ec9b0;
+}
+
+.dark .hljs-built_in, .dark .hljs-builtin-name {
+  color: #569cd6;
+}
+
+.dark .hljs-attribute, .dark .hljs-name {
+  color: #92c5f1;
+}
+
+.dark .hljs-tag {
+  color: #569cd6;
+}
+
+.dark .hljs-operator, .dark .hljs-punctuation {
+  color: #cccccc;
+}
+
+/* 特定语言的样式增强 */
+.hljs-meta {
+  color: #569cd6;
+}
+
+.hljs-doctag {
+  color: #608b4e;
+}
+
+.hljs-deletion {
+  background: #ff6b6b20;
+  color: #ff6b6b;
+}
+
+.hljs-addition {
+  background: #51cf6620;
+  color: #51cf66;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}
+
+/* =================
+   调试和开发辅助
+   ================= */
+
+/* 开发环境下的调试样式 */
+@media screen and (max-width: 0) {
+  /* 这个媒体查询永远不会匹配，可以用来放调试样式 */
+  .debug-border * {
+    outline: 1px solid red !important;
+  }
+  
+  .debug-grid {
+    background-image: 
+      linear-gradient(rgba(255, 0, 0, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 0, 0, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+}

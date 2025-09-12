@@ -1,0 +1,317 @@
+/* =============================================================================
+   Anning 主题系统 - 输入框组件样式
+   Components/Inputs - 统一的输入控件样式系统
+============================================================================= */
+
+/* =================
+   基础输入框样式
+   ================= */
+
+.theme-input {
+  width: 100%;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  background: rgba(var(--bg-secondary), 0.85);
+  border: 1px solid rgba(var(--border-primary), 0.3);
+  border-radius: var(--radius-md);
+  color: rgba(var(--text-primary), 1);
+  padding: var(--spacing-sm) var(--spacing-md);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: all var(--duration-fast) ease;
+  outline: none;
+}
+
+.theme-input:focus {
+  background: rgba(var(--bg-secondary), 0.95);
+  border-color: rgba(var(--color-accent), 0.7);
+  box-shadow: 0 0 0 3px rgba(var(--color-accent), 0.15);
+  transform: translateY(-1px);
+}
+
+.theme-input::placeholder {
+  color: rgba(var(--text-tertiary), 0.8);
+  font-style: italic;
+}
+
+.theme-input:disabled {
+  background: rgba(var(--bg-tertiary), 0.5);
+  border-color: rgba(var(--border-primary), 0.2);
+  color: rgba(var(--text-tertiary), 1);
+  cursor: not-allowed;
+}
+
+/* =================
+   精致输入框样式 (毛玻璃效果)
+   ================= */
+
+.input-refined {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 0.875rem;
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(var(--border-primary), 0.3);
+  outline: none;
+  transition: all var(--duration-fast) ease;
+  
+  /* 毛玻璃效果 */
+  background: rgba(var(--bg-primary), 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(var(--bg-overlay), 0.05);
+  
+  /* 文字样式 */
+  color: rgba(var(--text-primary), 1);
+}
+
+.input-refined:focus {
+  background: rgba(var(--bg-primary), 0.95);
+  box-shadow: 0 4px 12px rgba(var(--color-accent), 0.15);
+  border: 1px solid rgba(var(--color-accent), 1);
+  transform: translateY(-1px);
+}
+
+.input-refined::placeholder {
+  color: rgba(var(--text-tertiary), 0.7);
+}
+
+/* 深色主题下的精致输入框 */
+[data-theme="dark"] .input-refined {
+  background: rgba(var(--bg-tertiary), 0.8);
+  border: 1px solid rgba(var(--border-primary), 0.3);
+  color: rgba(var(--text-primary), 1);
+}
+
+[data-theme="dark"] .input-refined:focus {
+  background: rgba(var(--bg-tertiary), 0.95);
+  border: 1px solid rgba(var(--color-accent), 1);
+}
+
+
+/* =================
+   Modern 玻璃输入框
+   ================= */
+
+.glass-input-modern {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 0.875rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(var(--border-primary), 0.3);
+  outline: none;
+  transition: all var(--duration-fast) ease;
+  
+  /* Modern 毛玻璃效果 */
+  background: rgba(var(--bg-primary), 0.90);
+  backdrop-filter: blur(6px) saturate(120%);
+  -webkit-backdrop-filter: blur(6px) saturate(120%);
+  box-shadow: 0 2px 8px rgba(var(--bg-overlay), 0.1);
+  
+  /* 文字样式 */
+  color: rgba(var(--text-primary), 1);
+}
+
+.glass-input-modern:focus {
+  background: rgba(var(--bg-primary), 0.95);
+  border: 1px solid rgba(var(--color-accent), 0.6);
+  box-shadow: 0 0 0 3px rgba(var(--color-accent), 0.12);
+}
+
+.glass-input-modern::placeholder {
+  color: rgba(var(--text-tertiary), 0.7);
+}
+
+/* 深色主题下的 Modern 输入框 */
+[data-theme="dark"] .glass-input-modern {
+  background: rgba(var(--bg-tertiary), 0.90);
+  border: 1px solid rgba(var(--border-primary), 0.3);
+  box-shadow: 0 2px 8px rgba(var(--bg-overlay), 0.2);
+}
+
+[data-theme="dark"] .glass-input-modern:focus {
+  background: rgba(var(--bg-tertiary), 0.95);
+  border: 1px solid rgba(var(--color-accent), 0.6);
+  box-shadow: 0 0 0 3px rgba(var(--color-accent), 0.12);
+}
+
+/* =================
+   通用玻璃输入框 (Tailwind 兼容)
+   ================= */
+
+.glass-input {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(var(--border-primary), 1);
+  background: rgba(var(--bg-secondary), 1);
+  color: rgba(var(--text-primary), 1);
+  outline: none;
+  transition: all var(--duration-fast) ease;
+}
+
+.glass-input::placeholder {
+  color: rgba(var(--text-tertiary), 1);
+}
+
+.glass-input:focus {
+  outline: none;
+  background: rgba(var(--bg-tertiary), 1);
+  border-color: rgba(var(--color-accent), 1);
+  box-shadow: 0 0 0 3px rgba(var(--color-accent), 0.3);
+}
+
+/* 深色主题通用输入框 */
+[data-theme="dark"] .glass-input {
+  background: rgba(var(--bg-tertiary), 1);
+  border: 1px solid rgba(var(--border-primary), 1);
+}
+
+[data-theme="dark"] .glass-input:focus {
+  background: rgba(var(--bg-secondary), 1);
+  border-color: rgba(var(--color-accent), 1);
+}
+
+/* =================
+   实用性输入框 - 已清理未使用的input-surface类
+   ================= */
+
+/* =================
+   下拉选择框样式
+   ================= */
+
+select.theme-input,
+select.glass-input,
+select.input-refined {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right var(--spacing-sm) center;
+  background-size: 1em;
+  padding-right: calc(var(--spacing-lg) + 0.5em);
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+/* 下拉选项样式 */
+select.theme-input option,
+select.glass-input option,
+select.input-refined option {
+  background: rgba(var(--bg-primary), 1);
+  color: rgba(var(--text-primary), 1);
+}
+
+[data-theme="dark"] select.theme-input option,
+[data-theme="dark"] select.glass-input option,
+[data-theme="dark"] select.input-refined option {
+  background: rgba(var(--bg-primary), 1);
+  color: rgba(var(--text-primary), 1);
+}
+
+/* =================
+   文本域样式
+   ================= */
+
+textarea.theme-input,
+textarea.glass-input,
+textarea.input-refined {
+  min-height: 80px;
+  resize: vertical;
+  line-height: 1.5;
+  padding: var(--spacing-md);
+}
+
+/* =================
+   输入框尺寸变体
+   ================= */
+
+/* 小尺寸输入框 */
+.theme-input-sm,
+.glass-input-sm,
+.input-refined-sm {
+  padding: calc(var(--spacing-xs) * 0.75) var(--spacing-sm);
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+/* 大尺寸输入框 */
+.theme-input-lg,
+.glass-input-lg,
+.input-refined-lg {
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+
+
+/* =================
+   滑块样式系统
+   ================= */
+
+/* 精致滑块样式 - 已清理未使用的slider-refined类 */
+
+/* 通用滑块样式 */
+input[type="range"].slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  width: 100%;
+  height: 8px;
+}
+
+input[type="range"].slider::-webkit-slider-track {
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(var(--bg-tertiary), 1);
+  transition: all var(--duration-fast) ease;
+}
+
+[data-theme="dark"] input[type="range"].slider::-webkit-slider-track {
+  background: rgba(var(--bg-tertiary), 1);
+}
+
+input[type="range"].slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(var(--color-accent), 1);
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+  border: none;
+}
+
+input[type="range"].slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 0 4px rgba(var(--color-accent), 0.2);
+}
+
+/* Firefox 滑块样式 */
+input[type="range"].slider::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(var(--bg-tertiary), 1);
+  border: none;
+}
+
+[data-theme="dark"] input[type="range"].slider::-moz-range-track {
+  background: rgba(var(--bg-tertiary), 1);
+}
+
+input[type="range"].slider::-moz-range-thumb {
+  border: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(var(--color-accent), 1);
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+}
+
+input[type="range"].slider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 0 4px rgba(var(--color-accent), 0.2);
+}
+
+/* 玻璃设置滑块样式 - 已清理未使用的glass-settings-slider类 */

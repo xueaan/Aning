@@ -1,0 +1,85 @@
+/* =============================================================================
+   Anning 主题系统 - 按钮组件样式 (优化版)
+   Components/Buttons - 只保留实际使用的核心样式
+============================================================================= */
+
+/* =================
+   主要按钮样式
+   ================= */
+
+.theme-button-primary {
+  /* 渐变背景 - 主品牌色到次品牌色 */
+  background: linear-gradient(135deg, rgba(var(--color-primary), 1), rgba(var(--color-secondary), 1));
+  color: rgba(var(--text-inverse), 1);
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  cursor: pointer;
+
+  /* 动画效果 */
+  transition: all var(--duration-fast) ease;
+  transform: translateY(0);
+
+  /* 阴影效果 */
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-button-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.theme-button-primary:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-button-primary:disabled {
+  background: rgba(var(--text-tertiary), 0.5);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* =================
+   次要按钮样式
+   ================= */
+
+.theme-button-secondary {
+  background: rgba(var(--bg-secondary), 1);
+  color: rgba(var(--text-primary), 1);
+  border: 1px solid rgba(var(--border-primary), 1);
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  cursor: pointer;
+
+  /* 动画效果 */
+  transition: all var(--duration-fast) ease;
+  transform: translateY(0);
+
+  /* 阴影效果 */
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-button-secondary:hover:not(:disabled) {
+  background: rgba(var(--bg-tertiary), 1);
+  border-color: rgba(var(--border-secondary), 1);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.theme-button-secondary:active {
+  transform: translateY(0);
+  background: rgba(var(--bg-quaternary), 1);
+}
+
+.theme-button-secondary:disabled {
+  background: rgba(var(--bg-tertiary), 0.5);
+  color: rgba(var(--text-tertiary), 1);
+  border-color: rgba(var(--border-primary), 0.5);
+  cursor: not-allowed;
+}

@@ -1,0 +1,378 @@
+use crate::database::Database;
+use serde::{Deserialize, Serialize};
+use std::sync::Arc;
+use tauri::State;
+
+// 会议数据结构
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Meeting {
+    pub id: Option<i64>,
+    pub title: String,
+    pub r#type: Option<String>,
+    pub status: String,
+    pub location: Option<String>,
+    pub start_time: Option<String>,
+    pub end_time: Option<String>,
+    pub participants: Option<String>, // JSON string
+    pub agenda: Option<String>,
+    pub tags: Option<String>, // JSON string
+    pub color: Option<String>,
+    pub icon: Option<String>,
+    pub created_at: Option<String>,
+    pub updated_at: Option<String>,
+}
+
+// 会议记录数据结构
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct MeetingRecord {
+    pub id: Option<i64>,
+    pub meeting_id: i64,
+    pub r#type: String, // note, action, decision, audio, transcript
+    pub content: Option<String>,
+    pub speaker: Option<String>,
+    pub timestamp: Option<String>,
+    pub audio_path: Option<String>,
+    pub is_ai_generated: bool,
+    pub created_at: Option<String>,
+}
+
+// 会议纪要数据结构
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct MeetingSummary {
+    pub id: Option<i64>,
+    pub meeting_id: i64,
+    pub summary: Option<String>,
+    pub key_points: Option<String>, // JSON string
+    pub action_items: Option<String>, // JSON string
+    pub decisions: Option<String>, // JSON string
+    pub generated_at: Option<String>,
+}
+
+// ===== 会议 CRUD 操作 =====
+
+#[tauri::command]
+pub async fn create_meeting(
+    db: State<'_, Arc<Database>>,
+    meeting: Meeting,
+) -> Result<i64, String> {
+    let conn = db.get_connection();
+    
+    let result = conn.prepare("
+        INSERT INTO meetings (title, type, status, location, start_time, end_time, participants, agenda, tags, color, icon)
+        VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)
+    ").and_then(|mut stmt| {
+        stmt.insert(&[
+            &meeting.title,
+            &meeting.r#type.as_deref().unwrap_or("personal"),
+            &meeting.status,
+            &meeting.location,
+            &meeting.start_time,
+            &meeting.end_time,
+            &meeting.participants,
+            &meeting.agenda,
+            &meeting.tags,
+            &meeting.color,
+            &meeting.icon,
+        ])
+    });
+
+    match result {
+        Ok(id) => Ok(id),
+        Err(e) => Err(format!("创建会议失败: {}", e)),
+    }
+}
+
+#[tauri::command]
+pub async fn get_meetings(
+    db: State<'_, Arc<Database>>,
+) -> Result<Vec<Meeting>, String> {
+    let conn = db.get_connection();
+    
+    let result = conn.prepare("
+        SELECT id, title, type, status, location, start_time, end_time, participants, agenda, tags, color, icon, created_at, updated_at
+        FROM meetings
+        ORDER BY created_at DESC
+    ").and_then(|mut stmt| {
+        let meeting_iter = stmt.query_map([], |row| {
+            Ok(Meeting {
+                id: Some(row.get(0)?),
+                title: row.get(1)?,
+                r#type: row.get(2)?,
+                status: row.get(3)?,
+                location: row.get(4)?,
+                start_time: row.get(5)?,
+                end_time: row.get(6)?,
+                participants: row.get(7)?,
+                agenda: row.get(8)?,
+                tags: row.get(9)?,
+                color: row.get(10)?,
+                icon: row.get(11)?,
+                created_at: row.get(12)?,
+                updated_at: row.get(13)?,
+            })
+        })?;
+
+        let mut meetings = Vec::new();
+        for meeting in meeting_iter {
+            meetings.push(meeting?);
+        }
+        Ok(meetings)
+    });
+
+    match result {
+        Ok(meetings) => Ok(meetings),
+        Err(e) => Err(format!("获取会议列表失败: {}", e)),
+    }
+}
+
+#[tauri::command]
+pub async fn update_meeting(
+    db: State<'_, Arc<Database>>,
+    id: i64,
+    meeting: Meeting,
+) -> Result<(), String> {
+    let conn = db.get_connection();
+    
+    let result = conn.execute("
+        UPDATE meetings 
+        SET title = ?1, type = ?2, status = ?3, location = ?4, start_time = ?5, end_time = ?6, 
+            participants = ?7, agenda = ?8, tags = ?9, color = ?10, icon = ?11
+        WHERE id = ?12
+    ", [
+        &meeting.title,
+        &meeting.r#type.as_deref().unwrap_or("personal"),
+        &meeting.status,
+        &meeting.location.as_deref().unwrap_or(""),
+        &meeting.start_time.as_deref().unwrap_or(""),
+        &meeting.end_time.as_deref().unwrap_or(""),
+        &meeting.participants.as_deref().unwrap_or(""),
+        &meeting.agenda.as_deref().unwrap_or(""),
+        &meeting.tags.as_deref().unwrap_or(""),
+        &meeting.color.as_deref().unwrap_or(""),
+        &meeting.icon.as_deref().unwrap_or(""),
+        &id.to_string(),
+    ]);
+
+    match result {
+        Ok(_) => Ok(()),
+        Err(e) => Err(format!("更新会议失败: {}", e)),
+    }
+}
+
+#[tauri::command]
+pub async fn delete_meeting(
+    db: State<'_, Arc<Database>>,
+    id: i64,
+) -> Result<(), String> {
+    let conn = db.get_connection();
+    
+    let result = conn.execute("DELETE FROM meetings WHERE id = ?1", [&id.to_string()]);
+
+    match result {
+        Ok(_) => Ok(()),
+        Err(e) => Err(format!("删除会议失败: {}", e)),
+    }
+}
+
+// ===== 会议记录操作 =====
+
+#[tauri::command]
+pub async fn create_meeting_record(
+    db: State<'_, Arc<Database>>,
+    record: MeetingRecord,
+) -> Result<i64, String> {
+    let conn = db.get_connection();
+    
+    let result = conn.prepare("
+        INSERT INTO meeting_records (meeting_id, type, content, speaker, timestamp, audio_path, is_ai_generated)
+        VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
+    ").and_then(|mut stmt| {
+        stmt.insert(&[
+            &record.meeting_id.to_string(),
+            &record.r#type,
+            &record.content,
+            &record.speaker,
+            &record.timestamp,
+            &record.audio_path,
+            &record.is_ai_generated.to_string(),
+        ])
+    });
+
+    match result {
+        Ok(id) => Ok(id),
+        Err(e) => Err(format!("创建会议记录失败: {}", e)),
+    }
+}
+
+#[tauri::command]
+pub async fn get_meeting_records(
+    db: State<'_, Arc<Database>>,
+    meeting_id: i64,
+) -> Result<Vec<MeetingRecord>, String> {
+    let conn = db.get_connection();
+    
+    let result = conn.prepare("
+        SELECT id, meeting_id, type, content, speaker, timestamp, audio_path, is_ai_generated, created_at
+        FROM meeting_records
+        WHERE meeting_id = ?1
+        ORDER BY timestamp ASC
+    ").and_then(|mut stmt| {
+        let record_iter = stmt.query_map([&meeting_id.to_string()], |row| {
+            Ok(MeetingRecord {
+                id: Some(row.get(0)?),
+                meeting_id: row.get(1)?,
+                r#type: row.get(2)?,
+                content: row.get(3)?,
+                speaker: row.get(4)?,
+                timestamp: row.get(5)?,
+                audio_path: row.get(6)?,
+                is_ai_generated: row.get::<_, i64>(7)? != 0,
+                created_at: row.get(8)?,
+            })
+        })?;
+
+        let mut records = Vec::new();
+        for record in record_iter {
+            records.push(record?);
+        }
+        Ok(records)
+    });
+
+    match result {
+        Ok(records) => Ok(records),
+        Err(e) => Err(format!("获取会议记录失败: {}", e)),
+    }
+}
+
+// ===== 会议纪要操作 =====
+
+#[tauri::command]
+pub async fn create_meeting_summary(
+    db: State<'_, Arc<Database>>,
+    summary: MeetingSummary,
+) -> Result<i64, String> {
+    let conn = db.get_connection();
+    
+    let result = conn.prepare("
+        INSERT INTO meeting_summaries (meeting_id, summary, key_points, action_items, decisions)
+        VALUES (?1, ?2, ?3, ?4, ?5)
+    ").and_then(|mut stmt| {
+        stmt.insert(&[
+            &summary.meeting_id.to_string(),
+            &summary.summary,
+            &summary.key_points,
+            &summary.action_items,
+            &summary.decisions,
+        ])
+    });
+
+    match result {
+        Ok(id) => Ok(id),
+        Err(e) => Err(format!("创建会议纪要失败: {}", e)),
+    }
+}
+
+#[tauri::command]
+pub async fn get_meeting_summary(
+    db: State<'_, Arc<Database>>,
+    meeting_id: i64,
+) -> Result<Option<MeetingSummary>, String> {
+    let conn = db.get_connection();
+    
+    let result = conn.prepare("
+        SELECT id, meeting_id, summary, key_points, action_items, decisions, generated_at
+        FROM meeting_summaries
+        WHERE meeting_id = ?1
+        ORDER BY generated_at DESC
+        LIMIT 1
+    ").and_then(|mut stmt| {
+        let mut summary_iter = stmt.query_map([&meeting_id.to_string()], |row| {
+            Ok(MeetingSummary {
+                id: Some(row.get(0)?),
+                meeting_id: row.get(1)?,
+                summary: row.get(2)?,
+                key_points: row.get(3)?,
+                action_items: row.get(4)?,
+                decisions: row.get(5)?,
+                generated_at: row.get(6)?,
+            })
+        })?;
+
+        match summary_iter.next() {
+            Some(Ok(summary)) => Ok(Some(summary)),
+            Some(Err(e)) => Err(e),
+            None => Ok(None),
+        }
+    });
+
+    match result {
+        Ok(summary) => Ok(summary),
+        Err(e) => Err(format!("获取会议纪要失败: {}", e)),
+    }
+}
+
+// ===== 会议状态管理 =====
+
+#[tauri::command]
+pub async fn update_meeting_status(
+    db: State<'_, Arc<Database>>,
+    id: i64,
+    status: String,
+) -> Result<(), String> {
+    let conn = db.get_connection();
+    
+    let result = conn.execute("UPDATE meetings SET status = ?1 WHERE id = ?2", [&status, &id.to_string()]);
+
+    match result {
+        Ok(_) => Ok(()),
+        Err(e) => Err(format!("更新会议状态失败: {}", e)),
+    }
+}
+
+// ===== 搜索和过滤 =====
+
+#[tauri::command]
+pub async fn search_meetings(
+    db: State<'_, Arc<Database>>,
+    query: String,
+) -> Result<Vec<Meeting>, String> {
+    let conn = db.get_connection();
+    let search_query = format!("%{}%", query);
+    
+    let result = conn.prepare("
+        SELECT id, title, type, status, location, start_time, end_time, participants, agenda, tags, color, icon, created_at, updated_at
+        FROM meetings
+        WHERE title LIKE ?1 OR agenda LIKE ?1 OR location LIKE ?1
+        ORDER BY created_at DESC
+    ").and_then(|mut stmt| {
+        let meeting_iter = stmt.query_map([&search_query], |row| {
+            Ok(Meeting {
+                id: Some(row.get(0)?),
+                title: row.get(1)?,
+                r#type: row.get(2)?,
+                status: row.get(3)?,
+                location: row.get(4)?,
+                start_time: row.get(5)?,
+                end_time: row.get(6)?,
+                participants: row.get(7)?,
+                agenda: row.get(8)?,
+                tags: row.get(9)?,
+                color: row.get(10)?,
+                icon: row.get(11)?,
+                created_at: row.get(12)?,
+                updated_at: row.get(13)?,
+            })
+        })?;
+
+        let mut meetings = Vec::new();
+        for meeting in meeting_iter {
+            meetings.push(meeting?);
+        }
+        Ok(meetings)
+    });
+
+    match result {
+        Ok(meetings) => Ok(meetings),
+        Err(e) => Err(format!("搜索会议失败: {}", e)),
+    }
+}

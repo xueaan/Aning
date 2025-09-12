@@ -1,0 +1,303 @@
+/* =============================================================================
+   Anning 主题系统 - 知识库模块样式
+   Modules/Knowledge - 知识库模块专用样式
+============================================================================= */
+
+/* =================
+   2025-01-23 卡片化设计专用样式 - 优雅实现
+   使用CSS特异性选择器替代!important，确保样式优先级
+   ================= */
+
+/* 侧边栏内容容器 - 融入整体设计 */
+.theme-knowledge-sidebar-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  margin: 12px;
+  overflow: hidden;
+  width: calc(100% - 24px);
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* 滚动条样式 */
+.theme-knowledge-sidebar-content .overflow-y-auto::-webkit-scrollbar {
+  width: 4px;
+}
+
+.theme-knowledge-sidebar-content .overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.theme-knowledge-sidebar-content .overflow-y-auto::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}
+
+.theme-knowledge-sidebar-content .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+
+
+/* 页面项卡片 - 精致紧凑设计 */
+.flex-1 .space-y-6 .theme-knowledge-page-item {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin: 0;
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.04),
+    0 2px 8px rgba(var(--color-accent), 0.02),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.flex-1 .space-y-6 .theme-knowledge-page-item::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    rgba(var(--color-accent), 0.1) 0%,
+    rgba(var(--color-primary), 0.15) 50%,
+    rgba(var(--color-secondary), 0.1) 100%
+  );
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+.flex-1 .space-y-6 .theme-knowledge-page-item:hover {
+  background: 
+    linear-gradient(135deg, 
+      rgba(var(--bg-secondary), 0.95) 0%,
+      rgba(var(--bg-tertiary), 0.9) 50%,
+      rgba(var(--bg-secondary), 0.85) 100%
+    );
+  border-color: rgba(var(--border-secondary), 0.4);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.1),
+    0 6px 20px rgba(var(--color-accent), 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transform: translateY(-3px) scale(1.008);
+}
+
+.flex-1 .space-y-6 .theme-knowledge-page-item:hover::after {
+  opacity: 1;
+}
+
+
+/* 操作按钮组 - 精致化设计 */
+.group .theme-knowledge-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 200ms ease;
+  position: relative;
+  z-index: 20;
+  flex-shrink: 0;
+}
+
+.group:hover .theme-knowledge-actions {
+  opacity: 1;
+}
+
+.theme-knowledge-actions .theme-knowledge-action-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  color: rgba(var(--text-primary), 0.8);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 21;
+  font-size: 12px;
+}
+
+.theme-knowledge-actions .theme-knowledge-action-btn:hover {
+  background: rgba(var(--color-accent), 0.85);
+  border-color: rgba(var(--color-accent), 0.6);
+  color: white;
+  transform: scale(1.08) translateY(-1px);
+  box-shadow: 
+    0 4px 12px rgba(var(--color-accent), 0.3),
+    0 2px 6px rgba(var(--color-accent), 0.2);
+}
+
+.theme-knowledge-actions .theme-knowledge-action-btn:active {
+  transform: scale(1.02) translateY(0px);
+  transition: all 100ms ease;
+}
+
+/* 深色模式适配 */
+[data-theme="dark"] .theme-knowledge-sidebar-content {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.06);
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+
+[data-theme="dark"] .flex-1 .space-y-6 .theme-knowledge-page-item {
+  background: rgba(20, 20, 20, 0.05);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.2),
+    0 2px 8px rgba(var(--color-accent), 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* =================
+   原有知识库容器样式 - 保持向后兼容
+   ================= */
+
+.knowledge-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: rgba(var(--bg-primary), 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+/* =================
+   知识卡片样式
+   ================= */
+
+.knowledge-card {
+  background: rgba(var(--bg-primary), 0.95);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid rgba(var(--border-primary), 0.4);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  transition: all var(--duration-normal) cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  
+  /* 高级阴影效果 */
+  box-shadow: 
+    0 8px 32px rgba(var(--bg-overlay), 0.12),
+    0 4px 16px rgba(var(--color-accent), 0.06),
+    inset 0 1px 0 rgba(var(--bg-overlay), 0.05);
+}
+
+.knowledge-card:hover {
+  background: rgba(var(--bg-secondary), 0.8);
+  border-color: rgba(var(--border-secondary), 0.6);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 
+    0 12px 40px rgba(var(--bg-overlay), 0.12),
+    inset 0 1px 0 rgba(var(--bg-overlay), 0.1);
+}
+
+/* 钉住状态 */
+.knowledge-card.pinned {
+  background: rgba(var(--color-accent), 0.15);
+  border-color: rgba(var(--color-accent), 0.4);
+  box-shadow: 
+    0 8px 32px rgba(var(--color-accent), 0.2),
+    inset 0 1px 0 rgba(var(--color-accent), 0.1);
+}
+
+.knowledge-card.pinned:hover {
+  background: rgba(var(--color-accent), 0.2);
+  border-color: rgba(var(--color-accent), 0.6);
+  transform: translateY(-2px) scale(1.02);
+}
+
+/* 深色模式下操作按钮适配 */
+[data-theme="dark"] .theme-knowledge-actions .theme-knowledge-action-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(var(--text-primary), 0.9);
+}
+
+[data-theme="dark"] .theme-knowledge-actions .theme-knowledge-action-btn:hover {
+  background: rgba(var(--color-accent), 0.75);
+  border-color: rgba(var(--color-accent), 0.5);
+  color: white;
+}
+
+/* =================
+   拖拽调整功能样式
+   ================= */
+
+/* 拖拽手柄样式 */
+.knowledge-resize-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 4px;
+  height: 100%;
+  cursor: col-resize;
+  background: transparent;
+  transition: all 0.2s ease;
+  z-index: 50;
+}
+
+.knowledge-resize-handle:hover {
+  background: rgba(var(--color-accent), 0.2);
+}
+
+.knowledge-resize-handle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 1px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.knowledge-resize-handle:hover::after {
+  opacity: 1;
+}
+
+/* 拖拽中的视觉反馈 */
+body.resizing-sidebar {
+  cursor: col-resize !important;
+  user-select: none;
+}
+
+body.resizing-sidebar .knowledge-resize-handle {
+  background: rgba(var(--color-accent), 0.3);
+}
+
+body.resizing-sidebar .knowledge-resize-handle::after {
+  opacity: 1;
+  background: rgba(var(--color-accent), 0.8);
+}

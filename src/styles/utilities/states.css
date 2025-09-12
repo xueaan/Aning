@@ -1,0 +1,572 @@
+/* =============================================================================
+   Anning 主题系统 - 状态工具类
+   Utilities/States - 统一的状态样式系统
+============================================================================= */
+
+/* =================
+   主题渐变背景系统
+   ================= */
+
+/* 渐变主题背景 - 核心功能 */
+.theme-gradient-bg {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background-color: rgb(var(--bg-primary));
+}
+
+
+/* 带噪点的渐变背景 - 超明显增强版本 */
+.theme-gradient-bg.with-noise::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  /* 超增强版噪点SVG：更大颗粒，极强对比度 */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150' viewBox='0 0 150 150'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch' seed='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='0 .5 .5 .7 .7 .9 1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 25px 25px;
+  mix-blend-mode: multiply;
+  opacity: var(--noise-opacity, 0.10);
+  transition: opacity var(--duration-normal) ease;
+  pointer-events: none;
+  z-index: 0;
+  /* 噪点在渐变之上，内容之下 */
+  /* 降低对比度，让渐变背景透过 */
+  filter: contrast(0.8) brightness(1.4) saturate(0);
+}
+
+/* 深色模式下的优化噪点 */
+.dark .theme-gradient-bg.with-noise::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150' viewBox='0 0 150 150'%3E%3Cfilter id='noiseFilterDark'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch' seed='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='0 .5 .5 .7 .7 .9 1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilterDark)' opacity='1'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+  opacity: var(--noise-opacity, 0.15);
+  filter: contrast(2.0) brightness(0.3) saturate(0);
+}
+
+/* 修复层级：确保渐变背景在噪点下方显示 */
+.theme-gradient-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-theme, linear-gradient(135deg, rgba(var(--color-primary), 1), rgba(var(--color-secondary), 1)));
+  opacity: var(--bg-gradient-opacity-local, 1);
+  transition: opacity var(--duration-normal) ease;
+  pointer-events: none;
+  z-index: -1;
+  /* 渐变背景在最底层 */
+}
+
+/* 深色模式下降低渐变亮度 */
+.dark .theme-gradient-bg::before {
+  /* 降低渐变的最大不透明度，让深色背景更明显 */
+  opacity: calc(var(--bg-gradient-opacity-local, 1) * 0.6);
+  /* 添加滤镜降低亮度和饱和度 */
+  filter: brightness(0.7) saturate(0.8);
+}
+
+/* 玻璃态效果 */
+.theme-glass {
+  background: rgba(var(--bg-primary), 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(var(--border-primary), 0.2);
+}
+
+.theme-glass-strong {
+  background: rgba(var(--bg-primary), 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(var(--border-primary), 0.3);
+}
+
+/* =================
+   基础状态类
+   ================= */
+
+/* 显示/隐藏状态 */
+.show {
+  display: block !important;
+  opacity: 1;
+}
+
+.hide {
+  display: none !important;
+}
+
+.invisible {
+  visibility: hidden;
+}
+
+.visible {
+  visibility: visible;
+}
+
+.opacity-0 {
+  opacity: 0;
+}
+
+.opacity-25 {
+  opacity: 0.25;
+}
+
+.opacity-50 {
+  opacity: 0.5;
+}
+
+.opacity-75 {
+  opacity: 0.75;
+}
+
+.opacity-100 {
+  opacity: 1;
+}
+
+/* =================
+   交互状态
+   ================= */
+
+/* 可点击状态 */
+.clickable {
+  cursor: pointer;
+  user-select: none;
+  transition: all var(--duration-fast) ease;
+}
+
+.clickable:hover {
+  transform: translateY(-1px);
+}
+
+.clickable:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* 禁用状态 */
+.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.disabled:hover {
+  transform: none !important;
+}
+
+/* 加载状态 */
+.loading {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid rgba(var(--color-accent), 0.3);
+  border-top: 2px solid rgba(var(--color-accent), 1);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* =================
+   激活状态
+   ================= */
+
+.active {
+  background: rgba(var(--color-accent), 0.1) !important;
+  border-color: rgba(var(--color-accent), 0.4) !important;
+  color: rgba(var(--color-accent), 1) !important;
+}
+
+.selected {
+  background: rgba(var(--color-accent), 0.15) !important;
+  border-color: rgba(var(--color-accent), 0.5) !important;
+  box-shadow: 0 0 0 2px rgba(var(--color-accent), 0.2);
+}
+
+.highlighted {
+  background: rgba(var(--color-accent), 0.1);
+  border: 1px solid rgba(var(--color-accent), 0.3);
+}
+
+/* =================
+   焦点状态
+   ================= */
+
+.focus-visible {
+  outline: 2px solid rgba(var(--color-accent), 0.6);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.focus-within {
+  border-color: rgba(var(--color-accent), 0.5);
+  box-shadow: 0 0 0 3px rgba(var(--color-accent), 0.1);
+}
+
+/* =================
+   悬停状态增强
+   ================= */
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(var(--bg-overlay), 0.15);
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(var(--color-accent), 0.3);
+}
+
+.hover-blur:hover {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* =================
+   状态颜色系统
+   ================= */
+
+/* 成功状态 */
+.state-success {
+  color: rgba(var(--color-success), 1) !important;
+}
+
+/* 警告状态 */
+.state-warning {
+  color: rgba(var(--color-warning), 1) !important;
+}
+
+/* 错误状态 */
+.state-error {
+  color: rgba(var(--color-error), 1) !important;
+}
+
+/* 信息状态 */
+.state-info {
+  color: rgba(var(--color-accent), 1) !important;
+}
+
+/* =================
+   优先级状态
+   ================= */
+
+.priority-urgent {
+  background: rgba(var(--color-error), 0.15) !important;
+  border: 1px solid rgba(var(--color-error), 0.3) !important;
+  color: rgba(var(--color-error), 1) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+}
+
+.priority-high {
+  background: rgba(var(--color-warning), 0.15) !important;
+  border: 1px solid rgba(var(--color-warning), 0.3) !important;
+  color: rgba(var(--color-warning), 1) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+}
+
+.priority-medium {
+  background: rgba(var(--color-accent), 0.15) !important;
+  border: 1px solid rgba(var(--color-accent), 0.3) !important;
+  color: rgba(var(--color-accent), 1) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+}
+
+.priority-low {
+  background: rgba(var(--color-success), 0.15) !important;
+  border: 1px solid rgba(var(--color-success), 0.3) !important;
+  color: rgba(var(--color-success), 1) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+}
+
+/* =================
+   进度状态
+   ================= */
+
+.progress-pending {
+  background: rgba(var(--text-tertiary), 0.2);
+  color: rgba(var(--text-tertiary), 1);
+}
+
+.progress-in-progress {
+  background: rgba(var(--color-accent), 0.2);
+  color: rgba(var(--color-accent), 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-in-progress::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(var(--color-accent), 0.3),
+      transparent);
+  animation: progress-indeterminate 2s ease-in-out infinite;
+}
+
+.progress-completed {
+  background: rgba(var(--color-success), 0.2);
+  color: rgba(var(--color-success), 1);
+}
+
+.progress-failed {
+  background: rgba(var(--color-error), 0.2);
+  color: rgba(var(--color-error), 1);
+}
+
+/* =================
+   连接状态
+   ================= */
+
+.connected {
+  position: relative;
+}
+
+.connected::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 8px;
+  height: 8px;
+  background: rgba(var(--color-success), 1);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(var(--bg-primary), 1);
+}
+
+.disconnected::before {
+  background: rgba(var(--color-error), 1);
+}
+
+.connecting::before {
+  background: rgba(var(--color-warning), 1);
+  animation: pulse 1s infinite;
+}
+
+/* =================
+   拖拽状态
+   ================= */
+
+.draggable {
+  cursor: move;
+  user-select: none;
+  transition: all var(--duration-fast) ease;
+}
+
+.dragging {
+  opacity: 0.7;
+  transform: rotate(5deg) scale(1.05);
+  z-index: 1000;
+  box-shadow: 0 10px 30px rgba(var(--bg-overlay), 0.3);
+}
+
+.drop-zone {
+  border: 2px dashed rgba(var(--border-primary), 0.3);
+  border-radius: var(--radius-lg);
+  transition: all var(--duration-fast) ease;
+}
+
+.drop-zone-active {
+  border-color: rgba(var(--color-accent), 0.6);
+  background: rgba(var(--color-accent), 0.05);
+}
+
+.drop-zone-invalid {
+  border-color: rgba(var(--color-error), 0.6);
+  background: rgba(var(--color-error), 0.05);
+}
+
+/* =================
+   展开/折叠状态
+   ================= */
+
+.collapsible {
+  transition: all var(--duration-normal) ease;
+  overflow: hidden;
+}
+
+.collapsed {
+  max-height: 0 !important;
+  opacity: 0;
+  margin: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.expanded {
+  max-height: none;
+  opacity: 1;
+}
+
+/* =================
+   锁定状态
+   ================= */
+
+.locked {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.locked::after {
+  content: '🔒';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.5rem;
+  z-index: 10;
+}
+
+/* =================
+   通知状态
+   ================= */
+
+.notification-dot {
+  position: relative;
+}
+
+.notification-dot::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  background: rgba(var(--color-error), 1);
+  border-radius: 50%;
+  border: 2px solid rgba(var(--bg-primary), 1);
+}
+
+.notification-badge {
+  position: relative;
+}
+
+.notification-badge::after {
+  content: attr(data-count);
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  min-width: 16px;
+  height: 16px;
+  background: rgba(var(--color-error), 1);
+  color: rgba(var(--text-inverse), 1);
+  border-radius: 8px;
+  font-size: 0.7rem;
+  line-height: 16px;
+  text-align: center;
+  font-weight: 600;
+  border: 2px solid rgba(var(--bg-primary), 1);
+}
+
+/* =================
+   主题状态指示
+   ================= */
+
+.theme-switching {
+  pointer-events: none;
+  transition: all var(--duration-slow) ease-in-out;
+}
+
+.theme-light-only {
+  display: block;
+}
+
+.theme-dark-only {
+  display: none;
+}
+
+[data-theme="dark"] .theme-light-only {
+  display: none;
+}
+
+[data-theme="dark"] .theme-dark-only {
+  display: block;
+}
+
+/* =================
+   响应式状态
+   ================= */
+
+@media (max-width: 768px) {
+  .mobile-hidden {
+    display: none !important;
+  }
+
+  .mobile-only {
+    display: block !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .desktop-hidden {
+    display: none !important;
+  }
+
+  .desktop-only {
+    display: block !important;
+  }
+
+  .mobile-only {
+    display: none !important;
+  }
+}
+
+/* =================
+   无障碍状态
+   ================= */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.focus-trap {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* =================
+   性能优化状态
+   ================= */
+
+.no-transition {
+  transition: none !important;
+}
+
+.no-animation {
+  animation: none !important;
+}
+
+.reduce-motion * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}

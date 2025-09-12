@@ -1,0 +1,724 @@
+/* =============================================================================
+   Anning 主题系统 - 毛玻璃效果组件样式
+   Components/Glass - 统一的毛玻璃效果系统
+============================================================================= */
+
+/* =================
+   基础毛玻璃效果类
+   ================= */
+
+/* 保留仍在使用的基础样式，移除无毛玻璃效果的简单样式 */
+
+
+/* 按钮玻璃效果 */
+.glass-button-modern {
+  background: rgba(var(--bg-primary), 0.8);
+  backdrop-filter: blur(8px) saturate(130%);
+  -webkit-backdrop-filter: blur(8px) saturate(130%);
+  border: 1px solid rgba(var(--border-primary), 0.3);
+  box-shadow: 0 2px 8px 0 rgba(var(--bg-overlay), 0.1);
+}
+
+[data-theme="dark"] .glass-button-modern {
+  background: rgba(var(--bg-secondary), 0.8);
+  border: 1px solid rgba(var(--border-primary), 0.3);
+  box-shadow: 0 2px 8px 0 rgba(var(--bg-overlay), 0.2);
+}
+
+.glass-button-modern:hover {
+  background: rgba(var(--bg-secondary), 0.9);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  transform: translateY(-1px);
+}
+
+[data-theme="dark"] .glass-button-modern:hover {
+  background: rgba(var(--bg-tertiary), 0.9);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* =================
+   AI 对话消息专用毛玻璃
+   ================= */
+
+.theme-ai-message-glass {
+  background: rgba(var(--bg-secondary), 0.3);
+  backdrop-filter: blur(8px) saturate(110%);
+  -webkit-backdrop-filter: blur(8px) saturate(110%);
+  border: 1px solid rgba(var(--border-primary), 0.3);
+  transition: all var(--duration-fast) ease;
+
+  /* 轻微阴影效果 */
+  box-shadow:
+    0 2px 8px rgba(var(--bg-overlay), 0.06),
+    0 1px 2px rgba(var(--bg-overlay), 0.08),
+    inset 0 1px 0 rgba(var(--bg-overlay), 0.05);
+}
+
+.theme-ai-message-glass:hover {
+  background: rgba(var(--bg-secondary), 0.8);
+  border-color: rgba(var(--border-secondary), 0.5);
+  box-shadow:
+    0 4px 16px rgba(var(--bg-overlay), 0.12),
+    0 2px 6px rgba(var(--bg-overlay), 0.08),
+    inset 0 1px 0 rgba(var(--bg-overlay), 0.15);
+}
+
+/* AI 消息错误状态 */
+.theme-ai-message-glass.error {
+  background: rgba(var(--color-error), 0.1);
+  border-color: rgba(var(--color-error), 0.3);
+  color: rgba(var(--color-error), 0.9);
+}
+
+/* 深色模式下的 AI 消息毛玻璃 */
+[data-theme="dark"] .theme-ai-message-glass {
+  background: rgba(var(--bg-secondary), 0.3);
+  border-color: rgba(var(--border-primary), 0.4);
+  box-shadow:
+    0 2px 8px rgba(var(--bg-overlay), 0.2),
+    0 1px 2px rgba(var(--bg-overlay), 0.15),
+    inset 0 1px 0 rgba(var(--bg-overlay), 0.08);
+}
+
+[data-theme="dark"] .theme-ai-message-glass:hover {
+  background: rgba(var(--bg-secondary), 0.5);
+  border-color: rgba(var(--border-secondary), 0.5);
+  box-shadow:
+    0 3px 12px rgba(var(--bg-overlay), 0.25),
+    0 1px 4px rgba(var(--bg-overlay), 0.2),
+    inset 0 1px 0 rgba(var(--bg-overlay), 0.12);
+}
+
+[data-theme="dark"] .theme-ai-message-glass.error {
+  background: rgba(var(--color-error), 0.15);
+  border-color: rgba(var(--color-error), 0.4);
+}
+
+/* =================
+   分层玻璃效果系统
+   ================= */
+
+/* 底层背景 - 主要内容区域 */
+.theme-bg-glass {
+  background: rgba(var(--bg-primary), 0.5);
+  backdrop-filter: blur(8px) saturate(110%);
+  -webkit-backdrop-filter: blur(8px) saturate(110%);
+  border: 1px solid rgba(var(--border-primary), 0.15);
+  box-shadow: inset 0 0 0 1px rgba(var(--bg-overlay), 0.05);
+}
+
+/* 面板层 - 侧边栏 */
+.theme-panel-glass {
+  background: rgba(var(--bg-secondary), 0.9);
+  backdrop-filter: blur(20px) saturate(130%);
+  -webkit-backdrop-filter: blur(20px) saturate(130%);
+  border-right: 1px solid rgba(var(--border-primary), 0.5);
+  box-shadow:
+    4px 0 32px rgba(var(--bg-overlay), 0.15),
+    inset 0 1px 0 rgba(var(--bg-overlay), 0.2),
+    inset -1px 0 0 rgba(var(--bg-overlay), 0.1);
+}
+
+/* 导航项层 - 交互元素 */
+.theme-nav-glass {
+  background: rgba(var(--bg-primary), 0.7);
+  backdrop-filter: blur(12px) saturate(115%);
+  -webkit-backdrop-filter: blur(12px) saturate(115%);
+  border: 1px solid rgba(var(--border-primary), 0.25);
+  transition: all var(--duration-fast) ease;
+  box-shadow:
+    0 2px 8px rgba(var(--bg-overlay), 0.06),
+    inset 0 1px 0 rgba(var(--bg-overlay), 0.1);
+}
+
+.theme-nav-glass:hover {
+  background: rgba(var(--bg-secondary), 0.9);
+  border-color: rgba(var(--border-primary), 0.4);
+  backdrop-filter: blur(16px) saturate(125%);
+  -webkit-backdrop-filter: blur(16px) saturate(125%);
+  box-shadow:
+    0 4px 16px rgba(var(--bg-overlay), 0.1),
+    inset 0 1px 0 rgba(var(--bg-overlay), 0.15);
+}
+
+.theme-nav-glass.active {
+  background: rgba(var(--color-accent), 0.25);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(var(--color-accent), 0.5);
+}
+
+/* =================
+   毛玻璃模态框样式
+   ================= */
+
+.theme-modal-glass {
+  background: rgba(var(--bg-primary), 0.98);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  border: 1px solid rgba(var(--border-primary), 0.8);
+  box-shadow: 0 16px 40px rgba(var(--bg-overlay), 0.1);
+}
+
+[data-theme="dark"] .theme-modal-glass {
+  background: rgba(var(--bg-primary), 0.95);
+  box-shadow: 0 16px 40px rgba(var(--bg-overlay), 0.4);
+}
+
+/* =================
+   Modern 系列毛玻璃效果
+   ================= */
+
+/* 已清理未使用的玻璃效果类 */
+
+/* 已清理的modern类 - 无组件使用 */
+
+/* 已清理未使用的工具栏和侧边栏样式 */
+
+/* =================
+   实用性玻璃效果 - 简化版
+   ================= */
+
+/* 中等透明度玻璃效果 */
+.glass-panel {
+  background: rgba(var(--bg-primary), 0.05);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border: 1px solid rgba(var(--border-primary), 0.25);
+  box-shadow: 0 4px 16px rgba(var(--bg-overlay), 0.12);
+}
+
+[data-theme="dark"] .glass-panel {
+  background: rgba(var(--bg-secondary), 0.08);
+  border: 1px solid rgba(var(--border-primary), 0.3);
+  box-shadow: 0 4px 16px rgba(var(--bg-overlay), 0.25);
+}
+
+/* 已清理的modern类组 - 无组件使用 */
+
+
+
+
+
+/* glass-layer 系统已被 feather-glass 替代 */
+
+/* 侧边栏专用样式 - 无边框，适合布局容器 */
+.feather-glass-sidebar {
+  background: rgba(var(--bg-primary), 0.20);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  /* 移除边框以免影响布局 */
+  transition: all 0.3s ease;
+  box-shadow:
+    0 4px 24px rgba(var(--bg-overlay), 0.08),
+    inset 0 1px 0 rgba(var(--bg-overlay), 0.15);
+}
+
+[data-theme="dark"] .feather-glass-sidebar {
+  background: rgba(var(--bg-secondary), 0.25);
+  box-shadow:
+    0 4px 24px rgba(var(--bg-overlay), 0.15),
+    inset 0 1px 0 rgba(var(--bg-overlay), 0.08);
+}
+
+/* =================
+   优化的毛玻璃效果 - 精致版本
+   ================= */
+
+/* 模态框精致版本 - 用于主题选择器等 */
+.glass-modal-refined {
+  background: rgba(var(--bg-primary), 0.85);
+  backdrop-filter: blur(10px) saturate(1.8);
+  -webkit-backdrop-filter: blur(10px) saturate(1.8);
+  border: 1px solid rgba(var(--border-primary), 0.2);
+  box-shadow: 0 8px 32px rgba(var(--bg-overlay), 0.12);
+}
+
+[data-theme="dark"] .glass-modal-refined {
+  background: rgba(var(--bg-primary), 0.85);
+  border: 1px solid rgba(var(--border-primary), 0.1);
+  box-shadow: 0 8px 32px rgba(var(--bg-overlay), 0.3);
+}
+
+/* 面板精致版本 */
+.glass-panel-refined {
+  background: rgba(var(--bg-primary), 0.7);
+  backdrop-filter: blur(8px) saturate(1.2);
+  -webkit-backdrop-filter: blur(8px) saturate(1.2);
+  border: 1px solid rgba(var(--border-primary), 0.3);
+}
+
+[data-theme="dark"] .glass-panel-refined {
+  background: rgba(var(--bg-secondary), 0.7);
+  border: 1px solid rgba(var(--border-primary), 0.2);
+}
+
+/* =================
+
+/* =================
+   兼容性和降级处理
+   ================= */
+
+/* 低端设备减少模糊效果 */
+@media (prefers-reduced-motion: reduce) {
+
+  .glass-panel,
+  .glass-premium,
+  .theme-ai-message-glass,
+  .theme-nav-glass,
+  .theme-modal-glass {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* 不支持 backdrop-filter 的浏览器降级方案 */
+@supports not (backdrop-filter: blur(1px)) {
+
+  .glass-panel,
+  .glass-premium,
+  .theme-ai-message-glass,
+  .theme-nav-glass,
+  .theme-modal-glass {
+    background: rgba(var(--bg-primary), 0.95);
+  }
+
+  [data-theme="dark"] .glass-panel,
+  [data-theme="dark"] .glass-premium,
+  [data-theme="dark"] .theme-ai-message-glass,
+  [data-theme="dark"] .theme-nav-glass,
+  [data-theme="dark"] .theme-modal-glass {
+    background: rgba(var(--bg-secondary), 0.95);
+  }
+}
+
+/* =================
+   无边框玻璃效果 - 只有背景无边框
+   ================= */
+
+/* MainContent 专用无边框玻璃效果 */
+.glass-panel-no-border {
+  background: rgba(var(--bg-primary), 0.05);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+}
+
+[data-theme="dark"] .glass-panel-no-border {
+  background: rgba(var(--bg-secondary), 0.08);
+}
+
+/* =================
+   轻羽毛玻璃系统 - Feather Glass System
+   解决透明度问题，提供4级可读性层级
+   ================= */
+
+/* Level 1: 装饰级 - Decorative (2-5% opacity) 极致透明，用于装饰性元素 */
+.feather-glass-deco {
+  /* 毛玻璃视觉效果 - 极致透明 */
+  background: rgba(255, 255, 255, 0.01);
+  backdrop-filter: blur(15px) saturate(150%);
+  -webkit-backdrop-filter: blur(15px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+
+  /* 基础样式 */
+  border-radius: var(--radius-xl);
+  transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .feather-glass-deco {
+  background: rgba(20, 20, 20, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* 装饰级hover效果 */
+.feather-glass-deco:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="dark"] .feather-glass-deco:hover {
+  background: rgba(25, 25, 25, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 20px 25px -5px rgba(0, 0, 0, 0.25),
+    0 10px 10px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* 底部边框样式 - 用于任务列表等需要分隔线的场景 */
+.feather-glass-bottom-border {
+  /* 完全透明背景，没有毛玻璃效果 */
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  
+  /* 只有底部边框 */
+  border: none !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  
+  /* 移除所有阴影 */
+  box-shadow: none !important;
+
+  /* 基础样式 */
+  transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .feather-glass-bottom-border {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: none !important;
+}
+
+/* 底部边框hover效果 - 只改变边框颜色 */
+.feather-glass-bottom-border:hover {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: none !important;
+}
+
+[data-theme="dark"] .feather-glass-bottom-border:hover {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: none !important;
+}
+
+/* Level 2: 面板级 - Panel (15-25% opacity) 侧边栏、工具栏 */
+.feather-glass-panel {
+  /* 毛玻璃视觉效果 */
+  background: rgba(var(--bg-primary), 0.20);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  border: 1px solid rgba(var(--border-primary), 0.25);
+  box-shadow:
+    0 4px 24px rgba(var(--bg-overlay), 0.08),
+    inset 0 1px 0 rgba(var(--bg-overlay), 0.15);
+
+  /* 常用交互样式 */
+  border-radius: var(--radius-lg);
+  transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .feather-glass-panel {
+  background: rgba(var(--bg-secondary), 0.25);
+  border: 1px solid rgba(var(--border-primary), 0.2);
+  box-shadow:
+    0 4px 24px rgba(var(--bg-overlay), 0.15),
+    inset 0 1px 0 rgba(var(--bg-overlay), 0.08);
+}
+
+/* Level 3: 内容级 - Content (40-60% opacity) 卡片容器，内容区域 */
+.feather-glass-content {
+  /* 毛玻璃视觉效果 */
+  background: rgba(var(--bg-primary), 0.50);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border: 1px solid rgba(var(--border-primary), 0.3);
+  box-shadow: 0 4px 20px rgba(var(--bg-overlay), 0.1);
+
+  /* 基础样式 */
+  border-radius: var(--radius-lg);
+  transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .feather-glass-content {
+  background: rgba(var(--bg-secondary), 0.55);
+  border: 1px solid rgba(var(--border-primary), 0.25);
+  box-shadow: 0 4px 20px rgba(var(--bg-overlay), 0.2);
+}
+
+/* Level 4: 弹出级 - Modal 整合遮罩的弹窗 */
+/* 旧的 .feather-glass-modal 样式已移除，使用新的定义 */
+
+/* 下拉菜单 - Dropdown (88% opacity) 确保列表项清晰可读 */
+.feather-glass-dropdown {
+  background: rgba(var(--bg-primary), 0.88);
+  backdrop-filter: blur(18px) saturate(145%);
+  -webkit-backdrop-filter: blur(18px) saturate(145%);
+  border: 1px solid rgba(var(--border-primary), 0.3);
+  box-shadow: 0 10px 40px rgba(var(--bg-overlay), 0.2);
+}
+
+[data-theme="dark"] .feather-glass-dropdown {
+  background: rgba(var(--bg-secondary), 0.90);
+  border: 1px solid rgba(var(--border-primary), 0.25);
+  box-shadow: 0 10px 40px rgba(var(--bg-overlay), 0.4);
+}
+
+/* 提示框 - Tooltip (90% opacity) 确保文字清晰 */
+.feather-glass-tooltip {
+  background: rgba(var(--bg-primary), 0.90);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid rgba(var(--border-primary), 0.25);
+  box-shadow: 0 8px 24px rgba(var(--bg-overlay), 0.15);
+}
+
+[data-theme="dark"] .feather-glass-tooltip {
+  background: rgba(var(--bg-secondary), 0.92);
+  border: 1px solid rgba(var(--border-primary), 0.2);
+  box-shadow: 0 8px 24px rgba(var(--bg-overlay), 0.25);
+}
+
+/* 导航项 - Navigation 支持hover和active状态 */
+.feather-glass-nav {
+  background: rgba(var(--bg-primary), 0.35);
+  backdrop-filter: blur(12px) saturate(130%);
+  -webkit-backdrop-filter: blur(12px) saturate(130%);
+  border: 1px solid rgba(var(--border-primary), 0.25);
+  transition: all var(--duration-fast) ease;
+}
+
+.feather-glass-nav:hover {
+  background: rgba(var(--bg-secondary), 0.50);
+  border-color: rgba(var(--border-primary), 0.4);
+  transform: translateY(-1px);
+}
+
+.feather-glass-nav.active {
+  background: rgba(var(--color-accent), 0.25);
+  border-color: rgba(var(--color-accent), 0.5);
+}
+
+[data-theme="dark"] .feather-glass-nav {
+  background: rgba(var(--bg-secondary), 0.40);
+  border: 1px solid rgba(var(--border-primary), 0.2);
+}
+
+[data-theme="dark"] .feather-glass-nav:hover {
+  background: rgba(var(--bg-tertiary), 0.55);
+  border-color: rgba(var(--border-primary), 0.3);
+}
+
+[data-theme="dark"] .feather-glass-nav.active {
+  background: rgba(var(--color-accent), 0.3);
+  border-color: rgba(var(--color-accent), 0.5);
+}
+
+/* =================
+   向后兼容别名 - Backward Compatibility
+   为旧样式类提供新的实现，确保无破坏性升级
+   ================= */
+
+/* glass-timekeeper 在弹出层使用时自动升级透明度以确保可读性 */
+
+/* 在弹出层和重要内容区域，自动提升透明度以确保可读性 */
+.glass-timekeeper.modal-content,
+.glass-timekeeper.important-content {
+  background: rgba(var(--bg-primary), 0.85) !important;
+}
+
+[data-theme="dark"] .glass-timekeeper.modal-content,
+[data-theme="dark"] .glass-timekeeper.important-content {
+  background: rgba(var(--bg-primary), 0.88) !important;
+}
+
+/* =================
+   CardSearchModal 专用样式类
+   为笔记选择界面提供统一的毛玻璃效果
+   ================= */
+
+/* 模态框背景遮罩 */
+.feather-glass-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+[data-theme="dark"] .feather-glass-modal-backdrop {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+/* 模态框主体样式 */
+.feather-glass-modal {
+  background: rgba(var(--bg-primary), 0.75);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid rgba(var(--border-primary), 0.3);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.15),
+    0 10px 20px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .feather-glass-modal {
+  background: rgba(var(--bg-secondary), 0.7);
+  border: 1px solid rgba(var(--border-primary), 0.4);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    0 10px 20px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* 当作为 backdrop 的子元素时，略微增加不透明度 */
+.feather-glass-modal-backdrop .feather-glass-modal {
+  background: rgba(var(--bg-primary), 0.8);
+}
+
+[data-theme="dark"] .feather-glass-modal-backdrop .feather-glass-modal {
+  background: rgba(var(--bg-secondary), 0.75);
+}
+
+/* 模态框透明变体 - 用于更透明的效果 */
+.feather-glass-modal.modal-glass {
+  background: rgba(var(--bg-primary), 0.5);
+}
+
+[data-theme="dark"] .feather-glass-modal.modal-glass {
+  background: rgba(var(--bg-secondary), 0.45);
+}
+
+/* 输入框样式 */
+.feather-glass-input {
+  background: rgba(var(--bg-primary), 0.5);
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+  border: 1px solid rgba(var(--border-primary), 0.3);
+  color: rgba(var(--text-primary), 1);
+  transition: all 0.2s ease;
+}
+
+.feather-glass-input:focus {
+  background: rgba(var(--bg-primary), 0.7);
+  border-color: rgba(var(--color-accent), 0.5);
+  box-shadow: 0 0 0 3px rgba(var(--color-accent), 0.1);
+  outline: none;
+}
+
+[data-theme="dark"] .feather-glass-input {
+  background: rgba(var(--bg-secondary), 0.4);
+  border: 1px solid rgba(var(--border-primary), 0.3);
+}
+
+[data-theme="dark"] .feather-glass-input:focus {
+  background: rgba(var(--bg-secondary), 0.6);
+  border-color: rgba(var(--color-accent), 0.5);
+  box-shadow: 0 0 0 3px rgba(var(--color-accent), 0.15);
+}
+
+/* 普通按钮样式 */
+.feather-glass-button {
+  background: rgba(var(--bg-secondary), 0.5);
+  backdrop-filter: blur(10px) saturate(130%);
+  -webkit-backdrop-filter: blur(10px) saturate(130%);
+  border: 1px solid rgba(var(--border-primary), 0.3);
+  color: rgba(var(--text-primary), 1);
+  transition: all 0.2s ease;
+}
+
+.feather-glass-button:hover {
+  background: rgba(var(--bg-secondary), 0.7);
+  border-color: rgba(var(--border-primary), 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] .feather-glass-button {
+  background: rgba(var(--bg-secondary), 0.4);
+  border: 1px solid rgba(var(--border-primary), 0.35);
+}
+
+[data-theme="dark"] .feather-glass-button:hover {
+  background: rgba(var(--bg-tertiary), 0.6);
+  border-color: rgba(var(--border-primary), 0.5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* 主要按钮样式 */
+.feather-glass-button-primary {
+  background: rgba(var(--color-accent), 0.8);
+  backdrop-filter: blur(10px) saturate(150%);
+  -webkit-backdrop-filter: blur(10px) saturate(150%);
+  border: 1px solid rgba(var(--color-accent), 0.9);
+  color: white;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.feather-glass-button-primary:hover {
+  background: rgba(var(--color-accent), 0.9);
+  border-color: rgba(var(--color-accent), 1);
+  transform: translateY(-1px);
+  box-shadow: 
+    0 4px 12px rgba(var(--color-accent), 0.3),
+    0 2px 4px rgba(var(--color-accent), 0.2);
+}
+
+[data-theme="dark"] .feather-glass-button-primary {
+  background: rgba(var(--color-accent), 0.75);
+  border: 1px solid rgba(var(--color-accent), 0.85);
+}
+
+[data-theme="dark"] .feather-glass-button-primary:hover {
+  background: rgba(var(--color-accent), 0.85);
+  box-shadow: 
+    0 4px 12px rgba(var(--color-accent), 0.4),
+    0 2px 4px rgba(var(--color-accent), 0.3);
+}
+
+/* 列表项激活状态 */
+.feather-glass-active {
+  background: rgba(var(--color-accent), 0.15) !important;
+  border-color: rgba(var(--color-accent), 0.4) !important;
+  box-shadow: 
+    0 0 0 1px rgba(var(--color-accent), 0.2),
+    inset 0 1px 0 rgba(var(--color-accent), 0.1);
+}
+
+[data-theme="dark"] .feather-glass-active {
+  background: rgba(var(--color-accent), 0.2) !important;
+  border-color: rgba(var(--color-accent), 0.5) !important;
+  box-shadow: 
+    0 0 0 1px rgba(var(--color-accent), 0.3),
+    inset 0 1px 0 rgba(var(--color-accent), 0.15);
+}
+
+/* 列表项悬停状态 */
+.feather-glass-hover:hover {
+  background: rgba(var(--bg-secondary), 0.4);
+  border-color: rgba(var(--border-primary), 0.4);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .feather-glass-hover:hover {
+  background: rgba(var(--bg-secondary), 0.3);
+  border-color: rgba(var(--border-primary), 0.4);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

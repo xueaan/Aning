@@ -1,0 +1,474 @@
+/* =============================================================================
+   Anning 主题系统 - 动画工具类
+   Utilities/Animations - 统一的动画系统
+============================================================================= */
+
+/* =================
+   基础动画定义
+   ================= */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes scaleOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =================
+   打字机动画
+   ================= */
+
+@keyframes typing-cursor {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
+}
+
+@keyframes typing-dots {
+  0%, 80%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* =================
+   主题切换动画
+   ================= */
+
+@keyframes theme-fade {
+  0%, 100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.1;
+  }
+}
+
+/* =================
+   加载动画
+   ================= */
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes loading-dots {
+  0%, 80%, 100% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes progress-indeterminate {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+/* =================
+   特殊效果动画
+   ================= */
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(var(--color-accent), 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(var(--color-accent), 0.8);
+  }
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+/* =================
+   动画工具类
+   ================= */
+
+/* 淡入淡出 */
+.animate-fadeIn {
+  animation: fadeIn var(--duration-normal) ease-out;
+}
+
+.animate-fadeOut {
+  animation: fadeOut var(--duration-normal) ease-out;
+}
+
+/* 滑动进入 */
+.animate-slideInLeft {
+  animation: slideInLeft var(--duration-normal) ease-out;
+}
+
+.animate-slideInRight {
+  animation: slideInRight var(--duration-slow) ease-out;
+}
+
+.animate-slideInUp {
+  animation: slideInUp var(--duration-normal) ease-out;
+}
+
+.animate-slideInDown {
+  animation: slideInDown var(--duration-normal) ease-out;
+}
+
+/* 缩放动画 */
+.animate-scaleIn {
+  animation: scaleIn var(--duration-fast) ease-out;
+}
+
+.animate-scaleOut {
+  animation: scaleOut var(--duration-fast) ease-out;
+}
+
+.animate-bounceIn {
+  animation: bounceIn 0.6s ease-out;
+}
+
+/* 状态动画 */
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* 特殊效果 */
+.animate-glow {
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+.animate-gradient {
+  background: linear-gradient(-45deg, 
+    rgba(var(--color-primary), 0.8), 
+    rgba(var(--color-secondary), 0.8), 
+    rgba(var(--color-accent), 0.8)
+  );
+  background-size: 400% 400%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+/* =================
+   动画延迟
+   ================= */
+
+.animation-delay-100 { animation-delay: 0.1s; }
+.animation-delay-200 { animation-delay: 0.2s; }
+.animation-delay-300 { animation-delay: 0.3s; }
+.animation-delay-500 { animation-delay: 0.5s; }
+.animation-delay-700 { animation-delay: 0.7s; }
+.animation-delay-1000 { animation-delay: 1s; }
+.animation-delay-2000 { animation-delay: 2s; }
+
+/* =================
+   动画持续时间
+   ================= */
+
+.animation-duration-fast { animation-duration: var(--duration-fast); }
+.animation-duration-normal { animation-duration: var(--duration-normal); }
+.animation-duration-slow { animation-duration: var(--duration-slow); }
+
+/* =================
+   动画缓动函数
+   ================= */
+
+.animation-ease-linear { animation-timing-function: linear; }
+.animation-ease-in { animation-timing-function: ease-in; }
+.animation-ease-out { animation-timing-function: ease-out; }
+.animation-ease-in-out { animation-timing-function: ease-in-out; }
+
+/* =================
+   动画填充模式
+   ================= */
+
+.animation-fill-none { animation-fill-mode: none; }
+.animation-fill-forwards { animation-fill-mode: forwards; }
+.animation-fill-backwards { animation-fill-mode: backwards; }
+.animation-fill-both { animation-fill-mode: both; }
+
+/* =================
+   动画播放状态
+   ================= */
+
+.animation-play { animation-play-state: running; }
+.animation-pause { animation-play-state: paused; }
+
+/* =================
+   组合动画类
+   ================= */
+
+/* 页面进入动画 */
+.page-enter {
+  animation: slideInUp var(--duration-normal) ease-out;
+}
+
+/* 卡片悬停动画 */
+.card-hover-lift {
+  transition: all var(--duration-fast) ease;
+}
+
+.card-hover-lift:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 40px rgba(var(--bg-overlay), 0.15);
+}
+
+/* 按钮点击反馈 */
+.button-press {
+  transition: transform var(--duration-fast) ease;
+}
+
+.button-press:active {
+  transform: scale(0.96);
+}
+
+/* 加载指示器 */
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+.loading-dots {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.loading-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: loading-dots 1.4s ease-in-out infinite both;
+}
+
+.loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+.loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+/* =================
+   响应式动画控制
+   ================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  /* 保持重要的状态指示动画 */
+  .loading-spinner,
+  .loading-dots span {
+    animation: none;
+  }
+  
+  .loading-spinner::after {
+    content: "...";
+  }
+}
+
+/* =================
+   动画性能优化
+   ================= */
+
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
+.will-change-auto {
+  will-change: auto;
+}
+
+/* GPU 加速优化 */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}

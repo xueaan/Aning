@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anning - 启动中</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .splash-container {
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: rgba(255, 255, 255, 0.9);
+            border-right-color: rgba(240, 147, 251, 0.9);
+            border-radius: 50%;
+            animation: spin 1.5s ease-in-out infinite;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+        }
+        
+        @keyframes spin {
+            0% { 
+                transform: rotate(0deg) scale(1);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            }
+            50% { 
+                transform: rotate(180deg) scale(1.1);
+                box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+            }
+            100% { 
+                transform: rotate(360deg) scale(1);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            }
+        }
+        
+        .app-name {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .app-description {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 32px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+        
+        .loading-text {
+            font-size: 13px;
+            opacity: 0.8;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+        
+        .decorative-dots {
+            position: absolute;
+            top: -100px;
+            left: -100px;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 4s ease-in-out infinite;
+        }
+        
+        .decorative-dots:nth-child(2) {
+            top: auto;
+            bottom: -100px;
+            right: -100px;
+            left: auto;
+            animation-delay: 2s;
+        }
+        
+        @keyframes float {
+            0%, 100% { 
+                transform: translateY(0px) scale(1);
+                opacity: 0.1;
+            }
+            50% { 
+                transform: translateY(-20px) scale(1.1);
+                opacity: 0.2;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="decorative-dots"></div>
+    <div class="decorative-dots"></div>
+    
+    <div class="splash-container">
+        <div class="logo">Anning</div>
+        <div class="app-name">Anning</div>
+        <div class="app-description">智能笔记系统 • 本地优先的知识管理平台</div>
+        <div class="loading-text">正在启动...</div>
+    </div>
+</body>
+</html>

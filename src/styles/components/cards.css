@@ -1,0 +1,237 @@
+/* =============================================================================
+   Anning 主题系统 - 卡片组件样式
+   Components/Cards - 统一的卡片样式系统
+============================================================================= */
+
+/* =================
+   基础卡片样式
+   ================= */
+
+.theme-card {
+  background-color: rgba(var(--bg-secondary), 1);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(var(--border-primary), 1);
+  padding: var(--spacing-lg);
+  transition: all var(--duration-normal) ease;
+  
+  /* 默认文字颜色 */
+  color: rgba(var(--text-primary), 1);
+}
+
+.theme-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+  border-color: rgba(var(--border-secondary), 1);
+}
+
+
+/* =================
+   毛玻璃卡片样式 - 主要内容卡片
+   ================= */
+
+.theme-card-glass {
+  background: rgba(var(--bg-primary), 0.95);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid rgba(var(--border-primary), 0.4);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-lg);
+  position: relative;
+  overflow: hidden;
+  transition: all var(--duration-normal) cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* 高级阴影效果 */
+  box-shadow: 
+    0 8px 32px rgba(var(--bg-overlay), 0.12),
+    0 4px 16px rgba(var(--color-accent), 0.06),
+    inset 0 1px 0 rgba(var(--bg-overlay), 0.05);
+}
+
+/* 卡片顶部高光效果 */
+.theme-card-glass::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(var(--border-primary), 0.5) 50%,
+    transparent
+  );
+  opacity: 0.6;
+}
+
+.theme-card-glass:hover {
+  background: rgba(var(--bg-secondary), 0.8);
+  border-color: rgba(var(--border-secondary), 0.6);
+  box-shadow: 
+    0 12px 40px rgba(var(--bg-overlay), 0.12),
+    inset 0 1px 0 rgba(var(--bg-overlay), 0.1);
+  transform: translateY(-2px) scale(1.02);
+}
+
+/* =================
+   钉住状态卡片
+   ================= */
+
+.theme-card-glass.pinned {
+  background: rgba(var(--color-accent), 0.15);
+  border-color: rgba(var(--color-accent), 0.4);
+  box-shadow: 
+    0 8px 32px rgba(var(--color-accent), 0.2),
+    inset 0 1px 0 rgba(var(--color-accent), 0.1);
+}
+
+.theme-card-glass.pinned:hover {
+  background: rgba(var(--color-accent), 0.2);
+  border-color: rgba(var(--color-accent), 0.6);
+  transform: translateY(-2px) scale(1.02);
+}
+
+/* =================
+   展开视图卡片样式
+   ================= */
+
+.theme-card-glass-expanded {
+  background: rgba(var(--bg-primary), 0.95);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid rgba(var(--border-primary), 0.2);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xl);
+  
+  /* 更强的阴影效果 */
+  box-shadow: 
+    0 32px 64px rgba(var(--bg-overlay), 0.15),
+    inset 0 2px 0 rgba(var(--bg-overlay), 0.05);
+}
+
+/* =================
+   深色主题优化
+   ================= */
+
+[data-theme="dark"] .theme-card-glass {
+  background: rgba(var(--bg-primary), 0.9);
+  box-shadow: 
+    0 8px 32px rgba(var(--bg-overlay), 0.4),
+    inset 0 1px 0 rgba(var(--bg-overlay), 0.1),
+    inset 0 -1px 0 rgba(var(--bg-overlay), 0.02);
+}
+
+[data-theme="dark"] .theme-card-glass:hover {
+  background: rgba(var(--bg-secondary), 0.95);
+  box-shadow: 
+    0 12px 40px rgba(var(--bg-overlay), 0.5),
+    inset 0 1px 0 rgba(var(--bg-overlay), 0.15),
+    inset 0 -1px 0 rgba(var(--bg-overlay), 0.05);
+}
+
+[data-theme="dark"] .theme-card-glass-expanded {
+  background: rgba(var(--bg-primary), 0.9);
+  box-shadow: 
+    0 32px 64px rgba(var(--bg-overlay), 0.5),
+    inset 0 2px 0 rgba(var(--bg-overlay), 0.05);
+}
+
+/* =================
+   精致卡片样式 (毛玻璃变体)
+   ================= */
+
+.card-refined {
+  background: rgba(var(--bg-primary), 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(var(--border-primary), 0.3);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-lg);
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+  
+  /* 轻微阴影 */
+  box-shadow: 0 2px 8px rgba(var(--bg-overlay), 0.04);
+}
+
+.card-refined:hover {
+  background: rgba(var(--bg-primary), 0.85);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(var(--bg-overlay), 0.08);
+  border-color: rgba(var(--border-secondary), 0.5);
+}
+
+/* 激活状态 */
+.card-refined.active {
+  background: rgba(var(--color-accent), 0.1);
+  border: 1px solid rgba(var(--color-accent), 0.3);
+  box-shadow: 0 4px 16px rgba(var(--color-accent), 0.15);
+}
+
+/* 深色主题下的精致卡片 */
+[data-theme="dark"] .card-refined {
+  background: rgba(var(--bg-tertiary), 0.7);
+  border: 1px solid rgba(var(--border-primary), 0.3);
+}
+
+[data-theme="dark"] .card-refined:hover {
+  background: rgba(var(--bg-tertiary), 0.85);
+}
+
+[data-theme="dark"] .card-refined.active {
+  background: rgba(var(--color-accent), 0.15);
+  border: 1px solid rgba(var(--color-accent), 0.3);
+}
+
+
+/* =================
+   卡片内容区域
+   ================= */
+
+.theme-card-content {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+}
+
+/* =================
+   卡片展开按钮
+   ================= */
+
+.theme-card-expand-btn {
+  position: absolute;
+  top: var(--spacing-xs);
+  right: var(--spacing-xs);
+  background: rgba(var(--bg-tertiary), 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(var(--border-primary), 0.3);
+  border-radius: var(--radius-sm);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all var(--duration-fast) ease;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.theme-card-glass:hover .theme-card-expand-btn {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.theme-card-expand-btn:hover {
+  background: rgba(var(--color-accent), 0.8);
+  border-color: rgba(var(--color-accent), 0.6);
+  transform: scale(1.1);
+}
+
+.theme-card-expand-btn:hover .icon {
+  color: rgba(var(--text-inverse), 1);
+}
+
+

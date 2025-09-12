@@ -1,0 +1,87 @@
+/* ReactFlow Controls 优化样式 */
+.react-flow__controls {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  overflow: hidden;
+  backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+/* 深色模式适配 */
+.dark .react-flow__controls {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.react-flow__controls-button {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: rgba(0, 0, 0, 0.8);
+  font-size: 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.react-flow__controls-button:last-child {
+  border-bottom: none;
+}
+
+.react-flow__controls-button:hover {
+  background: rgba(0, 0, 0, 0.1);
+  color: rgba(0, 0, 0, 1);
+  transform: scale(1.05);
+}
+
+.react-flow__controls-button:active {
+  transform: scale(0.95);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.react-flow__controls-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* 深色主题适配 */
+.dark .react-flow__controls {
+  background: rgba(24, 24, 27, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .react-flow__controls-button {
+  color: rgba(255, 255, 255, 0.8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .react-flow__controls-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 1);
+}
+
+.dark .react-flow__controls-button:active {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* 自定义图标样式 */
+.react-flow__controls-button[title*="放大"] svg {
+  stroke-width: 2.5;
+}
+
+.react-flow__controls-button[title*="缩小"] svg {
+  stroke-width: 2.5;
+}
+
+.react-flow__controls-button[title*="适应画布"] svg {
+  stroke-width: 2;
+}
+
+.react-flow__controls-button[title*="切换交互"] svg {
+  stroke-width: 2;
+}

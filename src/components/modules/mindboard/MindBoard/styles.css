@@ -1,0 +1,120 @@
+/* ReactFlow 自定义样式 */
+
+/* 设置思维板画布为透明背景，但保留网格小点 */
+.react-flow {
+  background: transparent !important;
+}
+
+.react-flow__viewport {
+  background: transparent !important;
+}
+
+.react-flow__pane {
+  background: transparent !important;
+}
+
+/* 保留网格背景的小点，但让背景透明 */
+.react-flow__background {
+  background: transparent !important;
+}
+
+.react-flow__node {
+  font-size: 14px;
+}
+
+.react-flow__handle {
+  width: 10px;
+  height: 10px;
+  background: #3b82f6;
+  border: 2px solid #fff;
+}
+
+.react-flow__handle-connecting {
+  background: #10b981;
+}
+
+.react-flow__edge-path {
+  stroke: #64748b;
+  stroke-width: 2;
+}
+
+.react-flow__edge-path:hover {
+  stroke: #3b82f6;
+  stroke-width: 3;
+}
+
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke: #3b82f6;
+  stroke-width: 3;
+}
+
+/* 节点样式 */
+.text-card-node {
+  cursor: move;
+}
+
+.note-card-node {
+  cursor: move;
+}
+
+.text-card-node:hover,
+.note-card-node:hover {
+  transform: scale(1.02);
+  transition: transform 0.2s;
+}
+
+/* 移除选中节点的默认边框 */
+.react-flow__node.selected {
+  outline: none !important;
+}
+
+.react-flow__node.selected::before {
+  content: none !important;
+}
+
+.react-flow__node.selected .text-card-node,
+.react-flow__node.selected .note-card-node {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+
+/* Controls 样式 */
+.react-flow__controls {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.dark .react-flow__controls {
+  background: rgba(31, 41, 55, 0.9);
+  border: 1px solid #374151;
+}
+
+.react-flow__controls-button {
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.dark .react-flow__controls-button {
+  background: #1f2937;
+  border-bottom: 1px solid #374151;
+}
+
+.react-flow__controls-button:hover {
+  background: #f3f4f6;
+}
+
+.dark .react-flow__controls-button:hover {
+  background: #374151;
+}
+
+/* Panel 样式 */
+.react-flow__panel {
+  margin: 16px;
+}
+
+/* 隐藏 React Flow Attribution */
+.react-flow__attribution {
+  display: none !important;
+}

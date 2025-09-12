@@ -1,0 +1,344 @@
+/* =============================================================================
+   Anning 主题系统 - 过渡工具类
+   Utilities/Transitions - 统一的过渡动画系统
+============================================================================= */
+
+/* =================
+   基础过渡类
+   ================= */
+
+.transition-all {
+  transition: all var(--duration-fast) ease;
+}
+
+.transition-colors {
+  transition: color var(--duration-fast) ease,
+              background-color var(--duration-fast) ease,
+              border-color var(--duration-fast) ease;
+}
+
+.transition-opacity {
+  transition: opacity var(--duration-fast) ease;
+}
+
+.transition-transform {
+  transition: transform var(--duration-fast) ease;
+}
+
+.transition-shadow {
+  transition: box-shadow var(--duration-fast) ease;
+}
+
+.transition-size {
+  transition: width var(--duration-normal) ease,
+              height var(--duration-normal) ease;
+}
+
+/* =================
+   过渡持续时间
+   ================= */
+
+.transition-fast {
+  transition-duration: var(--duration-fast);
+}
+
+.transition-normal {
+  transition-duration: var(--duration-normal);
+}
+
+.transition-slow {
+  transition-duration: var(--duration-slow);
+}
+
+.duration-75 { transition-duration: 75ms; }
+.duration-100 { transition-duration: 100ms; }
+.duration-150 { transition-duration: 150ms; }
+.duration-200 { transition-duration: 200ms; }
+.duration-300 { transition-duration: 300ms; }
+.duration-500 { transition-duration: 500ms; }
+.duration-700 { transition-duration: 700ms; }
+.duration-1000 { transition-duration: 1000ms; }
+
+/* =================
+   过渡缓动函数
+   ================= */
+
+.ease-linear { transition-timing-function: linear; }
+.ease-in { transition-timing-function: cubic-bezier(0.4, 0, 1, 1); }
+.ease-out { transition-timing-function: cubic-bezier(0, 0, 0.2, 1); }
+.ease-in-out { transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+
+/* 自定义缓动函数 - 已清理未使用的缓动函数 */
+
+/* =================
+   过渡延迟
+   ================= */
+
+/* 过渡延迟 - 只保留项目中实际使用的 */
+.delay-300 { transition-delay: 300ms; } /* App.tsx中使用 */
+
+/* =================
+   主题切换过渡
+   ================= */
+
+.theme-transition {
+  transition: background-color var(--duration-slow) ease-in-out,
+              border-color var(--duration-slow) ease-in-out,
+              color var(--duration-slow) ease-in-out;
+}
+
+/* 主题切换时的平滑过渡 */
+body,
+.theme-bg-primary,
+.theme-bg-secondary,
+.theme-bg-tertiary,
+.theme-text-primary,
+.theme-text-secondary,
+.theme-text-tertiary,
+.theme-border-primary,
+.theme-border-secondary {
+  transition: background-color var(--duration-slow) ease-in-out,
+              color var(--duration-slow) ease-in-out,
+              border-color var(--duration-slow) ease-in-out;
+}
+
+/* =================
+   交互过渡效果
+   ================= */
+
+/* 悬停过渡 */
+.hover-transition {
+  transition: all var(--duration-fast) ease;
+}
+
+.hover-transition:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(var(--bg-overlay), 0.15);
+}
+
+/* 点击反馈过渡 */
+.click-transition {
+  transition: transform var(--duration-fast) ease;
+}
+
+.click-transition:active {
+  transform: scale(0.98);
+}
+
+/* 焦点过渡 */
+.focus-transition {
+  transition: outline var(--duration-fast) ease,
+              box-shadow var(--duration-fast) ease;
+}
+
+.focus-transition:focus {
+  outline: 2px solid rgba(var(--color-accent), 0.6);
+  outline-offset: 2px;
+}
+
+/* =================
+   页面切换过渡 - 已清理未使用的页面过渡类
+   ================= */
+
+/* =================
+   模态框过渡 - 已清理未使用的模态框过渡类
+   ================= */
+
+/* =================
+   侧边栏过渡 - 已清理未使用的侧边栏过渡类
+   ================= */
+
+/* =================
+   下拉菜单过渡 - 已清理未使用的下拉菜单过渡类
+   ================= */
+
+/* =================
+   标签页过渡 - 已清理未使用的标签页过渡类
+   ================= */
+
+/* =================
+   卡片过渡效果
+   ================= */
+
+.card-enter {
+  opacity: 0;
+  transform: translateY(30px) scale(0.9);
+  transition: opacity var(--duration-normal) ease,
+              transform var(--duration-normal) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.card-enter-active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.card-hover {
+  transition: transform var(--duration-fast) ease,
+              box-shadow var(--duration-fast) ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(var(--bg-overlay), 0.15);
+}
+
+/* =================
+   列表过渡效果
+   ================= */
+
+.list-item-enter {
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: opacity var(--duration-normal) ease,
+              transform var(--duration-normal) ease;
+}
+
+.list-item-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.list-item-exit {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity var(--duration-fast) ease,
+              transform var(--duration-fast) ease;
+}
+
+.list-item-exit-active {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+/* =================
+   通知过渡效果
+   ================= */
+
+.notification-enter {
+  opacity: 0;
+  transform: translateY(-100%) scale(0.9);
+  transition: opacity var(--duration-normal) ease,
+              transform var(--duration-normal) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.notification-enter-active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.notification-exit {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: opacity var(--duration-fast) ease,
+              transform var(--duration-fast) ease;
+}
+
+.notification-exit-active {
+  opacity: 0;
+  transform: translateY(-100%) scale(0.9);
+}
+
+/* =================
+   加载状态过渡
+   ================= */
+
+.loading-enter {
+  opacity: 0;
+  transition: opacity var(--duration-normal) ease;
+}
+
+.loading-enter-active {
+  opacity: 1;
+}
+
+.loading-exit {
+  opacity: 1;
+  transition: opacity var(--duration-fast) ease;
+}
+
+.loading-exit-active {
+  opacity: 0;
+}
+
+/* =================
+   骨架屏过渡
+   ================= */
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(var(--bg-tertiary), 0.8) 25%,
+    rgba(var(--bg-secondary), 0.8) 50%,
+    rgba(var(--bg-tertiary), 0.8) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* =================
+   响应式过渡控制
+   ================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .transition-all,
+  .transition-colors,
+  .transition-opacity,
+  .transition-transform,
+  .transition-shadow,
+  .transition-size,
+  .hover-transition,
+  .click-transition,
+  .focus-transition,
+  .theme-transition {
+    transition-duration: 0.01ms !important;
+  }
+  
+  .page-enter,
+  .page-exit,
+  .modal-enter,
+  .modal-exit,
+  .sidebar-enter,
+  .sidebar-exit,
+  .dropdown-enter,
+  .dropdown-exit,
+  .tab-enter,
+  .tab-exit,
+  .card-enter,
+  .list-item-enter,
+  .list-item-exit,
+  .notification-enter,
+  .notification-exit,
+  .loading-enter,
+  .loading-exit {
+    transition: none !important;
+  }
+  
+  .skeleton {
+    animation: none;
+    background: rgba(var(--bg-tertiary), 0.8);
+  }
+}
+
+/* =================
+   GPU 加速优化
+   ================= */
+
+/* GPU 加速优化 - 已清理未使用的GPU加速类 */
+
+/* =================
+   过渡性能优化
+   ================= */
+
+/* 过渡性能优化 - 已清理未使用的will-change类 */
+.will-change-transform {
+  will-change: transform;
+} /* 保留：在Dialog等组件中使用 */

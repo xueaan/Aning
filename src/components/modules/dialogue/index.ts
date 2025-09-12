@@ -1,0 +1,2 @@
+export { DialogueRoom } from './DialogueRoom';
+

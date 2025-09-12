@@ -1,0 +1,289 @@
+/* =============================================================================
+   Anning 主题系统 - 标题栏组件样式
+   Components/Titlebar - 窗口标题栏和控制按钮样式
+============================================================================= */
+
+/* =================
+   标题栏容器
+   ================= */
+
+.titlebar {
+  height: 32px;
+  background: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  display: flex;
+  align-items: center;
+  transition: left 0.3s ease, right 0.3s ease;
+}
+
+/* =================
+   导航按钮样式
+   ================= */
+
+.titlebar-nav-buttons {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 4px;
+}
+
+.titlebar-nav-button {
+  width: 32px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: rgb(var(--text-secondary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.titlebar-nav-button:hover {
+  background-color: rgb(var(--hover-bg));
+  color: rgb(var(--text-primary));
+}
+
+.titlebar-nav-button:active {
+  background-color: rgb(var(--bg-tertiary));
+}
+
+.titlebar-nav-button.disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.titlebar-nav-button.disabled:hover {
+  background-color: transparent;
+  color: rgb(var(--text-secondary));
+}
+
+/* =================
+   窗口控制按钮 - 优化间距
+   ================= */
+
+.titlebar-buttons {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.titlebar-button {
+  width: 38px;  /* 紧凑宽度 */
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: rgba(var(--text-secondary), 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+/* 最小化按钮 */
+.titlebar-button-minimize {
+  margin-right: 0px;  /* 无额外间距 */
+}
+
+.titlebar-button-minimize:hover {
+  background-color: rgba(var(--hover-bg), 0.6);
+  color: rgba(var(--text-primary), 1);
+}
+
+.titlebar-button-minimize:active {
+  background-color: rgba(var(--bg-tertiary), 0.8);
+}
+
+/* 最大化按钮 */
+.titlebar-button-maximize {
+  margin-right: 0px;  /* 无额外间距 */
+}
+
+.titlebar-button-maximize:hover {
+  background-color: rgba(var(--hover-bg), 0.6);
+  color: rgba(var(--text-primary), 1);
+}
+
+.titlebar-button-maximize:active {
+  background-color: rgba(var(--bg-tertiary), 0.8);
+}
+
+/* 关闭按钮 - 特殊的红色悬浮效果 */
+.titlebar-button-close:hover {
+  background-color: #dc2626;
+  color: white;
+}
+
+.titlebar-button-close:active {
+  background-color: #b91c1c;
+}
+
+/* SVG 图标不可交互 */
+.titlebar-button svg {
+  pointer-events: none;
+}
+
+/* =================
+   深色主题适配
+   ================= */
+
+[data-theme="dark"] .titlebar-button {
+  color: rgba(var(--text-secondary), 0.7);
+}
+
+[data-theme="dark"] .titlebar-button-minimize:hover,
+[data-theme="dark"] .titlebar-button-maximize:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: rgba(var(--text-primary), 1);
+}
+
+[data-theme="dark"] .titlebar-button-minimize:active,
+[data-theme="dark"] .titlebar-button-maximize:active {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="dark"] .titlebar-button-close:hover {
+  background-color: #dc2626;
+  color: white;
+}
+
+[data-theme="dark"] .titlebar-button-close:active {
+  background-color: #b91c1c;
+}
+
+/* =================
+   内容区域样式
+   ================= */
+
+.titlebar-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  height: 100%;
+}
+
+.titlebar-title {
+  font-size: 13px;
+  color: rgb(var(--text-primary));
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+/* =================
+   功能按钮样式
+   ================= */
+
+.titlebar-function-buttons {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  gap: 4px;
+}
+
+.titlebar-function-button {
+  height: 24px;
+  padding: 0 10px;
+  border: none;
+  background: transparent;
+  color: rgb(var(--text-secondary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.titlebar-function-button:hover {
+  background-color: rgb(var(--hover-bg));
+  color: rgb(var(--text-primary));
+}
+
+.titlebar-function-button.active {
+  background-color: rgb(var(--accent) / 0.2);
+  color: rgb(var(--accent));
+}
+
+.titlebar-function-button.active:hover {
+  background-color: rgb(var(--accent) / 0.3);
+}
+
+/* =================
+   响应式和过渡动画
+   ================= */
+
+.sidebar-collapsed ~ .flex-1 .titlebar {
+  left: 60px;
+  transition: left 0.3s ease;
+}
+
+.titlebar.right-collapsed {
+  right: 60px;
+}
+
+.titlebar.right-expanded {
+  right: 288px;
+}
+
+/* =================
+   主容器样式
+   ================= */
+
+.main-container {
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+/* =================
+   毛玻璃效果增强
+   ================= */
+
+.glass-panel .titlebar {
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+}
+
+/* 输入框毛玻璃效果 */
+.glass-panel .titlebar input[type="text"].theme-border {
+  background: rgba(var(--bg-secondary), 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  color: rgba(var(--text-primary), 1);
+  border: 1px solid rgba(var(--border-primary), 0.3);
+  transition: all 0.2s ease;
+}
+
+.glass-panel .titlebar input[type="text"].theme-border:focus {
+  background: rgba(var(--bg-secondary), 0.95);
+  border-color: rgba(var(--color-accent), 0.7);
+  box-shadow: 0 0 0 3px rgba(var(--color-accent), 0.15);
+}
+
+.glass-panel .titlebar input[type="text"].theme-border::placeholder {
+  color: rgba(var(--text-tertiary), 0.8);
+}
+
+/* 深色主题下的输入框样式 */
+[data-theme="dark"] .glass-panel .titlebar input[type="text"].theme-border {
+  background: rgba(39, 51, 71, 0.9);
+  color: #f8fafc;
+  border: 1px solid rgba(100, 116, 139, 0.4);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .glass-panel .titlebar input[type="text"].theme-border:focus {
+  background: rgba(51, 65, 85, 0.95);
+  border-color: rgba(79, 172, 254, 0.8);
+  box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.2), 0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="dark"] .glass-panel .titlebar input[type="text"].theme-border::placeholder {
+  color: rgba(148, 163, 184, 0.7);
+}

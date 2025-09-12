@@ -1,0 +1,72 @@
+/* 选中状态样式 - 移除丑陋的蓝色边框 */
+.react-flow__node.selected {
+  /* 移除默认的蓝色边框和动画 */
+  box-shadow: none !important;
+  animation: none !important;
+  /* 可选：添加更subtle的选中指示 */
+  filter: brightness(1.05);
+}
+
+/* 框选样式 */
+.react-flow__selection {
+  background: rgba(59, 130, 246, 0.1);
+  border: 2px dashed #3b82f6;
+}
+
+/* 分组节点特殊样式 */
+.react-flow__node-groupNode {
+  background: transparent;
+}
+
+.react-flow__node-groupNode.selected {
+  box-shadow: 0 0 0 2px #8b5cf6 !important;
+}
+
+/* 节点悬停效果 */
+.react-flow__node:hover {
+  cursor: pointer;
+  filter: brightness(1.05);
+}
+
+/* 连接线选中样式 */
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke: #3b82f6;
+  stroke-width: 2;
+}
+
+/* 框选时的鼠标样式 */
+.react-flow__selectionpane {
+  cursor: crosshair !important;
+}
+
+/* 分组节点内部节点样式 */
+.react-flow__node[data-parentnode] {
+  /* 子节点稍微透明 */
+  opacity: 0.95;
+}
+
+/* 分组折叠时隐藏内部节点 */
+.group-collapsed .react-flow__node[data-parentnode] {
+  display: none;
+}
+
+/* 画布背景优化 */
+.react-flow__background {
+  background-color: #f9fafb;
+}
+
+.dark .react-flow__background {
+  background-color: #111827;
+}
+
+/* 选择框优化 */
+.react-flow__nodesselection-rect {
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid #3b82f6;
+}
+
+/* 节点拖动时的样式 */
+.react-flow__node.dragging {
+  cursor: grabbing !important;
+  opacity: 0.8;
+}
