@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import { useKnowledgeStore } from '@/stores/knowledgeStore';
+import { useKnowledgeOperations } from '@/stores';
 import type { KnowledgeBase } from '@/types';
 import { IconPicker } from '@/components/common/IconPicker';
 import { convertEmojiToIcon } from '@/constants/commonIcons';
@@ -16,7 +16,7 @@ export const EditKnowledgeBaseModal: React.FC<EditKnowledgeBaseModalProps> = ({
   onClose,
   knowledgeBase
 }) => {
-  const { updateKnowledgeBase } = useKnowledgeStore();
+  const { updateKnowledgeBase } = useKnowledgeOperations();
 
   const [name, setName] = useState('');
   const [selectedIcon, setSelectedIcon] = useState('Book');

@@ -3378,4 +3378,50 @@ impl Database {
             }))
         })
     }
+
+    // 清理"未命名页面"的历史数据
+    pub fn cleanup_unnamed_pages(&self) -> Result<u32> {
+        let conn = self.conn.lock().unwrap();
+        
+        // 查找所有标题为"未命名页面"的页面
+        let mut stmt = conn.prepare(
+            "SELECT id, created_at FROM pages WHERE title = '未命名页面' AND is_deleted = 0"
+        )?;
+        
+        let page_rows: Result<Vec<(String, i64)>, _> = stmt.query_map([], |row| {
+            Ok((row.get(0)?, row.get(1)?))
+        })?.collect();
+        
+        let pages = page_rows?;
+        let mut updated_count = 0;
+        
+        for (i, (page_id, created_at)) in pages.iter().enumerate() {
+            // 生成新的页面标题，使用创建时间
+            let created_date = chrono::DateTime::from_timestamp(*created_at / 1000, 0)
+                .unwrap_or_default();
+            let new_title = if i == 0 {
+                format!("页面 {}", created_date.format("%m/%d %H:%M"))
+            } else {
+                format!("页面 {} ({})", created_date.format("%m/%d %H:%M"), i + 1)
+            };
+            
+            // 更新页面标题
+            let rows_affected = conn.execute(
+                "UPDATE pages SET title = ?1, updated_at = ?2 WHERE id = ?3",
+                params![new_title, Self::current_timestamp(), page_id],
+            )?;
+            
+            if rows_affected > 0 {
+                updated_count += 1;
+                
+                // 更新搜索索引
+                conn.execute(
+                    "UPDATE search_index SET title = ?1 WHERE id = ?2",
+                    params![new_title, page_id],
+                ).ok(); // 忽略搜索索引更新错误
+            }
+        }
+        
+        Ok(updated_count)
+    }
 }

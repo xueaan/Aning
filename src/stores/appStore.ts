@@ -10,6 +10,7 @@ export interface NavigationItem {
   moduleId: string;
   noteId?: string;
   timestamp: number;
+  title?: string;
 }
 
 // 响应式断点类型
@@ -82,6 +83,7 @@ interface AppStore extends AppState {
   addToHistory: (item: NavigationItem) => void;
   navigateBack: () => void;
   navigateForward: () => void;
+  clearHistory: () => void;
   
   // 响应式 Actions
   setWindowWidth: (width: number) => void;
@@ -297,6 +299,20 @@ export const useAppStore = create<AppStore>()(
               currentModule: item.moduleId as AppModule
             });
           }
+        },
+        
+        clearHistory: () => {
+          const { currentModule } = get();
+          const initialItem: NavigationItem = {
+            moduleId: currentModule,
+            timestamp: Date.now(),
+            title: '首页'
+          };
+          
+          set({
+            navigationHistory: [initialItem],
+            navigationIndex: 0
+          });
         },
         
         // 响应式 Actions

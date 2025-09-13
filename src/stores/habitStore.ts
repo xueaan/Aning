@@ -92,7 +92,13 @@ export const useHabitStore = create<HabitStore>()(
           }
 
           // 加载所有记录用于统计计算
-          const allRecords = await DatabaseAPI.getHabitRecords();
+          const allRecords: any[] = [];
+          for (const habit of dbHabits) {
+            if (habit.id) {
+              const records = await DatabaseAPI.getHabitRecords(habit.id);
+              allRecords.push(...records);
+            }
+          }
           
           // 获取今日日期
           const today = formatDate(new Date());
@@ -102,7 +108,15 @@ export const useHabitStore = create<HabitStore>()(
             dbHabits.map(async (dbHabit) => {
               // 获取今日记录
               const todayRecords = await DatabaseAPI.getHabitRecords(dbHabit.id!, today, today);
-              const todayRecord = todayRecords.length > 0 ? todayRecords[0] : undefined;
+              const todayRecord = todayRecords.length > 0 ? {
+                id: todayRecords[0].id,
+                habit_id: todayRecords[0].habit_id,
+                date: todayRecords[0].date,
+                completed_count: todayRecords[0].count || 1,
+                notes: '',
+                created_at: todayRecords[0].created_at,
+                updated_at: todayRecords[0].created_at
+              } : undefined;
               
               // 获取此习惯的所有记录
               const habitRecords = allRecords.filter(r => r.habit_id === dbHabit.id);
@@ -190,10 +204,10 @@ export const useHabitStore = create<HabitStore>()(
             id: dbRecord.id,
             habit_id: dbRecord.habit_id,
             date: dbRecord.date,
-            completed_count: dbRecord.completed_count,
-            notes: dbRecord.notes,
+            completed_count: dbRecord.count || 1,
+            notes: '',
             created_at: dbRecord.created_at,
-            updated_at: dbRecord.updated_at
+            updated_at: dbRecord.created_at
           }));
           
           set({ habits: basicHabits, records, isLoading: false });
@@ -205,14 +219,15 @@ export const useHabitStore = create<HabitStore>()(
 
       createHabit: async (habitData) => {
         try {
-          await DatabaseAPI.createHabit(
-            habitData.name,
-            habitData.description,
-            habitData.icon,
-            habitData.color,
-            habitData.frequency,
-            habitData.target_count
-          );
+          await DatabaseAPI.createHabit({
+            name: habitData.name,
+            description: habitData.description,
+            icon: habitData.icon,
+            color: habitData.color,
+            frequency: habitData.frequency,
+            target_count: habitData.target_count || 1,
+            is_active: true
+          });
           
           // 重新加载习惯列表
           await get().loadHabits();
@@ -226,16 +241,16 @@ export const useHabitStore = create<HabitStore>()(
           const habit = get().habits.find(h => h.id === id);
           if (!habit) throw new Error('习惯未找到');
 
-          await DatabaseAPI.updateHabit(
-            id,
-            updates.name || habit.name,
-            updates.description || habit.description,
-            updates.icon || habit.icon,
-            updates.color || habit.color,
-            updates.frequency || habit.frequency,
-            updates.target_count || habit.target_count,
-            updates.is_active !== undefined ? updates.is_active : habit.is_active
-          );
+          await DatabaseAPI.updateHabit(id, {
+            name: updates.name || habit.name,
+            description: updates.description || habit.description,
+            icon: updates.icon || habit.icon,
+            color: updates.color || habit.color,
+            frequency: updates.frequency || habit.frequency,
+            target_count: updates.target_count || habit.target_count,
+            is_active: updates.is_active !== undefined ? updates.is_active : habit.is_active,
+            updated_at: new Date().toISOString()
+          });
           
           // 重新加载习惯列表
           await get().loadHabits();
@@ -265,6 +280,11 @@ export const useHabitStore = create<HabitStore>()(
       // 记录操作方法
       loadRecords: async (habitId?, dateRange?) => {
         try {
+          if (!habitId) {
+            set({ records: [] });
+            return;
+          }
+          
           const dbRecords = await DatabaseAPI.getHabitRecords(
             habitId,
             dateRange?.start,
@@ -276,10 +296,10 @@ export const useHabitStore = create<HabitStore>()(
             id: dbRecord.id,
             habit_id: dbRecord.habit_id,
             date: dbRecord.date,
-            completed_count: dbRecord.completed_count,
-            notes: dbRecord.notes,
+            completed_count: dbRecord.count || 1,
+            notes: '',
             created_at: dbRecord.created_at,
-            updated_at: dbRecord.updated_at
+            updated_at: dbRecord.created_at
           }));
           
           set({ records });

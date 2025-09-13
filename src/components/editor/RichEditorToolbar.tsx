@@ -1,6 +1,7 @@
 ﻿import React, { useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { processImageUpload } from '@/utils/imageUtils';
+import { Bold, Italic, Underline, Heading1, Heading2, Heading3, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, CheckSquare, Quote, Minus, Link, Image, Code2 } from 'lucide-react';
 
 interface RichEditorToolbarProps {
   onFormat?: (format: string) => void;
@@ -22,47 +23,47 @@ export const RichEditorToolbar: React.FC<RichEditorToolbarProps> = ({
     {
       name: 'headings',
       items: [
-        { key: 'heading1', icon: 'H1', tooltip: '标题 1' },
-        { key: 'heading2', icon: 'H2', tooltip: '标题 2' },
-        { key: 'heading3', icon: 'H3', tooltip: '标题 3' }
+        { key: 'heading1', icon: Heading1, tooltip: '标题 1' },
+        { key: 'heading2', icon: Heading2, tooltip: '标题 2' },
+        { key: 'heading3', icon: Heading3, tooltip: '标题 3' }
       ]
     },
     // 格式化组
     {
       name: 'formatting',
       items: [
-        { key: 'bold', icon: 'B', tooltip: '粗体 (⌘B)' },
-        { key: 'italic', icon: 'I', tooltip: '斜体 (⌘I)' },
-        { key: 'underline', icon: 'U', tooltip: '下划线(⌘U)' }
+        { key: 'bold', icon: Bold, tooltip: '粗体 (⌘B)' },
+        { key: 'italic', icon: Italic, tooltip: '斜体 (⌘I)' },
+        { key: 'underline', icon: Underline, tooltip: '下划线(⌘U)' }
       ]
     },
     // 对齐组
     {
       name: 'alignment',
       items: [
-        { key: 'left', icon: '≡', tooltip: '左对齐' },
-        { key: 'center', icon: '≡', tooltip: '居中' },
-        { key: 'right', icon: '≡', tooltip: '右对齐' }
+        { key: 'left', icon: AlignLeft, tooltip: '左对齐' },
+        { key: 'center', icon: AlignCenter, tooltip: '居中' },
+        { key: 'right', icon: AlignRight, tooltip: '右对齐' }
       ]
     },
     // 列表和块组
     {
       name: 'blocks',
       items: [
-        { key: 'bullet', icon: '•', tooltip: '无序列表' },
-        { key: 'ordered', icon: '1.', tooltip: '有序列表' },
-        { key: 'task', icon: '☐', tooltip: '任务列表' },
-        { key: 'blockquote', icon: '"', tooltip: '引用块' },
-        { key: 'divider', icon: '—', tooltip: '分割线' }
+        { key: 'bullet', icon: List, tooltip: '无序列表' },
+        { key: 'ordered', icon: ListOrdered, tooltip: '有序列表' },
+        { key: 'task', icon: CheckSquare, tooltip: '任务列表' },
+        { key: 'blockquote', icon: Quote, tooltip: '引用块' },
+        { key: 'divider', icon: Minus, tooltip: '分割线' }
       ]
     },
     // 插入组
     {
       name: 'insert',
       items: [
-        { key: 'link', icon: '🔗', tooltip: '插入链接' },
-        { key: 'image', icon: '🖼', tooltip: '插入图片' },
-        { key: 'codeBlock', icon: '</>', tooltip: '代码块' }
+        { key: 'link', icon: Link, tooltip: '插入链接' },
+        { key: 'image', icon: Image, tooltip: '插入图片' },
+        { key: 'codeBlock', icon: Code2, tooltip: '代码块' }
       ]
     }
   ];
@@ -111,10 +112,11 @@ export const RichEditorToolbar: React.FC<RichEditorToolbarProps> = ({
       "w-full max-w-full",
       className
     )}>
-      {toolbarGroups.map((group, groupIndex) => (
+      {toolbarGroups.map((group) => (
         <React.Fragment key={group.name}>
           <div className="flex items-center gap-1">
             {group.items.map((item) => {
+              const Icon = item.icon;
               const active = isActive(item.key);
 
               return (
@@ -132,15 +134,11 @@ export const RichEditorToolbar: React.FC<RichEditorToolbarProps> = ({
                     !active && "hover:scale-105 active:scale-95"
                   )} title={item.tooltip}
                 >
-                  <span className="text-xs font-medium">{item.icon}</span>
+                  <Icon size={16} />
                 </button>
               );
             })}
           </div>
-          
-          {groupIndex < toolbarGroups.length - 1 && (
-            <div className="w-px h-4 theme-border/40 mx-0.5" />
-          )}
         </React.Fragment>
       ))}
 

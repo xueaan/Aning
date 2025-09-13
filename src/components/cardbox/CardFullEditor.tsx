@@ -1,19 +1,29 @@
-﻿import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { ArrowLeft, Eye } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { NovelEditor, type NovelEditorRef } from '@/components/editor/Novel';
-import { RichEditorToolbar } from '@/components/editor/RichEditorToolbar';
-import { type Card } from '@/stores';
-import { debounce } from '@/utils/debounce';
-import { extractHeadings, scrollToHeading, getActiveHeadingId, flattenOutlineItems, type OutlineItem } from '@/pages/Knowledge/components/HeadingExtractor';
-import { FloatingOutline } from '@/pages/Knowledge/components/FloatingOutline';
+﻿import React, { useRef, useState, useEffect, useCallback } from "react";
+import { ArrowLeft, Eye } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { NovelEditor, type NovelEditorRef } from "@/components/editor/Novel";
+import { RichEditorToolbar } from "@/components/editor/RichEditorToolbar";
+import { type Card } from "@/stores";
+import { debounce } from "@/utils/debounce";
+import {
+  extractHeadings,
+  scrollToHeading,
+  getActiveHeadingId,
+  flattenOutlineItems,
+  type OutlineItem,
+} from "@/pages/Knowledge/components/HeadingExtractor";
+import { FloatingOutline } from "@/pages/Knowledge/components/FloatingOutline";
 
 interface CardFullEditorProps {
   isOpen: boolean;
   card?: Card | null;
   boxId?: string | null;
   onClose: () => void;
-  onSave: (title: string, content: string, shouldClose?: boolean) => Promise<void>;
+  onSave: (
+    title: string,
+    content: string,
+    shouldClose?: boolean,
+  ) => Promise<void>;
   className?: string;
 }
 
@@ -23,11 +33,11 @@ export const CardFullEditor: React.FC<CardFullEditorProps> = ({
   boxId,
   onClose,
   onSave,
-  className = ''
+  className = "",
 }) => {
   const editorRef = useRef<NovelEditorRef>(null);
-  const [title, setTitle] = useState('');
-  const [editorContent, setEditorContent] = useState('');
+  const [title, setTitle] = useState("");
+  const [editorContent, setEditorContent] = useState("");
   const [hasChanges, setHasChanges] = useState(false);
   const [activeFormats, setActiveFormats] = useState<string[]>([]);
 
@@ -44,18 +54,18 @@ export const CardFullEditor: React.FC<CardFullEditorProps> = ({
           await onSave(title.trim(), content, false);
           setHasChanges(false);
         } catch (error) {
-          console.error('自动保存失败:', error);
+          console.error("自动保存失败:", error);
         }
       }
     }, 2000),
-    [boxId, card, onSave]
+    [boxId, card, onSave],
   );
 
   // 初始化编辑器内容
   useEffect(() => {
     if (isOpen) {
-      const initialContent = card?.content || '';
-      setTitle(card?.title || '');
+      const initialContent = card?.content || "";
+      setTitle(card?.title || "");
       setEditorContent(initialContent);
       setHasChanges(false);
 
@@ -91,8 +101,8 @@ export const CardFullEditor: React.FC<CardFullEditorProps> = ({
   const updateOutline = (content: string) => {
     const newHeadings = extractHeadings(content);
     setHeadings(newHeadings);
-    
-    const headingIds = flattenOutlineItems(newHeadings).map(item => item.id);
+
+    const headingIds = flattenOutlineItems(newHeadings).map((item) => item.id);
     const activeId = getActiveHeadingId(headingIds);
     setActiveHeadingId(activeId);
   };
@@ -110,21 +120,24 @@ export const CardFullEditor: React.FC<CardFullEditorProps> = ({
     const formats: string[] = [];
     const editor = editorRef.current;
 
-    if (editor.isActive('bold')) formats.push('bold');
-    if (editor.isActive('italic')) formats.push('italic');
-    if (editor.isActive('strike')) formats.push('strike');
-    if (editor.isActive('code')) formats.push('code');
-    if (editor.isActive('heading', { level: 1 })) formats.push('heading1');
-    if (editor.isActive('heading', { level: 2 })) formats.push('heading2');
-    if (editor.isActive('heading', { level: 3 })) formats.push('heading3');
-    if (editor.isActive('paragraph')) formats.push('paragraph');
-    if (editor.isActive('textAlign', { textAlign: 'left' })) formats.push('left');
-    if (editor.isActive('textAlign', { textAlign: 'center' })) formats.push('center');
-    if (editor.isActive('textAlign', { textAlign: 'right' })) formats.push('right');
-    if (editor.isActive('bullet')) formats.push('bullet');
-    if (editor.isActive('ordered')) formats.push('ordered');
-    if (editor.isActive('blockquote')) formats.push('blockquote');
-    if (editor.isActive('codeBlock')) formats.push('codeBlock');
+    if (editor.isActive("bold")) formats.push("bold");
+    if (editor.isActive("italic")) formats.push("italic");
+    if (editor.isActive("strike")) formats.push("strike");
+    if (editor.isActive("code")) formats.push("code");
+    if (editor.isActive("heading", { level: 1 })) formats.push("heading1");
+    if (editor.isActive("heading", { level: 2 })) formats.push("heading2");
+    if (editor.isActive("heading", { level: 3 })) formats.push("heading3");
+    if (editor.isActive("paragraph")) formats.push("paragraph");
+    if (editor.isActive("textAlign", { textAlign: "left" }))
+      formats.push("left");
+    if (editor.isActive("textAlign", { textAlign: "center" }))
+      formats.push("center");
+    if (editor.isActive("textAlign", { textAlign: "right" }))
+      formats.push("right");
+    if (editor.isActive("bullet")) formats.push("bullet");
+    if (editor.isActive("ordered")) formats.push("ordered");
+    if (editor.isActive("blockquote")) formats.push("blockquote");
+    if (editor.isActive("codeBlock")) formats.push("codeBlock");
 
     setActiveFormats(formats);
   }, []);
@@ -133,7 +146,7 @@ export const CardFullEditor: React.FC<CardFullEditorProps> = ({
     debounce(() => {
       updateActiveFormats();
     }, 100),
-    [updateActiveFormats]
+    [updateActiveFormats],
   );
 
   // 处理工具栏格式化
@@ -141,49 +154,49 @@ export const CardFullEditor: React.FC<CardFullEditorProps> = ({
     if (!editorRef.current) return;
 
     switch (format) {
-      case 'bold':
+      case "bold":
         editorRef.current.toggleBold();
         break;
-      case 'italic':
+      case "italic":
         editorRef.current.toggleItalic();
         break;
-      case 'strike':
+      case "strike":
         editorRef.current.toggleStrike();
         break;
-      case 'code':
+      case "code":
         editorRef.current.toggleCode();
         break;
-      case 'heading1':
+      case "heading1":
         editorRef.current.toggleHeading(1);
         break;
-      case 'heading2':
+      case "heading2":
         editorRef.current.toggleHeading(2);
         break;
-      case 'heading3':
+      case "heading3":
         editorRef.current.toggleHeading(3);
         break;
-      case 'paragraph':
+      case "paragraph":
         editorRef.current.setParagraph();
         break;
-      case 'left':
-        editorRef.current.setTextAlign('left');
+      case "left":
+        editorRef.current.setTextAlign("left");
         break;
-      case 'center':
-        editorRef.current.setTextAlign('center');
+      case "center":
+        editorRef.current.setTextAlign("center");
         break;
-      case 'right':
-        editorRef.current.setTextAlign('right');
+      case "right":
+        editorRef.current.setTextAlign("right");
         break;
-      case 'bullet':
+      case "bullet":
         editorRef.current.toggleBullet();
         break;
-      case 'ordered':
+      case "ordered":
         editorRef.current.toggleOrdered();
         break;
-      case 'blockquote':
+      case "blockquote":
         editorRef.current.toggleBlockquote();
         break;
-      case 'codeBlock':
+      case "codeBlock":
         editorRef.current.toggleCodeBlock();
         break;
     }
@@ -195,7 +208,7 @@ export const CardFullEditor: React.FC<CardFullEditorProps> = ({
       try {
         await onSave(title.trim(), editorContent, true);
       } catch (error) {
-        console.error('保存失败:', error);
+        console.error("保存失败:", error);
       }
     }
     onClose();
@@ -204,77 +217,69 @@ export const CardFullEditor: React.FC<CardFullEditorProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className={cn('h-full flex flex-col relative', className)}>
+    <div className={cn("h-full flex flex-col relative", className)}>
       {/* 头部工具栏 */}
-      <div className="flex items-center justify-between p-4 border-b theme-border">
-        <div className="flex items-center gap-4">
-          <button onClick={handleClose}
-            className="p-2 rounded-lg hover:theme-bg-tertiary transition-colors"
-            title="返回"
-          >
-            <ArrowLeft size={20} className="theme-text-secondary" />
-          </button>
+      <div className="flex items-center justify-start gap-4 p-4 border-b theme-border">
+        <button
+          onClick={handleClose}
+          className="p-2 rounded-lg hover:theme-bg-tertiary transition-colors"
+          title="返回"
+        >
+          <ArrowLeft size={20} className="theme-text-secondary" />
+        </button>
 
-          <div className="flex items-center gap-2">
-            <span className="text-sm theme-text-secondary">
-              {card ? '编辑笔记' : '新建笔记'}
-            </span>
-            {hasChanges && (
-              <div className="w-2 h-2 bg-orange-400 rounded-full" title="有未保存的更改" />
-            )}
-          </div>
+        <div className="flex-1 flex justify-center">
+          <RichEditorToolbar
+            onFormat={handleFormat}
+            activeFormats={activeFormats}
+            className="bg-transparent"
+          />
         </div>
 
-        <div className="flex items-center gap-2">
-          <button onClick={() => setIsOutlineVisible(!isOutlineVisible)}
-            className={cn(
-              'p-2 rounded-lg transition-colors',
-              isOutlineVisible ? 'theme-bg-tertiary' : 'hover:theme-bg-tertiary'
-            )}
-            title="显示大纲"
-          >
-            <Eye size={18} className="theme-text-secondary" />
-          </button>
-        </div>
+        <button
+          onClick={() => setIsOutlineVisible(!isOutlineVisible)}
+          className={cn(
+            "p-2 rounded-lg transition-colors",
+            isOutlineVisible
+              ? "theme-bg-tertiary"
+              : "hover:theme-bg-tertiary",
+          )}
+          title="显示大纲"
+        >
+          <Eye size={18} className="theme-text-secondary" />
+        </button>
       </div>
-      <div className="p-6 border-b theme-border">
-        <input type="text"
-          value={title} onChange={handleTitleChange}
+      <div className="px-6 py-4 border-b theme-border">
+        <input
+          type="text"
+          value={title}
+          onChange={handleTitleChange}
           placeholder="输入笔记标题..."
-          
-            className="w-full text-3xl font-bold theme-text-primary bg-transparent border-none outline-none placeholder:theme-text-tertiary"
+          className="w-full text-3xl font-bold theme-text-primary bg-transparent border-none outline-none placeholder:theme-text-tertiary"
           autoFocus={!card}
         />
       </div>
       <div className="flex-1 flex min-h-0">
         <div className="flex-1 flex flex-col">
-          {/* 工具栏 */}
-          <div className="p-4 border-b theme-border">
-            <RichEditorToolbar onFormat={handleFormat} activeFormats={activeFormats}
-            />
-          </div>
-          <div className="flex-1 p-6">
-            <NovelEditor ref={editorRef} value={editorContent}
-              onChange={handleContentChange} placeholder="开始编写你的想法..."
-              
-            className="h-full"
+          <div className="flex-1 px-6 py-4">
+            <NovelEditor
+              ref={editorRef}
+              value={editorContent}
+              onChange={handleContentChange}
+              placeholder="开始编写你的想法..."
+              className="h-full"
             />
           </div>
         </div>
         {isOutlineVisible && headings.length > 0 && (
-          <FloatingOutline headings={headings} activeHeadingId={activeHeadingId}
-            onHeadingClick={handleOutlineClick} onClose={() => setIsOutlineVisible(false)}
+          <FloatingOutline
+            headings={headings}
+            activeHeadingId={activeHeadingId}
+            onHeadingClick={handleOutlineClick}
+            onClose={() => setIsOutlineVisible(false)}
           />
         )}
       </div>
     </div>
   );
 };
-
-
-
-
-
-
-
-

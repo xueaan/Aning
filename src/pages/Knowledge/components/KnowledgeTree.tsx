@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useKnowledgeStore } from '@/stores';
+import { useKnowledgeOperations } from '@/stores/knowledgeStore';
 import { FolderOpen, Trash2, FileText, Plus, FolderMinus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { KnowledgeBase } from '@/types';
@@ -21,19 +21,7 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
   selectedId,
   searchQuery: externalSearchQuery
 }) => {
-  const {
-    currentKnowledgeBase,
-    pages,
-    pageTree,
-    expandedIds,
-    toggleExpansion,
-    create,
-    delete: deletePage,
-    update,
-    deleteKnowledgeBase,
-    loadKnowledgeBases,
-    searchQuery
-  } = useKnowledgeStore();
+  const knowledgeOps = useKnowledgeOperations();
 
   const [expandedKnowledgeBases, setExpandedKnowledgeBases] = useState<Set<string>>(new Set());
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -74,23 +62,34 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
 
   // 创建新页面
   const handleCreate = async (parentId?: string) => {
-    if (!currentKnowledgeBase) return;
+    console.log('🚀 handleCreate called with parentId:', parentId);
+    
+    if (!knowledgeOps.currentKnowledgeBase) {
+      console.warn('❌ No current knowledge base');
+      return;
+    }
 
     try {
-      const newId = await create('未命名页面', parentId);
+      const newTitle = `新页面 ${new Date().toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' })}`;
+      console.log('📝 Creating page with title:', newTitle);
+      
+      const newId = await knowledgeOps.createPage?.(knowledgeOps.currentKnowledgeBase.id, newTitle, parentId);
+      console.log('✅ Page created with ID:', newId);
 
       // 确保知识库展开显示页面
-      if (!expandedKnowledgeBases.has(currentKnowledgeBase.id)) {
+      if (!expandedKnowledgeBases.has(knowledgeOps.currentKnowledgeBase.id)) {
         const newExpanded = new Set(expandedKnowledgeBases);
-        newExpanded.add(currentKnowledgeBase.id);
+        newExpanded.add(knowledgeOps.currentKnowledgeBase.id);
         setExpandedKnowledgeBases(newExpanded);
+        console.log('📂 Expanded knowledge base');
       }
 
       if (newId && onSelect) {
         onSelect(newId);
+        console.log('🎯 Selected new page');
       }
     } catch (error) {
-      console.error('创建页面失败:', error);
+      console.error('❌ 创建页面失败:', error);
     }
   };
 
@@ -114,7 +113,7 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
 
     setIsDeletingKnowledgeBase(true);
     try {
-      await deleteKnowledgeBase(deleteConfirm.knowledgeBase.id);
+      await knowledgeOps.deleteKnowledgeBase?.(deleteConfirm.knowledgeBase.id);
       setDeleteConfirm({
         isOpen: false,
         knowledgeBase: null
@@ -146,7 +145,7 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
 
     setIsDeleting(true);
     try {
-      await deletePage(deleteTarget.id);
+      await knowledgeOps.deletePage?.(deleteTarget.id);
       setShowDeleteConfirm(false);
       setDeleteTarget(null);
     } catch (error) {
@@ -170,7 +169,7 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
   // 刷新数据
   const handleRefresh = async () => {
     try {
-      await loadKnowledgeBases();
+      await knowledgeOps.loadKnowledgeBases?.();
     } catch (error) {
       console.error('刷新失败:', error);
     }
@@ -197,7 +196,7 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
   // 递归渲染页面树节点
   const renderNode = (node: any, level: number = 0) => {
     const hasChildren = node.children && node.children.length > 0;
-    const isExpanded = expandedIds.has(node.id);
+    const isExpanded = knowledgeOps.expandedIds?.has(node.id);
     const paddingLeft = level * 20; // 每层缩进20px
 
     return (
@@ -217,7 +216,7 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
                 onSelect?.(node.id);
                 // 如果有子节点，也切换展开/折叠状态
                 if (hasChildren) {
-                  toggleExpansion(node.id);
+                  knowledgeOps.toggleExpansion?.(node.id);
                 }
               }}
             >
@@ -235,7 +234,7 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
                 onBlur={async () => {
                   if (editingTitle.trim() && editingTitle !== node.title) {
                     try {
-                      await update(node.id, editingTitle.trim());
+                      await knowledgeOps.updatePage?.(node.id, editingTitle.trim());
                     } catch (error) {
                       console.error('重命名页面失败:', error);
                     }
@@ -311,19 +310,19 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
 
   // 过滤页面（根据搜索查询）
   const getFilteredTree = () => {
-    if (!currentKnowledgeBase) return [];
+    if (!knowledgeOps.currentKnowledgeBase) return [];
 
-    const currentSearchQuery = externalSearchQuery || searchQuery;
+    const currentSearchQuery = externalSearchQuery || knowledgeOps.searchQuery;
 
-    if (currentSearchQuery.trim()) {
+    if (currentSearchQuery?.trim()) {
       // 搜索模式：显示扁平化的匹配结果
-      return pages.filter(page =>
-        page.kb_id === currentKnowledgeBase.id && page.title.toLowerCase().includes(currentSearchQuery.toLowerCase())
-      );
+      return knowledgeOps.pages?.filter((page: any) =>
+        page.kb_id === knowledgeOps.currentKnowledgeBase!.id && page.title.toLowerCase().includes(currentSearchQuery.toLowerCase())
+      ) || [];
     }
 
     // 正常模式：显示树状结构
-    return pageTree;
+    return knowledgeOps.pageTree || [];
   };
 
   return (
@@ -331,8 +330,8 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
       {/* 页面列表 */}
       <div className="flex-1 overflow-y-auto">
         <div className="py-2">
-          {currentKnowledgeBase ? (
-            (externalSearchQuery || searchQuery).trim() ? (
+          {knowledgeOps.currentKnowledgeBase ? (
+            (externalSearchQuery || knowledgeOps.searchQuery)?.trim() ? (
               // 搜索模式：显示匹配的页面（扁平化）
               <div className="space-y-2">
                 {getFilteredTree().map((page: any) => (
@@ -367,7 +366,7 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
             </div>
           )}
 
-          {currentKnowledgeBase && getFilteredTree().length === 0 && !(externalSearchQuery || searchQuery).trim() && (
+          {knowledgeOps.currentKnowledgeBase && getFilteredTree().length === 0 && !(externalSearchQuery || knowledgeOps.searchQuery)?.trim() && (
             <div className="px-3 py-8 text-center theme-text-secondary">
               <p className="text-sm mb-2">暂无页面</p>
               <button 

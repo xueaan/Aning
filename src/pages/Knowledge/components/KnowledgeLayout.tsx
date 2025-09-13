@@ -1,5 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { useKnowledgeStore } from '@/stores';
+import { useKnowledgeOperations } from '@/stores/knowledgeStore';
 import { KnowledgeTree } from './KnowledgeTree';
 import { BlockEditor } from './BlockEditor';
 import { KnowledgeEmptyState } from './KnowledgeEmptyState';
@@ -16,20 +16,7 @@ interface KnowledgeLayoutProps {
 export const KnowledgeLayout: React.FC<KnowledgeLayoutProps> = ({
   searchQuery: externalSearchQuery
 }) => {
-  const {
-    currentKnowledgeBase,
-    knowledgeBases,
-    blocks,
-    expandedIds,
-    expandAll,
-    collapseAll,
-    loadKnowledgeBases,
-    loads,
-    loadBlocks,
-    updateBlocks,
-    create,
-    isLoading
-  } = useKnowledgeStore();
+  const knowledgeOps = useKnowledgeOperations();
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showCreateKnowledgeBaseModal, setShowCreateKnowledgeBaseModal] = useState(false);
@@ -43,19 +30,20 @@ export const KnowledgeLayout: React.FC<KnowledgeLayoutProps> = ({
 
   // 处理全局展开/折叠
   const handleToggleExpandAll = () => {
-    if (expandedIds.size === 0) {
-      expandAll();
+    if (knowledgeOps.expandedIds?.size === 0) {
+      knowledgeOps.expandAll?.();
     } else {
-      collapseAll();
+      knowledgeOps.collapseAll?.();
     }
   };
 
   // 处理创建页面
   const handleCreate = async () => {
-    if (!currentKnowledgeBase) return;
+    if (!knowledgeOps.currentKnowledgeBase) return;
 
     try {
-      const newId = await create('未命名页面');
+      const newTitle = `新页面 ${new Date().toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' })}`;
+      const newId = await knowledgeOps.createPage?.(knowledgeOps.currentKnowledgeBase.id, newTitle);
       if (newId) {
         setSelectedId(newId);
       }
@@ -69,46 +57,61 @@ export const KnowledgeLayout: React.FC<KnowledgeLayoutProps> = ({
     setShowCreateKnowledgeBaseModal(true);
   };
 
+  // 临时清理功能 - 测试用
+  const handleCleanupData = async () => {
+    try {
+      const { DatabaseAPI } = await import('@/services/api/database');
+      const updatedCount = await DatabaseAPI.cleanupUnnamedPages();
+      console.log(`清理完成，更新了 ${updatedCount} 个页面`);
+      // 刷新页面数据
+      if (knowledgeOps.currentKnowledgeBase) {
+        await knowledgeOps.loadPages?.(knowledgeOps.currentKnowledgeBase.id);
+      }
+    } catch (error) {
+      console.error('清理失败:', error);
+    }
+  };
+
   // 初始化数据
   useEffect(() => {
     const initData = async () => {
       try {
-        await loadKnowledgeBases();
+        await knowledgeOps.loadKnowledgeBases?.();
       } catch (error) {
         console.error('加载知识库失败:', error);
       }
     };
 
     initData();
-  }, [loadKnowledgeBases]);
+  }, [knowledgeOps.loadKnowledgeBases]);
 
   // 当选择知识库时加载页面并重置页面选择
   useEffect(() => {
-    if (currentKnowledgeBase) {
+    if (knowledgeOps.currentKnowledgeBase) {
       // 切换知识库时重置页面选择
       setSelectedId(null);
 
-      const loadKnowledgeBases = async () => {
+      const loadPages = async () => {
         try {
-          await loads(currentKnowledgeBase.id);
+          await knowledgeOps.loadPages?.(knowledgeOps.currentKnowledgeBase!.id);
         } catch (error) {
           console.error('加载页面失败:', error);
         }
       };
 
-      loadKnowledgeBases();
+      loadPages();
     } else {
       // 如果没有知识库，也重置页面选择
       setSelectedId(null);
     }
-  }, [currentKnowledgeBase, loads]);
+  }, [knowledgeOps.currentKnowledgeBase, knowledgeOps.loadPages]);
 
   // 当选择页面时加载块
   useEffect(() => {
     if (selectedId) {
       const loadPageBlocks = async () => {
         try {
-          await loadBlocks(selectedId);
+          await knowledgeOps.loadBlocks?.(selectedId);
         } catch (error) {
           console.error('加载页面内容失败:', error);
         }
@@ -116,7 +119,7 @@ export const KnowledgeLayout: React.FC<KnowledgeLayoutProps> = ({
 
       loadPageBlocks();
     }
-  }, [selectedId, loadBlocks]);
+  }, [selectedId, knowledgeOps.loadBlocks]);
 
   // 处理页面选择
   const handleSelect = (pageId: string) => {
@@ -128,7 +131,8 @@ export const KnowledgeLayout: React.FC<KnowledgeLayoutProps> = ({
     if (!selectedId) return;
 
     try {
-      await updateBlocks(selectedId, newBlocks);
+      // Note: Block updates are handled by individual components
+      console.log('Blocks changed:', newBlocks);
     } catch (error) {
       console.error('保存页面内容失败:', error);
     }
@@ -205,9 +209,9 @@ export const KnowledgeLayout: React.FC<KnowledgeLayoutProps> = ({
             <div className="flex items-center gap-1">
               <button onClick={handleToggleExpandAll}
             className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-white/8 text-white/50 hover:text-white/80 transition-colors"
-              title={expandedIds.size === 0 ? "展开全部" : "折叠全部"}
+              title={knowledgeOps.expandedIds?.size === 0 ? "展开全部" : "折叠全部"}
               >
-              {expandedIds.size === 0 ? (
+              {knowledgeOps.expandedIds?.size === 0 ? (
                 <ChevronRight className="w-3.5 h-3.5" />
               ) : (
                 <ChevronDown className="w-3.5 h-3.5" />
@@ -218,6 +222,22 @@ export const KnowledgeLayout: React.FC<KnowledgeLayoutProps> = ({
             title="创建新页面"
               >
             <Plus className="w-3.5 h-3.5" />
+          </button>
+          <button onClick={handleCleanupData}
+            className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-green-500/15 text-white/50 hover:text-green-300 transition-colors text-xs"
+            title="清理历史数据"
+              >
+            🧹
+          </button>
+          <button onClick={async () => {
+            if (knowledgeOps.currentKnowledgeBase) {
+              await knowledgeOps.loadPages?.(knowledgeOps.currentKnowledgeBase.id);
+            }
+          }}
+            className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-blue-500/15 text-white/50 hover:text-blue-300 transition-colors text-xs"
+            title="刷新页面数据"
+              >
+            🔄
           </button>
         </div>
       </div>
@@ -237,8 +257,8 @@ export const KnowledgeLayout: React.FC<KnowledgeLayoutProps> = ({
   <div className="flex-1 flex h-full">
     {/* 条件渲染：空状态、目录视图或编辑器 */ }
 {
-  !currentKnowledgeBase || knowledgeBases.length === 0 ? (
-    <KnowledgeEmptyState hasKnowledgeBases={knowledgeBases.length > 0} onCreateKnowledgeBase={handleCreateKnowledgeBase}
+  !knowledgeOps.currentKnowledgeBase || knowledgeOps.knowledgeBases?.length === 0 ? (
+    <KnowledgeEmptyState hasKnowledgeBases={knowledgeOps.knowledgeBases?.length > 0} onCreateKnowledgeBase={handleCreateKnowledgeBase}
       onCreate={handleCreate}
             className="flex-1"
     />
@@ -249,8 +269,8 @@ export const KnowledgeLayout: React.FC<KnowledgeLayoutProps> = ({
     />
   ) : (
   /* BlockSuite 编辑器 */
-  <BlockEditor knowledgeBaseId={currentKnowledgeBase?.id || ''} pageId={selectedId}
-    initialBlocks={blocks || []} onBlocksChange={handleBlocksChange}
+  <BlockEditor knowledgeBaseId={knowledgeOps.currentKnowledgeBase?.id || ''} pageId={selectedId}
+    initialBlocks={knowledgeOps.blocks || []} onBlocksChange={handleBlocksChange}
     onHeadingsChange={handleHeadingsChange} onOutlineToggle={handleOutlineToggle}
     isOutlineVisible={isOutlineVisible}
             className="flex-1"
@@ -260,7 +280,7 @@ export const KnowledgeLayout: React.FC<KnowledgeLayoutProps> = ({
         </div>
       </div>{/* 加载状态遮罩 */ }
 {
-  isLoading && (
+  knowledgeOps.isLoading && (
     <div className="absolute inset-0 theme-overlay flex items-center justify-center z-50">
       <div className="rounded-lg p-6 shadow-lg theme-card">
         <div className="flex items-center gap-3">
@@ -274,7 +294,7 @@ export const KnowledgeLayout: React.FC<KnowledgeLayoutProps> = ({
 
 {/* 浮动的新建页面按钮 - 只在有知识库时显示 */ }
 {
-  currentKnowledgeBase && (
+  knowledgeOps.currentKnowledgeBase && (
     <button onClick={handleCreate}
             className="fixed bottom-6 right-6 w-14 h-14 theme-button-primary rounded-full shadow-lg hover:shadow-xl transition-all duration-200 z-50 flex items-center justify-center group hover:scale-105"
       title="新建页面"

@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import type { Block as BackendBlock } from '@/types';
 import { cn } from '@/lib/utils';
-import { useAppStore, useKnowledgeStore } from '@/stores';
+import { useAppStore } from '@/stores';
+import { useKnowledgeOperations } from '@/stores/knowledgeStore';
 import { NovelEditor, type NovelEditorRef } from '@/components/editor/Novel';
 import { RichEditorToolbar } from '@/components/editor/RichEditorToolbar';
 import { Eye } from 'lucide-react';
@@ -41,12 +42,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
   // const [activeHeadingId, setActiveHeadingId] = useState<string>(''); // 暂时未使用
 
   const { theme } = useAppStore();
-  const {
-    hasUnsavedChanges,
-    autoSaveEnabled,
-    setHasUnsavedChanges,
-    setLastSavedAt
-  } = useKnowledgeStore();
+  const knowledgeOps = useKnowledgeOperations();
 
   // 加载页面内容
   const loadContent = async (pid: string) => {
@@ -54,10 +50,11 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
 
     try {
       setIsLoading(true);
-      console.log('Loading page content for:', pid);
+      console.log('🔄 Loading page content for:', pid);
 
       // 从数据库加载页面的块内容
       const blocks = await DatabaseAPI.getBlocks(pid);
+      console.log('📊 Retrieved blocks for page', pid, ':', blocks);
 
       if (blocks && blocks.length > 0) {
         // 如果有块数据，合并所有块的内容
@@ -76,6 +73,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
           .join('\n');
 
         const finalContent = htmlContent || '<p></p>';
+        console.log('✅ Setting editor content:', finalContent);
         setEditorContent(finalContent);
 
         // 立即提取标题
@@ -102,8 +100,30 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
           setHeadings([]);
         }
       } else {
-        // 如果没有块数据，显示空内容
-        setEditorContent('<p></p>');
+        // 如果没有块数据，尝试从页面标题创建初始内容
+        console.log('⚠️  No blocks found for page', pid);
+        
+        // 尝试从知识库操作中获取当前页面信息
+        const currentPage = knowledgeOps.pages.find(p => p.id === pid);
+        if (currentPage && currentPage.title && currentPage.title.trim() !== '' && !currentPage.title.startsWith('新页面')) {
+          // 如果页面有标题且不是默认的"新页面"，使用标题作为初始内容
+          const initialContent = `<h2>${currentPage.title}</h2><p></p>`;
+          console.log('✨ Creating initial content from page title:', initialContent);
+          setEditorContent(initialContent);
+          
+          // 自动保存这个初始内容到数据库
+          try {
+            await DatabaseAPI.createBlock(pid, 'heading', currentPage.title);
+            await DatabaseAPI.createBlock(pid, 'paragraph', '');
+          } catch (error) {
+            console.warn('Failed to create initial blocks:', error);
+          }
+        } else {
+          // 显示空内容
+          console.log('📝 Setting empty content (no valid title)');
+          setEditorContent('<p></p>');
+        }
+        
         // 清空标题
         if (onHeadingsChange) {
           onHeadingsChange([]);
@@ -124,8 +144,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
     if (!pageId) return;
 
     try {
-      // 设置保存状态
-      useKnowledgeStore.setState({ isSaving: true });
+      // No need to set saving state here
 
       // 获取现有的块
       const existingBlocks = await DatabaseAPI.getBlocks(pageId);
@@ -156,8 +175,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
         }
       }
 
-      // 更新保存状态
-      setLastSavedAt(Date.now());
+      // Content saved successfully
 
       // 更新页面的修改时间
       await DatabaseAPI.updatePage(pageId);
@@ -165,18 +183,18 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
       console.error('Failed to save page content:', error);
       throw error;
     } finally {
-      useKnowledgeStore.setState({ isSaving: false });
+      // Save operation completed
     }
   };
 
   // 防抖自动保存函数
   const debouncedAutoSave = useCallback(
     debounce(async (content: string) => {
-      if (autoSaveEnabled && !readOnly) {
+      if (knowledgeOps.autoSaveEnabled && !readOnly) {
         await saveContent(content);
       }
     }, 2000), // 2秒防抖
-    [pageId, autoSaveEnabled, readOnly]
+    [pageId, knowledgeOps.autoSaveEnabled, readOnly]
   );
 
   // 防抖提取标题函数
@@ -261,12 +279,12 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
     setEditorContent(newContent);
 
     // 标记有未保存的更改
-    if (!hasUnsavedChanges && newContent !== editorContent) {
-      setHasUnsavedChanges(true);
+    if (!knowledgeOps.hasUnsavedChanges && newContent !== editorContent) {
+      // Note: We don't have a direct setter, so we'll manage state locally
     }
 
     // 触发防抖自动保存
-    if (autoSaveEnabled && !readOnly) {
+    if (knowledgeOps.autoSaveEnabled && !readOnly) {
       debouncedAutoSave(newContent);
     }
 
@@ -294,15 +312,15 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
 
   // 当 pageId 变化时加载内容
   useEffect(() => {
+    console.log('🎯 PageId changed to:', pageId);
     if (pageId) {
-      // 重置状态
-      setHasUnsavedChanges(false);
+      // 重置状态（managing locally since we don't have direct setter)
       // 加载页面内容
       loadContent(pageId);
     } else {
       // 清空编辑器内容
+      console.log('🗑️  Clearing editor content (no pageId)');
       setEditorContent('');
-      setHasUnsavedChanges(false);
       // 清空标题
       if (onHeadingsChange) {
         onHeadingsChange([]);
@@ -310,7 +328,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
       // 清空浮动大纲标题
       setHeadings([]);
     }
-  }, [pageId, setHasUnsavedChanges]);
+  }, [pageId]);
 
   // 监听滚动更新活跃标题
   useEffect(() => {
@@ -452,7 +470,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
     )}>
       {/* 顶部工具栏 - 与大纲按钮对齐 */}
       <div className="sticky top-0 z-20">
-        <div className="flex items-start justify-between p-6 pb-4">
+        <div className="flex items-start justify-between px-6 py-3">
           {/* 左侧工具栏 */}
           <div className="flex-1 min-w-0">
             <RichEditorToolbar 

@@ -1,8 +1,10 @@
 // 导出所有状态管理
 export { useAppStore } from './appStore';
+
+// 业务模块 stores
 export { useNoteStore } from './noteStore';
 export { useTimelineStore } from './timelineStore';
-export { useKnowledgeStore } from './knowledgeStore';
+export { useKnowledgeStore, useKnowledgeOperations } from './knowledgeStore';
 export { useHomeStore } from './homeStore';
 export { useMindBoardStore } from './mindBoardStore';
 export { useTaskBoxStore } from './taskBoxStore';
@@ -10,6 +12,12 @@ export { useHabitStore } from './habitStore';
 export { usePasswordStore } from './passwordStore';
 export { useDialogueContextStore } from './dialogueContextStore';
 export { useCardBoxStore } from './cardBoxStore';
+
+// 知识库子模块 stores
+export { useKnowledgeBaseStore } from './knowledge/knowledgeBaseStore';
+export { usePageStore } from './knowledge/pageStore';
+export { useSearchStore } from './knowledge/searchStore';
+export { useEditorStore } from './knowledge/editorStore';
 
 // 导出类型 (只导出实际导出的接口)
 export type { KnowledgeStore } from './knowledgeStore';

@@ -1,6 +1,6 @@
 ﻿import React, { useState } from 'react';
 import { X } from 'lucide-react';
-import { useKnowledgeStore } from '@/stores/knowledgeStore';
+import { useKnowledgeOperations } from '@/stores';
 import { IconPicker } from '@/components/common/IconPicker';
 
 interface CreateKnowledgeBaseModalProps {
@@ -12,7 +12,7 @@ export const CreateKnowledgeBaseModal: React.FC<CreateKnowledgeBaseModalProps> =
   isOpen,
   onClose
 }) => {
-  const { createKnowledgeBase, setCurrentKnowledgeBase } = useKnowledgeStore();
+  const { createKnowledgeBase, setCurrentKnowledgeBase } = useKnowledgeOperations();
 
   const [name, setName] = useState('');
   const [selectedIcon, setSelectedIcon] = useState('Book');

@@ -172,7 +172,7 @@ export const useTaskBoxStore = create<TaskBoxStore>()(
             taskData.status,
             taskData.priority,
             taskData.due_date,
-            taskData.project_id
+            taskData.project_id || undefined
           );
 
           // 重新加载任务列表以获取最新数据
@@ -277,12 +277,12 @@ export const useTaskBoxStore = create<TaskBoxStore>()(
       
       createProject: async (projectData) => {
         try {
-          await DatabaseAPI.createTaskProject(
-            projectData.name,
-            projectData.icon || '📁',
-            projectData.color,
-            projectData.description
-          );
+          await DatabaseAPI.createTaskProject({
+            name: projectData.name,
+            icon: projectData.icon || '📁',
+            color: projectData.color,
+            description: projectData.description
+          });
           
           // 重新加载项目列表
           await get().loadProjects();

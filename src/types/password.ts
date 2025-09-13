@@ -8,6 +8,9 @@ export interface PasswordCategory {
   created_at?: string;
 }
 
+// 别名，用于向后兼容
+export type Category = PasswordCategory;
+
 export interface PasswordEntry {
   id?: number;
   title: string;

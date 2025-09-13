@@ -69,7 +69,7 @@ export const Timeline: React.FC = () => {
 
             if (dbEntries && dbEntries.length > 0) {
               // 转换数据库条目为Timeline Store格式
-              const timelineEntries: TimelineEntry[] = dbEntries.map(entry => ({
+              const timelineEntries: TimelineEntry[] = dbEntries.map((entry: any) => ({
                 id: entry.id?.toString() || `db-${Date.now()}-${Math.random()}`,
                 content: entry.content,
                 created_at: entry.created_at
@@ -175,7 +175,6 @@ export const Timeline: React.FC = () => {
       const dateStr = formatDate(currentDate);
       const time = getCurrentTime();
 
-      const timestamp = Date.now();
 
       // 保存到SQLite数据库（添加超时）
       await Promise.race([
@@ -184,8 +183,7 @@ export const Timeline: React.FC = () => {
           time,
           inputValue.trim(),
           undefined,
-          undefined,
-          timestamp
+          undefined
         ),
         new Promise<never>((_, reject) =>
           setTimeout(() => reject(new Error('数据库保存超时')), 4000)

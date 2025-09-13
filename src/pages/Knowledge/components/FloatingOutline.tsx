@@ -130,9 +130,9 @@ export const FloatingOutline: React.FC<FloatingOutlineProps> = ({
             onClick={() => setIsExpanded(true)} 
             className={cn(
               'flex items-center gap-2 px-3 py-2 rounded-lg shadow-lg backdrop-blur-md transition-all duration-200 text-sm',
-              'theme-bg-secondary/90 theme-text-secondary theme-border',
+              'theme-bg-secondary/85 theme-text-secondary border-2 theme-border-primary',
               'hover:theme-bg-secondary hover:theme-text-primary hover:shadow-xl hover:scale-105',
-              'border backdrop-blur-sm'
+              'backdrop-blur-sm'
             )}
           >
             <Eye className="w-4 h-4" />
@@ -142,12 +142,12 @@ export const FloatingOutline: React.FC<FloatingOutlineProps> = ({
       ) : (
         // 展开状态：显示大纲内容
         <div className={cn(
-          'theme-bg-primary/95 backdrop-blur-md rounded-lg shadow-2xl w-64 max-h-96 overflow-hidden',
-          'border theme-border'
+          'theme-bg-primary/85 backdrop-blur-md rounded-lg shadow-2xl w-64 max-h-96 overflow-hidden',
+          'border-2 theme-border-primary'
         )}>
           {/* 头部 */}
           <div className={cn(
-            'flex items-center justify-between px-3 py-2.5 theme-border border-b backdrop-blur-sm'
+            'flex items-center justify-between px-3 py-2.5 border-b-2 theme-border-primary backdrop-blur-sm'
           )}>
             <span className="text-sm font-semibold theme-text-primary">大纲</span>
             <div className="flex items-center gap-1">

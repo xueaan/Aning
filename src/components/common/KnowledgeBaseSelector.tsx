@@ -2,7 +2,7 @@
 import { createPortal } from 'react-dom';
 import { ChevronDown, Plus, Trash2, Edit2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useKnowledgeStore } from '@/stores';
+import { useKnowledgeOperations } from '@/stores';
 import type { KnowledgeBase } from '@/types';
 import { getIconComponent, isValidIcon } from '@/constants/commonIcons';
 import { ConfirmDeleteModal } from './ConfirmDeleteModal';
@@ -23,7 +23,7 @@ export const KnowledgeBaseSelector: React.FC<KnowledgeBaseSelectorProps> = ({
     currentKnowledgeBase,
     setCurrentKnowledgeBase,
     deleteKnowledgeBase
-  } = useKnowledgeStore();
+  } = useKnowledgeOperations();
 
   // 获取知识库图标，处理null/undefined/空字符串情况
   const getKnowledgeBaseIcon = (kb: typeof currentKnowledgeBase) => {

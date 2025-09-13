@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useKnowledgeStore } from '@/stores/knowledgeStore';
+import { useKnowledgeOperations } from '@/stores';
 import { X, Edit2 } from 'lucide-react';
 
 interface RenameModalProps {
@@ -17,7 +17,7 @@ export const RenameModal: React.FC<RenameModalProps> = ({
   pageId
 }) => {
   // Store references removed - themeMode cleanup
-  const { pages } = useKnowledgeStore();
+  const { pages } = useKnowledgeOperations();
   const [title, setTitle] = useState('');
 
   const page = pages.find(p => p.id === pageId);

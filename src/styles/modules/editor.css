@@ -13,7 +13,7 @@
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(var(--border-primary), 0.3);
   border-radius: var(--radius-xl);
-  overflow: hidden;
+  overflow: visible; /* 修复：改为visible避免containing block问题 */
   transition: all var(--duration-fast) ease;
 }
 

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { cn } from '@/lib/utils';
-import { useKnowledgeStore } from '@/stores';
+import { useKnowledgeOperations } from '@/stores/knowledgeStore';
 import { FileText, Clock } from 'lucide-react';
 import { formatSmartTime } from '@/utils/timeUtils';
 import type { Page } from '@/types';
@@ -20,16 +20,16 @@ export const PagesCatalog: React.FC<PagesCatalogProps> = ({
   searchQuery = '',
   className = ''
 }) => {
-  const { pages, currentKnowledgeBase } = useKnowledgeStore();
+  const knowledgeOps = useKnowledgeOperations();
 
   // 过滤页面（根据搜索条件）
   const filteredPages = useMemo(() => {
-    if (!searchQuery.trim()) return pages;
+    if (!searchQuery.trim()) return knowledgeOps.pages;
 
-    return pages.filter(page =>
+    return knowledgeOps.pages.filter((page: any) =>
       page.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [pages, searchQuery]);
+  }, [knowledgeOps.pages, searchQuery]);
 
   // 按层级组织页面
   const organizedPages = useMemo(() => {
@@ -119,7 +119,7 @@ export const PagesCatalog: React.FC<PagesCatalogProps> = ({
   };
 
   // 如果没有知识库，显示空状态
-  if (!currentKnowledgeBase) {
+  if (!knowledgeOps.currentKnowledgeBase) {
     return (
       <div className={cn('flex items-center justify-center h-full theme-knowledge-glass', className)}>
         <div className="text-center p-8">

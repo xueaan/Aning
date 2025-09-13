@@ -209,6 +209,7 @@ fn main() {
             commands::get_ai_agent,
             commands::delete_ai_agent,
             commands::set_current_ai_agent,
+            commands::cleanup_unnamed_pages,
             // Novel 知识库命令暂时注释，待数据库修复后启用
             // knowledge::save_page_content,
             // knowledge::get_page_content,

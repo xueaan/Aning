@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useKnowledgeStore } from '@/stores/knowledgeStore';
+import { useKnowledgeOperations } from '@/stores';
 import { X, FolderOpen, FileText, ChevronRight, ChevronDown } from 'lucide-react';
 
 interface MoveModalProps {
@@ -19,7 +19,7 @@ export const MoveModal: React.FC<MoveModalProps> = ({
   mode
 }) => {
   // Store references removed - themeMode cleanup
-  const { pageTree, pages } = useKnowledgeStore();
+  const { pageTree, pages } = useKnowledgeOperations();
   const [selectedParentId, setSelectedParentId] = useState<string | undefined>(undefined);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 

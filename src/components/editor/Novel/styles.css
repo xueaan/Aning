@@ -1181,59 +1181,115 @@ div[data-tippy-root]:has(.editor-bubble)>.tippy-content {
   position: relative;
 }
 
-/* 拖拽手柄样式 - 完全复制示例 */
-.drag-handle {
-  position: fixed !important;
-  opacity: 1 !important;
-  display: block !important;
-  visibility: visible !important;
-  transition: opacity ease-in 0.2s;
-  border-radius: 0.25rem;
-  
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10' style='fill: rgba(0, 0, 0, 0.5)'%3E%3Cpath d='M3,2 C2.44771525,2 2,1.55228475 2,1 C2,0.44771525 2.44771525,0 3,0 C3.55228475,0 4,0.44771525 4,1 C4,1.55228475 3.55228475,2 3,2 Z M3,6 C2.44771525,6 2,5.55228475 2,5 C2,4.44771525 2.44771525,4 3,4 C3.55228475,4 4,4.44771525 4,5 C4,5.55228475 3.55228475,6 3,6 Z M3,10 C2.44771525,10 2,9.55228475 2,9 C2,8.44771525 2.44771525,8 3,8 C3.55228475,8 4,8.44771525 4,9 C4,9.55228475 3.55228475,10 3,10 Z M7,2 C6.44771525,2 6,1.55228475 6,1 C6,0.44771525 6.44771525,0 7,0 C7.55228475,0 8,0.44771525 8,1 C8,1.55228475 7.55228475,2 7,2 Z M7,6 C6.44771525,6 6,5.55228475 6,5 C6,4.44771525 6.44771525,4 7,4 C7.55228475,4 8,4.44771525 8,5 C8,5.55228475 7.55228475,6 7,6 Z M7,10 C6.44771525,10 6,9.55228475 6,9 C6,8.44771525 6.44771525,8 7,8 C7.55228475,8 8,8.44771525 8,9 C8,9.55228475 7.55228475,10 7,10 Z'%3E%3C/path%3E%3C/svg%3E") !important;
-  background-size: calc(0.5em + 0.375rem) calc(0.5em + 0.375rem) !important;
-  background-repeat: no-repeat !important;
-  background-position: center !important;
-  width: 1.2rem !important;
-  height: 1.5rem !important;
+/* 官方DragHandle扩展样式 - 防止超出边界 */
+.drag-handle-official {
+  display: flex !important;
+  align-items: center !important;
+  gap: 3px !important;
+  padding: 2px 2px 2px 2px !important;
+  margin-top: 1px !important;
+  margin-left: 6px !important;
+  margin-right: 1px !important;
+  min-width: 44px !important;
+  width: auto !important;
+  overflow: visible !important;
+  opacity: 0.5;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 50 !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 3px !important;
+  flex-shrink: 0 !important;
+}
+
+.drag-handle-official:hover {
+  opacity: 0.9;
+  background: rgba(var(--text-primary), 0.02) !important;
+}
+
+.drag-handle-official:active {
+  cursor: grabbing !important;
+  opacity: 1;
+  background: rgba(var(--text-primary), 0.05) !important;
+}
+
+/* + 号按钮样式 - 使用Plus图标 */
+.drag-handle-add {
+  width: 20px !important;
+  height: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: rgba(var(--text-primary), 0.7) !important;
+  cursor: pointer !important;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  user-select: none !important;
+  flex-shrink: 0 !important;
+  border-radius: 3px !important;
+  background: transparent !important;
+  position: relative !important;
+}
+
+.drag-handle-add:hover {
+  color: rgba(var(--text-primary), 0.9) !important;
+  background: rgba(var(--text-primary), 0.05) !important;
+  transform: scale(1.05) !important;
+}
+
+.drag-handle-add:active {
+  transform: scale(0.98) !important;
+  background: rgba(var(--text-primary), 0.08) !important;
+}
+
+/* 六个小点容器样式 - 与Plus图标平衡 */
+.drag-handle-dots {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  grid-template-rows: repeat(3, 1fr) !important;
+  gap: 2px !important;
+  width: 14px !important;
+  height: 18px !important;
   cursor: grab !important;
-  pointer-events: auto !important;
+  padding: 2px !important;
+  border-radius: 2px !important;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  align-items: center !important;
+  justify-items: center !important;
+  flex-shrink: 0 !important;
 }
 
-.drag-handle:hover {
-  background-color: rgba(var(--novel-stone-100), 1);
-  transition: background-color 0.2s;
+.drag-handle-dots:hover {
+  background: rgba(var(--text-primary), 0.03) !important;
+  transform: scale(1.05) !important;
 }
 
-.drag-handle:active {
-  background-color: rgba(var(--novel-stone-200), 1);
-  transition: background-color 0.2s;
-  cursor: grabbing;
+/* 六个小点样式 - 使用统一变量 */
+.drag-handle-dot {
+  width: 3px !important;
+  height: 3px !important;
+  border-radius: 50% !important;
+  background: rgba(var(--text-primary), 0.6) !important;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-.drag-handle.hide {
-  opacity: 0;
-  pointer-events: none;
+.drag-handle-dots:hover .drag-handle-dot {
+  background: rgba(var(--text-primary), 0.8) !important;
+  transform: scale(1.1) !important;
 }
 
-/* 深色模式的拖拽手柄 */
-.dark .drag-handle {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10' style='fill: rgba(255, 255, 255, 0.5)'%3E%3Cpath d='M3,2 C2.44771525,2 2,1.55228475 2,1 C2,0.44771525 2.44771525,0 3,0 C3.55228475,0 4,0.44771525 4,1 C4,1.55228475 3.55228475,2 3,2 Z M3,6 C2.44771525,6 2,5.55228475 2,5 C2,4.44771525 2.44771525,4 3,4 C3.55228475,4 4,4.44771525 4,5 C4,5.55228475 3.55228475,6 3,6 Z M3,10 C2.44771525,10 2,9.55228475 2,9 C2,8.44771525 2.44771525,8 3,8 C3.55228475,8 4,8.44771525 4,9 C4,9.55228475 3.55228475,10 3,10 Z M7,2 C6.44771525,2 6,1.55228475 6,1 C6,0.44771525 6.44771525,0 7,0 C7.55228475,0 8,0.44771525 8,1 C8,1.55228475 7.55228475,2 7,2 Z M7,6 C6.44771525,6 6,5.55228475 6,5 C6,4.44771525 6.44771525,4 7,4 C7.55228475,4 8,4.44771525 8,5 C8,5.55228475 7.55228475,6 7,6 Z M7,10 C6.44771525,10 6,9.55228475 6,9 C6,8.44771525 6.44771525,8 7,8 C7.55228475,8 8,8.44771525 8,9 C8,9.55228475 7.55228475,10 7,10 Z'%3E%3C/path%3E%3C/svg%3E");
+/* 深色模式容器背景调整 */
+.dark .drag-handle-official:hover {
+  background: rgba(var(--text-primary), 0.02) !important;
 }
 
-.dark .drag-handle:hover {
-  background-color: rgba(var(--novel-stone-700), 1);
-}
-
-.dark .drag-handle:active {
-  background-color: rgba(var(--novel-stone-600), 1);
+.dark .drag-handle-official:active {
+  background: rgba(var(--text-primary), 0.05) !important;
 }
 
 /* 移动端隐藏拖拽手柄 */
 @media screen and (max-width: 600px) {
-  .drag-handle {
-    display: none;
+  .drag-handle-official {
+    display: none !important;
     pointer-events: none;
   }
 }
@@ -1244,4 +1300,91 @@ div[data-tippy-root]:has(.editor-bubble)>.tippy-content {
   background-color: rgba(var(--color-accent), 0.1);
   transition: background-color 0.2s;
   box-shadow: none;
+}
+
+/* 块操作菜单样式 */
+.block-action-menu {
+  position: fixed;
+  z-index: 9999;
+  min-width: 200px;
+  padding: 8px;
+  border-radius: 16px;
+  
+  /* 毛玻璃效果 - 与项目主题一致 */
+  background: rgba(255, 255, 255, 0.02) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+  
+  animation: menuFadeIn 0.2s ease;
+}
+
+/* 深色模式菜单 */
+.dark .block-action-menu {
+  background: rgba(20, 20, 20, 0.05) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+/* 菜单项样式 */
+.block-action-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 12px;
+  color: rgba(var(--text-primary), 0.9);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.block-action-item:hover {
+  background: rgba(var(--color-accent), 0.1);
+  color: rgba(var(--text-primary), 1);
+  transform: translateY(-1px);
+}
+
+.block-action-item:active {
+  transform: translateY(0);
+  background: rgba(var(--color-accent), 0.15);
+}
+
+/* 删除项特殊样式 */
+.block-action-item.delete-item {
+  color: #ef4444;
+}
+
+.block-action-item.delete-item:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+.dark .block-action-item.delete-item {
+  color: #f87171;
+}
+
+.dark .block-action-item.delete-item:hover {
+  background: rgba(248, 113, 113, 0.1);
+  color: #fca5a5;
+}
+
+/* 菜单动画 */
+@keyframes menuFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }

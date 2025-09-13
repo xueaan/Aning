@@ -790,3 +790,11 @@ pub async fn set_current_ai_agent(
 ) -> Result<(), String> {
     db.set_current_ai_agent(&agent_id).map_err(|e| e.to_string())
 }
+
+// 数据清理命令
+#[tauri::command]
+pub async fn cleanup_unnamed_pages(
+    db: State<'_, Arc<Database>>
+) -> Result<u32, String> {
+    db.cleanup_unnamed_pages().map_err(|e| e.to_string())
+}
