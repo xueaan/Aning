@@ -392,32 +392,30 @@ export const TaskQuickAdd: React.FC<TaskQuickAddProps> = ({
               transition={{ duration: 0.3 }}
             >
               <AnimatePresence mode="wait">
-                {isLoading && (
-                  <motion.div 
+                {isLoading ? (
+                  <motion.div
                     key="loading"
-                    initial={{ opacity: 0, rotate: 0 }} 
+                    initial={{ opacity: 0, rotate: 0 }}
                     animate={{ opacity: 1, rotate: 360 }}
-                    exit={{ opacity: 0 }} 
-                    transition={{ 
-                      duration: 0.2, 
-                      rotate: { duration: 1, repeat: Infinity, ease: 'linear' } 
+                    exit={{ opacity: 0 }}
+                    transition={{
+                      duration: 0.2,
+                      rotate: { duration: 1, repeat: Infinity, ease: 'linear' }
                     }}
                     className="w-3 h-3 border border-white/30 border-t-white rounded-full"
                   />
-                )}
-                {showSuccess && !isLoading && (
-                  <motion.div 
+                ) : showSuccess ? (
+                  <motion.div
                     key="success"
-                    initial={{ scale: 0, opacity: 0 }} 
+                    initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0, opacity: 0 }} 
+                    exit={{ scale: 0, opacity: 0 }}
                     transition={{ duration: 0.2 }}
                   >
                     <Check size={16} />
                   </motion.div>
-                )}
-                {!isLoading && !showSuccess && (
-                  <motion.div 
+                ) : (
+                  <motion.div
                     key="normal"
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}

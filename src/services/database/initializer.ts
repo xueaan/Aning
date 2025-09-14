@@ -29,14 +29,10 @@ class DatabaseInitializer {
     this.initPromise = new Promise<void>((resolve, reject) => {
       setTimeout(async () => {
         try {
-          const dbStartTime = performance.now();
-          console.log('💾 Database initialization started (deferred)');
-          
-          const stats = await DatabaseAPI.init();
-          
+          await DatabaseAPI.init();
+
           this.isInitialized = true;
-          const initTime = performance.now() - dbStartTime;
-          console.log(`💾 Database initialized successfully: ${initTime.toFixed(2)} ms`, stats);
+          // Database initialized successfully
           resolve();
         } catch (error) {
           const dbStartTime = performance.now();

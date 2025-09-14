@@ -3,9 +3,7 @@ import { cn } from '@/lib/utils';
 import { PenTool } from 'lucide-react';
 import { useCardBoxStore } from '@/stores';
 import { CardGrid } from './CardGrid';
-import { CardEditorModal } from './CardEditorModal';
 import { CardFullEditor } from './CardFullEditor';
-import { CardExpandedView } from './CardExpandedView';
 import { CreateCardBoxModal } from '@/components/modals/CreateCardBoxModal';
 
 interface CardBoxLayoutProps {
@@ -20,23 +18,15 @@ export const CardBoxLayout: React.FC<CardBoxLayoutProps> = ({
     activeBoxId,
     cards,
     isLoading,
-    editorModalOpen,
-    editingCard,
     fullEditorOpen,
     fullEditingCard,
-    expandedViewOpen,
-    expandedCard,
 
     loadBoxes,
     loadCards,
     deleteCard,
-    closeEditor,
-    saveCard,
     openFullEditor,
     closeFullEditor,
-    saveFullCard,
-    closeExpandedView,
-    saveExpandedCard
+    saveFullCard
   } = useCardBoxStore();
 
   const [showCreateBoxModal, setShowCreateBoxModal] = useState(false);
@@ -53,14 +43,14 @@ export const CardBoxLayout: React.FC<CardBoxLayoutProps> = ({
   }, [loadBoxes, loadCards]);
 
   // 创建新笔记
-  const handleCreateCard = () => {
+  const handleCreateCard = async () => {
     if (!activeBoxId && boxes.length === 0) {
       alert('请先创建一个笔记盒');
       return;
     }
 
     const targetBoxId = activeBoxId || boxes[0]?.id;
-    openFullEditor(undefined, targetBoxId);
+    await openFullEditor(undefined, targetBoxId);
   };
 
   // 创建笔记盒
@@ -78,8 +68,8 @@ export const CardBoxLayout: React.FC<CardBoxLayoutProps> = ({
   };
 
   // 展开笔记
-  const handleExpandCard = (card: any) => {
-    openFullEditor(card);
+  const handleExpandCard = async (card: any) => {
+    await openFullEditor(card);
   };
 
   // 如果全屏编辑器打开，显示全屏编辑器
@@ -122,23 +112,6 @@ export const CardBoxLayout: React.FC<CardBoxLayoutProps> = ({
         <PenTool size={24} className="text-white transition-transform group-hover:rotate-12 duration-200" />
       </button>
 
-      {/* 笔记编辑模态框 */}
-      <CardEditorModal
-        isOpen={editorModalOpen}
-        card={editingCard}
-        boxId={activeBoxId}
-        onClose={closeEditor}
-        onSave={saveCard}
-      />
-
-      {/* 笔记展开视图 */}
-      <CardExpandedView
-        card={expandedCard}
-        isOpen={expandedViewOpen}
-        onClose={closeExpandedView}
-        onSave={saveExpandedCard}
-        onDelete={handleDeleteCard}
-      />
 
       {/* 创建笔记盒模态框 */}
       <CreateCardBoxModal

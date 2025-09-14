@@ -11,7 +11,11 @@ import {
   Code,
   Minus,
   ImagePlus,
+  Table,
 } from "lucide-react";
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { TableSizeSelector } from "./TableSizeSelector";
 
 // 定义斜杠命令建议项
 export const suggestionItems: SuggestionItem[] = createSuggestionItems([
@@ -118,6 +122,110 @@ export const suggestionItems: SuggestionItem[] = createSuggestionItems([
     icon: <Minus size={16} className="theme-text-secondary" />,
     command: ({ editor, range }) => {
       editor.chain().focus().deleteRange(range).setHorizontalRule().run();
+    },
+  },
+  {
+    title: "表格",
+    description: "选择表格大小并插入。",
+    searchTerms: ["table", "grid", "data", "表格", "列表", "数据"],
+    icon: <Table size={16} className="theme-text-secondary" />,
+    command: ({ editor, range }) => {
+      editor.chain().focus().deleteRange(range).run();
+
+      // 创建一个容器来显示表格大小选择器
+      const selectorContainer = document.createElement('div');
+      selectorContainer.style.position = 'fixed';
+      selectorContainer.style.zIndex = '9999';
+
+      // 获取当前光标位置
+      const { view } = editor;
+      const coords = view.coordsAtPos(view.state.selection.from);
+
+      // 设置选择器位置
+      selectorContainer.style.left = `${coords.left}px`;
+      selectorContainer.style.top = `${coords.top + 30}px`;
+
+      document.body.appendChild(selectorContainer);
+
+      // 创建React根并渲染选择器
+      const root = ReactDOM.createRoot(selectorContainer);
+
+      const handleSelect = (rows: number, cols: number) => {
+        // 关闭选择器
+        root.unmount();
+        document.body.removeChild(selectorContainer);
+
+        // 插入指定大小的表格
+        (editor as any).chain()
+          .focus()
+          .insertTable({
+            rows: rows,
+            cols: cols,
+            withHeaderRow: false
+          })
+          .run();
+
+        // 最简单的方案：为所有空单元格填充零宽空格
+        setTimeout(() => {
+          const { state, view } = editor;
+          const { tr } = state;
+
+          let tableInfo = { rows: 0, cells: 0 };
+
+          // 遍历文档找到所有表格单元格
+          state.doc.descendants((node, pos) => {
+            if (node.type.name === 'tableRow') {
+              tableInfo.rows++;
+            }
+            if (node.type.name === 'tableCell' || node.type.name === 'tableHeader') {
+              // 检查单元格内容
+              if (node.content.size === 0) {
+                // 完全空的单元格，添加段落和零宽空格
+                const paragraph = state.schema.nodes.paragraph.create();
+                tr.insert(pos + 1, paragraph);
+                tr.insertText('\u200B', pos + 2);
+              } else if (node.content.size === 2 && node.firstChild?.type.name === 'paragraph' && node.firstChild.content.size === 0) {
+                // 有空段落的单元格，添加零宽空格
+                tr.insertText('\u200B', pos + 1);
+              }
+            }
+          });
+
+          if (tr.docChanged) {
+            view.dispatch(tr);
+          }
+
+          // 将光标移动到第一个单元格
+          editor.commands.focus();
+        }, 100);
+      };
+
+      const handleClose = () => {
+        if (selectorContainer && selectorContainer.parentNode) {
+          root.unmount();
+          document.body.removeChild(selectorContainer);
+        }
+        editor.commands.focus();
+      };
+
+      // 渲染表格大小选择器
+      root.render(
+        React.createElement(TableSizeSelector, {
+          onSelect: handleSelect,
+          onClose: handleClose
+        })
+      );
+
+      // 点击外部关闭选择器
+      setTimeout(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+          if (selectorContainer && !selectorContainer.contains(e.target as Node)) {
+            handleClose();
+            document.removeEventListener('click', handleClickOutside);
+          }
+        };
+        document.addEventListener('click', handleClickOutside);
+      }, 100);
     },
   },
   {

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trash2, X, Check } from 'lucide-react';
+import { Trash2, Check } from 'lucide-react';
 
 interface ConfirmDeleteModalProps {
   isOpen: boolean;
@@ -67,87 +68,71 @@ export const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
     };
   }, [isOpen, onClose]);
 
-  return (
+  const modalContent = (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <motion.div 
+        <div className="fixed inset-0 z-[10001] flex items-center justify-center p-4">
+          <motion.div
             ref={modalRef}
-            className="w-full max-w-md rounded-2xl shadow-2xl theme-bg-primary/95 backdrop-blur-xl theme-border"
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            className="w-full max-w-sm rounded-xl p-4 shadow-2xl feather-glass-dropdown border-2 theme-border"
+            initial={{ opacity: 0, scale: 0.9, y: -20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
+            exit={{ opacity: 0, scale: 0.9, y: -20 }}
+            transition={{
+              duration: 0.15,
+              ease: [0.16, 1, 0.3, 1]
+            }}
           >
-            {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b theme-border-primary">
-              <div className="flex items-center gap-3">
-                <div className="p-2 theme-bg-error/20 rounded-lg">
-                  <Trash2 
-                    size={18}
-                    className="theme-text-error" 
-                  />
-                </div>
-                <h2 className="text-lg font-medium theme-text-primary">
-                  {title}
-                </h2>
-              </div>
-              <button 
-                onClick={onClose} 
-                disabled={isLoading}
-                className="p-1.5 rounded-lg transition-all hover:scale-105 theme-text-secondary hover:theme-text-primary disabled:opacity-50 feather-glass-panel"
-              >
-                <X size={16} />
-              </button>
+            {/* 简洁标题 */}
+            <div className="flex items-center gap-2 mb-3">
+              <Trash2 size={16} className="theme-text-error" />
+              <h3 className="text-sm font-medium theme-text-primary">
+                {title}
+              </h3>
             </div>
 
-            {/* Content */}
-            <div className="px-6 py-4">
-              <p className="theme-text-secondary text-sm leading-relaxed">
-                {displayMessage}
-              </p>
-            </div>
+            {/* 提示文字 */}
+            <p className="text-xs theme-text-secondary mb-4 leading-relaxed">
+              {displayMessage}
+            </p>
 
-            {/* Actions */}
-            <div className="flex gap-3 p-6 pt-4">
-              <button 
+            {/* 按钮组 */}
+            <div className="flex gap-2">
+              <button
                 type="button"
-                onClick={onClose} 
+                onClick={onClose}
                 disabled={isLoading}
-                className="flex-1 px-4 py-3 rounded-lg transition-all hover:scale-[1.02] theme-text-secondary disabled:opacity-50 feather-glass-panel"
+                className="flex-1 px-3 py-2 text-xs rounded-lg transition-all theme-text-secondary disabled:opacity-50 feather-glass-panel hover:scale-[1.02]"
               >
                 取消
               </button>
-              <button 
+              <motion.button
                 type="button"
-                onClick={onConfirm} 
+                onClick={onConfirm}
                 disabled={isLoading}
-                className="flex-1 px-4 py-3 rounded-lg transition-all hover:scale-[1.02] disabled:opacity-50 theme-bg-error hover:theme-bg-error-hover theme-text-on-error font-medium flex items-center justify-center gap-2"
+                className="flex-1 px-3 py-2 text-xs rounded-lg transition-all disabled:opacity-50 theme-bg-error hover:theme-bg-error-hover theme-text-on-error font-medium flex items-center justify-center gap-1"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
                 {isLoading ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
-                    删除中...
+                    <div className="w-3 h-3 border border-current/30 border-t-current rounded-full animate-spin" />
+                    <span>删除中...</span>
                   </>
                 ) : (
                   <>
-                    <Check size={16} />
-                    确认删除
+                    <Check size={12} />
+                    <span>确认删除</span>
                   </>
                 )}
-              </button>
-            </div>
-
-            {/* Footer */}
-            <div className="px-6 pb-4 pt-0">
-              <div className="text-xs theme-text-tertiary text-center">
-                按 <kbd className="px-1.5 py-0.5 text-[10px] font-mono theme-bg-secondary border theme-border rounded">Esc</kbd> 取消，
-                <kbd className="px-1.5 py-0.5 text-[10px] font-mono theme-bg-secondary border theme-border rounded">Ctrl+Enter</kbd> 确认
-              </div>
+              </motion.button>
             </div>
           </motion.div>
         </div>
       )}
     </AnimatePresence>
   );
+
+  // 使用 createPortal 将弹窗渲染到 document.body
+  return createPortal(modalContent, document.body);
 };

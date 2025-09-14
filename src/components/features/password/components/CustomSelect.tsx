@@ -44,7 +44,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
           'flex items-center gap-2',
           selectedOption ? 'theme-text-primary' : 'theme-text-tertiary'
         )}>
-          {selectedOption?.icon}
+          {selectedOption?.icon && React.isValidElement(selectedOption.icon) ? selectedOption.icon : null}
           <span>{selectedOption ? selectedOption.label : placeholder}</span>
         </div>
         <ChevronDown size={16} className={cn(
@@ -65,7 +65,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
               }}
               className="w-full text-left px-4 py-3 hover:theme-bg-tertiary transition-colors flex items-center gap-2 theme-text-primary"
             >
-              {option.icon}
+              {option.icon && React.isValidElement(option.icon) ? option.icon : null}
               <span>{option.label}</span>
             </button>
           ))}

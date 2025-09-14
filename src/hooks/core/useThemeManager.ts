@@ -5,14 +5,12 @@ export const useThemeManager = () => {
     theme,
     gradientTheme,
     noiseLevel,
-    transparencyLevel,
     gradientAngle,
     blendMode,
     setTheme,
     toggleTheme,
     setGradientTheme,
     setNoiseLevel,
-    setTransparencyLevel,
     setGradientAngle,
     setBlendMode
   } = useAppStore();
@@ -29,14 +27,12 @@ export const useThemeManager = () => {
     isDark,
     gradientTheme,
     noiseLevel,
-    transparencyLevel,
     gradientAngle,
     blendMode,
     setTheme: applyTheme,
     toggleTheme,
     setGradientTheme,
     setNoiseLevel,
-    setTransparencyLevel,
     setGradientAngle,
     setBlendMode
   };

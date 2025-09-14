@@ -148,29 +148,29 @@ export const useDialogueContextStore = create<DialogueContextStore>()(
       addContext: (item: ContextItem) => {
         set((state) => {
           const newContexts = new Map(state.activeContexts);
-          
+
           // 检查是否超过限制
           if (newContexts.size >= DEFAULT_CONTEXT_CONFIG.MAX_ITEMS) {
             return state;
           }
-          
+
           // 检查token限制
           const totalTokens = Array.from(newContexts.values()).reduce(
             (sum, ctx) => sum + (ctx.tokenCount || 0), 0
           ) + (item.tokenCount || 0);
-          
+
           if (totalTokens > DEFAULT_CONTEXT_CONFIG.MAX_TOKENS) {
             return state;
           }
 
           newContexts.set(item.id, item);
-          
+
           return {
             ...state,
             activeContexts: newContexts
           };
         });
-        
+
         // 重新计算统计信息
         get().calculateStats();
       },
@@ -195,7 +195,7 @@ export const useDialogueContextStore = create<DialogueContextStore>()(
           activeContexts: new Map(),
           currentContext: null
         }));
-        
+
         get().calculateStats();
       },
       
@@ -706,8 +706,8 @@ export const useDialogueContextStore = create<DialogueContextStore>()(
       }),
       merge: (persistedState: any, currentState: DialogueContextStore) => ({
         ...currentState,
-        contextHistory: new Map(persistedState.contextHistory || []),
-        activeContexts: new Map(persistedState.activeContexts || [])
+        contextHistory: new Map(persistedState?.contextHistory || []),
+        activeContexts: new Map(persistedState?.activeContexts || [])
       })
     }
   )

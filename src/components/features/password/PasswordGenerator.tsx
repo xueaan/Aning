@@ -242,7 +242,7 @@ export const PasswordGenerator: React.FC<PasswordGeneratorProps> = ({
             <input type="checkbox"
               checked={generatorOptions.include_uppercase}
               onChange={(e) => updateOption('include_uppercase', e.target.checked)}
-              className="rounded border-border-primary text-accent focus:ring-accent"
+              className="w-4 h-4 bg-transparent border-2 theme-border rounded theme-text-accent"
             />
             <span className="text-sm theme-text-secondary">大写字母 (A-Z)</span>
           </label>
@@ -251,7 +251,7 @@ export const PasswordGenerator: React.FC<PasswordGeneratorProps> = ({
             <input type="checkbox"
               checked={generatorOptions.include_lowercase}
               onChange={(e) => updateOption('include_lowercase', e.target.checked)}
-              className="rounded border-border-primary text-accent focus:ring-accent"
+              className="w-4 h-4 bg-transparent border-2 theme-border rounded theme-text-accent"
             />
             <span className="text-sm theme-text-secondary">小写字母 (a-z)</span>
           </label>
@@ -260,7 +260,7 @@ export const PasswordGenerator: React.FC<PasswordGeneratorProps> = ({
             <input type="checkbox"
               checked={generatorOptions.include_numbers}
               onChange={(e) => updateOption('include_numbers', e.target.checked)}
-              className="rounded border-border-primary text-accent focus:ring-accent"
+              className="w-4 h-4 bg-transparent border-2 theme-border rounded theme-text-accent"
             />
             <span className="text-sm theme-text-secondary">数字 (0-9)</span>
           </label>
@@ -269,7 +269,7 @@ export const PasswordGenerator: React.FC<PasswordGeneratorProps> = ({
             <input type="checkbox"
               checked={generatorOptions.include_symbols}
               onChange={(e) => updateOption('include_symbols', e.target.checked)}
-              className="rounded border-border-primary text-accent focus:ring-accent"
+              className="w-4 h-4 bg-transparent border-2 theme-border rounded theme-text-accent"
             />
             <span className="text-sm theme-text-secondary">符号 (!@#$...)</span>
           </label>

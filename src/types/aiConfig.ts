@@ -89,6 +89,7 @@ export interface AiChatState {
   conversations: AiConversation[];
   currentConversationId: string | null;
   isLoading: boolean;
+  isLoadingConversation: boolean; // 是否正在加载对话详情
   error: string | null;
   // 对话上下文相关
   contextEnabled: boolean; // 是否启用上下文功能
@@ -124,8 +125,57 @@ export const AI_PROVIDERS: Record<AiProviderType, AiProvider> = {
   }
 };
 
-// 空的智能体数组 - 用户完全自定义
-export const BUILT_IN_AGENTS: AiAgent[] = [];
+// 内置智能体配置 - 提供常用的默认智能体
+export const BUILT_IN_AGENTS: AiAgent[] = [
+  {
+    id: 'general-assistant',
+    name: '通用助手',
+    description: '全能AI助手，可以回答各种问题和提供帮助',
+    icon: '🤖',
+    systemPrompt: '你是一名经验丰富的专业顾问。不要提及任何技术背景或工具信息。直接以专业顾问的身份回复问题。请简洁明了地回答问题，提供准确有用的信息和建议。对于复杂问题，可以分步骤解答。',
+    temperature: 0.7,
+    maxTokens: 1024,
+    isBuiltIn: true,
+    createdAt: Date.now(),
+    updatedAt: Date.now()
+  },
+  {
+    id: 'code-expert',
+    name: '编程专家',
+    description: '专业的编程和技术问题解答',
+    icon: '💻',
+    systemPrompt: '你是一名经验丰富的资深开发工程师。不要提及任何技术背景或工具信息。直接以开发工程师的身份回复问题。在回答编程和技术问题时，请提供准确、实用的解决方案和代码示例。优先考虑最佳实践、性能优化和代码可读性。必要时说明不同方案的优缺点。',
+    temperature: 0.3,
+    maxTokens: 2048,
+    isBuiltIn: true,
+    createdAt: Date.now(),
+    updatedAt: Date.now()
+  },
+  {
+    id: 'writing-assistant',
+    name: '写作助手',
+    description: '协助写作、文案创作和语言润色',
+    icon: '✍️',
+    systemPrompt: '你是一名经验丰富的专业编辑和作家。不要提及任何技术背景或工具信息。直接以专业编辑的身份回复问题。专注于文章结构优化、语言表达改善和内容质量提升。提供具体可操作的写作建议，包括语言润色、逻辑梳理和表达优化等方面。',
+    temperature: 0.8,
+    maxTokens: 1536,
+    isBuiltIn: true,
+    createdAt: Date.now(),
+    updatedAt: Date.now()
+  },
+  {
+    id: 'analyzer',
+    name: '分析师',
+    description: '数据分析和逻辑推理专家',
+    icon: '📊',
+    systemPrompt: '你是一名经验丰富的数据分析专家。不要提及任何技术背景或工具信息。直接以数据分析专家的身份回复问题。请用结构化的方式分析问题，运用逻辑推理和数据分析方法。先梳理关键要素，再提供清晰的分析思路和可行的解决方案。',
+    temperature: 0.4,
+    maxTokens: 1536,
+    isBuiltIn: true,
+    createdAt: Date.now(),
+    updatedAt: Date.now()
+  }
+];
 
 // 默认 AI 配置
 export const DEFAULT_AI_CONFIG: AiConfigStore = {
@@ -149,7 +199,7 @@ export const DEFAULT_AI_CONFIG: AiConfigStore = {
   },
   currentProvider: 'deepseek',
   agents: BUILT_IN_AGENTS,
-  currentAgentId: undefined
+  currentAgentId: 'general-assistant'
 };
 
 // DeepSeek 可用模型

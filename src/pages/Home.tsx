@@ -226,18 +226,12 @@ export const Home: React.FC = () => {
       setEditFormData(formData);
       setEditingShortcut(id);
     } else {
-      console.error('❌ 未找到要编辑的快捷方式:', id);
+      console.error('Shortcut not found for editing:', id);
     }
   };
 
   // 保存编辑
   const handleSaveEdit = () => {
-    console.log('💾 保存编辑开始:', {
-      editingShortcut,
-      editFormData,
-      hasTitle: !!editFormData.title,
-      hasUrl: !!editFormData.url
-    });
 
     if (editingShortcut && editFormData.title && editFormData.url) {
       updateShortcut(editingShortcut, editFormData);
@@ -404,7 +398,7 @@ export const Home: React.FC = () => {
                       e.stopPropagation();
 
                       if (!shortcut.url) {
-                        console.error('❌ 错误：快捷方式URL为空!', shortcut);
+                        console.error('Shortcut URL is empty:', shortcut);
                         showToast('错误：快捷方式URL为空!', 'error');
                         return;
                       }
@@ -413,13 +407,13 @@ export const Home: React.FC = () => {
                         await open(normalizedUrl);
                         showToast(`正在打开 ${shortcut.title}`, 'success');
                       } catch (error) {
-                        console.error('❌ Tauri open() 失败:', error);
+                        console.error('Tauri open() failed:', error);
                         try {
                           const normalizedUrl = normalizeUrl(shortcut.url);
                           window.open(normalizedUrl, '_blank');
                           showToast(`正在打开 ${shortcut.title} (备用方式)`, 'success');
                         } catch (backupError) {
-                          console.error('❌ window.open 也失败了:', backupError);
+                          console.error('window.open also failed:', backupError);
                           showToast(`无法打开链接: ${shortcut.url}`, 'error');
                         }
                       }

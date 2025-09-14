@@ -199,7 +199,7 @@ export const Ais: React.FC = () => {
               <input type="checkbox"
                 checked={currentConfig.enabled} onChange={(e) => handleConfigChange('enabled', e.target.checked)}
                 
-            className="w-4 h-4 theme-text-accent bg-white/10 border-white/20 rounded"
+            className="w-4 h-4 theme-text-accent bg-transparent border-2 theme-border rounded"
               />
               <span className="text-sm theme-text-primary">启用服务</span>
             </label>

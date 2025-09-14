@@ -1,5 +1,6 @@
 import { invoke } from '@tauri-apps/api/core';
 import type { KnowledgeBase, Page, Block } from '@/types';
+import { safeDbInvoke } from '@/utils/tauriWrapper';
 
 // Import specialized API modules
 import { KnowledgeBaseAPI } from './modules/knowledgeBaseAPI';
@@ -64,13 +65,17 @@ export interface DBHabitRecord {
 }
 
 export interface DBStats {
-  timeline_entries: number;
-  knowledge_bases: number;
-  pages: number;
-  blocks: number;
-  tasks: number;
-  habits: number;
-  database_path: string;
+  tables_count: number;
+  total_records: number;
+  db_size: string;
+  last_backup: string | null;
+  timeline_entries?: number;
+  knowledge_bases?: number;
+  pages?: number;
+  blocks?: number;
+  tasks?: number;
+  habits?: number;
+  database_path?: string;
 }
 
 // Main Database API class - delegates knowledge operations to specialized APIs
@@ -78,33 +83,32 @@ export class DatabaseAPI {
   // ===== Database Core Operations =====
   
   static async init(): Promise<DBStats> {
-    try {
-      const result = await invoke<DBStats>('db_init');
-      return result;
-    } catch (error) {
-      console.error('[DatabaseAPI] init() failed:', error);
-      throw error;
-    }
+    const defaultStats: DBStats = {
+      tables_count: 0,
+      total_records: 0,
+      db_size: '0 B',
+      last_backup: null
+    };
+
+    const result = await safeDbInvoke<DBStats>('db_init', undefined, defaultStats);
+    return result || defaultStats;
   }
 
   static async getPath(): Promise<string> {
-    try {
-      const result = await invoke('get_db_path');
-      return result as string;
-    } catch (error) {
-      console.error('[DatabaseAPI] getPath() failed:', error);
-      throw error;
-    }
+    const result = await safeDbInvoke<string>('get_db_path', undefined, '浏览器环境 - 数据库路径不可用');
+    return result || '浏览器环境 - 数据库路径不可用';
   }
 
   static async getStats(): Promise<DBStats> {
-    try {
-      const result = await invoke('get_db_stats');
-      return result as DBStats;
-    } catch (error) {
-      console.error('[DatabaseAPI] getStats() failed:', error);
-      throw error;
-    }
+    const defaultStats: DBStats = {
+      tables_count: 0,
+      total_records: 0,
+      db_size: '0 B',
+      last_backup: null
+    };
+
+    const result = await safeDbInvoke<DBStats>('get_db_stats', undefined, defaultStats);
+    return result || defaultStats;
   }
 
   // ===== Knowledge Base Operations (Delegated) =====
@@ -255,7 +259,7 @@ export class DatabaseAPI {
 
   static async deleteTimelineEntry(id: number): Promise<void> {
     try {
-      await invoke('delete_timeline_entry', { id });
+      await invoke('db_delete_timeline_entry', { id });
     } catch (error) {
       console.error('[DatabaseAPI] deleteTimelineEntry failed:', error);
       throw error;
@@ -280,20 +284,27 @@ export class DatabaseAPI {
   static async createTask(...args: any[]): Promise<number> {
     try {
       if (args.length === 1 && typeof args[0] === 'object') {
-        // New API format
-        return await invoke('create_task', { task: args[0] });
+        // New API format - convert to Tauri command format
+        const task = args[0];
+        return await invoke('create_task', {
+          title: task.title,
+          description: task.description,
+          status: task.status || 'todo',
+          priority: task.priority || 'medium',
+          deadline: task.due_date,    // 后端参数名是 deadline
+          project: task.project_id    // 后端参数名是 project
+        });
       } else {
-        // Old API format - convert to new format
+        // Old API format - convert to Tauri command format
         const [title, description, status, priority, due_date, project_id] = args;
-        const task = {
+        return await invoke('create_task', {
           title,
           description,
           status: status || 'todo',
           priority: priority || 'medium',
-          due_date,
-          project_id
-        };
-        return await invoke('create_task', { task });
+          deadline: due_date,  // 后端参数名是 deadline
+          project: project_id  // 后端参数名是 project
+        });
       }
     } catch (error) {
       console.error('[DatabaseAPI] createTask failed:', error);
@@ -324,9 +335,19 @@ export class DatabaseAPI {
 
   static async updateTask(id: number, updates: Partial<Omit<DBTask, 'id' | 'created_at'>>): Promise<void> {
     try {
-      await invoke('update_task', { id, updates });
+      // 修复参数结构：将嵌套的 updates 对象展开为扁平参数
+      await invoke('update_task', {
+        id,
+        title: updates.title,
+        description: updates.description,
+        status: updates.status,
+        priority: updates.priority,
+        deadline: updates.due_date,
+        completed_at: updates.completed_at,
+        project: updates.project_id
+      });
     } catch (error) {
-      console.error('[DatabaseAPI] updateTask failed:', error);
+      console.error('Failed to update task:', error);
       throw error;
     }
   }
@@ -398,7 +419,7 @@ export class DatabaseAPI {
   static async getTaskProjectStats(id: number): Promise<any> {
     // This method needs to be implemented based on requirements
     try {
-      return await invoke('get_task_project_stats', { id });
+      return await invoke('get_task_project_stats', { projectId: id });
     } catch (error) {
       console.error('[DatabaseAPI] getTaskProjectStats failed:', error);
       throw error;

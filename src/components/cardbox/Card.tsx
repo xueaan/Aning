@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Calendar, Maximize2, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { type Card as CardType } from '@/stores';
+import { ConfirmDeleteModal } from '@/components/common/ConfirmDeleteModal';
 
 interface CardProps {
   card: CardType;
@@ -16,6 +17,8 @@ export const Card: React.FC<CardProps> = ({
   onExpand,
   className = ''
 }) => {
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   // 格式化日期
   const formatDate = (timestamp: number) => {
     const date = new Date(timestamp);
@@ -46,12 +49,29 @@ export const Card: React.FC<CardProps> = ({
     onExpand?.(card);
   };
 
-  // 处理删除操作
-  const handleDelete = (e: React.MouseEvent) => {
+  // 处理删除按钮点击
+  const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (window.confirm('确定要删除这篇笔记吗？')) {
-      onDelete?.(card);
+    setShowDeleteConfirm(true);
+  };
+
+  // 处理确认删除
+  const handleConfirmDelete = async () => {
+    if (isDeleting) return;
+    setIsDeleting(true);
+    try {
+      await onDelete?.(card);
+    } catch (error) {
+      console.error('删除失败:', error);
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
     }
+  };
+
+  // 处理取消删除
+  const handleCancelDelete = () => {
+    setShowDeleteConfirm(false);
   };
 
   return (
@@ -80,7 +100,7 @@ export const Card: React.FC<CardProps> = ({
           
           {/* 删除按钮 */}
           <button
-            onClick={handleDelete}
+            onClick={handleDeleteClick}
             className="p-1.5 rounded-lg hover:bg-red-50 transition-colors"
             title="删除笔记"
           >
@@ -129,6 +149,17 @@ export const Card: React.FC<CardProps> = ({
           </div>
         </div>
       </div>
+
+      {/* 删除确认弹窗 */}
+      <ConfirmDeleteModal
+        isOpen={showDeleteConfirm}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        title="删除笔记"
+        message="确定要删除这篇笔记吗？删除后将无法恢复。"
+        itemName={card.title}
+        isLoading={isDeleting}
+      />
     </div>
   );
 };

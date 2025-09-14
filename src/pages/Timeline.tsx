@@ -375,12 +375,14 @@ export const Timeline: React.FC = () => {
                         </div>
                       </div>
                       <div className="flex-1 rounded-lg px-2.5 py-1 mb-4 transition-all relative group hover:shadow-lg feather-glass-deco">
-                        <button 
-                          onClick={() => handleDelete(entry.id, extractTimeFromCreatedAt(entry.created_at))}
-                          className="absolute top-2 right-2 p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity bg-red-500/20 text-red-400 hover:bg-red-500/30"
-                          title="删除">
-                          <X size={16} />
-                        </button>
+                        <div className="absolute top-1/2 right-2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                          <button
+                            onClick={() => handleDelete(entry.id, extractTimeFromCreatedAt(entry.created_at))}
+                            className="w-6 h-6 rounded-lg flex items-center justify-center bg-red-500/80 text-red-100 hover:bg-red-500/90 transition-all shadow-md"
+                            title="删除此记录">
+                            <X size={14} />
+                          </button>
+                        </div>
                         <div className="text-text-primary text-sm">
                           <ReactMarkdown>
                             {entry.content}

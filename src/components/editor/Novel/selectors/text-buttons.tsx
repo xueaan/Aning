@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Bold, Italic, Underline, Strikethrough, Code } from "lucide-react";
+import { Bold, Italic, Underline, Code } from "lucide-react";
 import { EditorBubbleItem, useEditor } from "novel";
 
 export type SelectorItem = {
@@ -34,12 +34,6 @@ export const TextButtons = () => {
       icon: Underline
     },
     {
-      name: "strike",
-      isActive: (editor) => editor.isActive("strike"),
-      command: (editor) => editor.chain().focus().toggleStrike().run(),
-      icon: Strikethrough,
-    },
-    {
       name: "code",
       isActive: (editor) => editor.isActive("code"),
       command: (editor) => editor.chain().focus().toggleCode().run(),
@@ -53,8 +47,8 @@ export const TextButtons = () => {
         <EditorBubbleItem key={item.name} onSelect={(editor) => {
             item.command(editor);
           }}>
-          <Button size="sm" 
-            className="rounded-none" variant="ghost" type="button">
+          <Button size="sm"
+            className="h-8 w-8 p-0 bg-transparent border-none hover:bg-transparent" variant="ghost" type="button">
             <item.icon className={cn("h-4 w-4", {
                 "text-blue-500": item.isActive(editor)
               })}

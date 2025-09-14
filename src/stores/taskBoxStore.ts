@@ -190,8 +190,7 @@ export const useTaskBoxStore = create<TaskBoxStore>()(
       
       updateTask: async (id, updates) => {
         try {
-          
-          await DatabaseAPI.updateTask(id, {
+          const dbUpdates = {
             title: updates.title,
             description: updates.description,
             status: updates.status,
@@ -199,11 +198,13 @@ export const useTaskBoxStore = create<TaskBoxStore>()(
             due_date: updates.due_date,
             completed_at: updates.completed_at,
             project_id: updates.project_id
-          });
+          };
+
+          await DatabaseAPI.updateTask(id, dbUpdates);
 
           // 重新加载任务列表以获取最新数据
           await get().loadTasks();
-          
+
           // 如果更新了项目关联，也需要重新加载项目数据以更新统计信息
           if (updates.project_id !== undefined) {
             await get().loadProjects();

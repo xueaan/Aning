@@ -221,8 +221,8 @@ export const SHORTCUT_MENTIONS: ShortcutMention[] = [
 
 // 正则表达式模式
 export const MENTION_PATTERNS = {
-  // @符号后跟可选的中文、英文、数字、冒号
-  MENTION_REGEX: /@([\u4e00-\u9fa5\w:]*)?$/,
+  // @符号后跟可选的中文、英文、数字、冒号，修复：去掉$结尾匹配，支持@提及后还有其他内容
+  MENTION_REGEX: /@([\u4e00-\u9fa5\w:]*)/g,
   // 完整的提及格式：@type:id 或 @快捷方式
   FULL_MENTION: /@(tasks?):([\w\-]+)|@([\u4e00-\u9fa5]+)/g,
   // 任务提及：@task:id 或 @tasks:filter

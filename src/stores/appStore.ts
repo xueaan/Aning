@@ -45,9 +45,12 @@ interface AppStore extends AppState {
   // 主题状态
   gradientTheme: string;
   noiseLevel: number;
-  transparencyLevel: number;  // 透明度级别 0-100
   gradientAngle: number;  // 渐变角度 0-360
   blendMode: number;      // 混合模式 0=暗 50=原色 100=亮
+
+  // 字体状态
+  fontFamily: string;      // 界面字体
+  editorFontFamily: string; // 编辑器字体
   
   // 设置弹窗状态
   settingsModalOpen: boolean;
@@ -57,6 +60,9 @@ interface AppStore extends AppState {
   
   // AI 对话状态
   aiChat: AiChatState;
+
+  // 知识库状态
+  lastUsedKnowledgeBaseId: string | null;
 
   // Actions
   setCurrentNote: (note?: Note) => void;
@@ -68,9 +74,12 @@ interface AppStore extends AppState {
   setTheme: (theme: 'light' | 'dark' | 'auto') => void;
   setGradientTheme: (theme: string) => void;
   setNoiseLevel: (level: number) => void;
-  setTransparencyLevel: (level: number) => void;
   setGradientAngle: (angle: number) => void;
   setBlendMode: (mode: number) => void;
+
+  // 字体 Actions
+  setFontFamily: (font: string) => void;
+  setEditorFontFamily: (font: string) => void;
 
   // 左侧面板 Actions
   setLeftSidebarWidth: (width: number) => void;
@@ -101,13 +110,15 @@ interface AppStore extends AppState {
   
   // AI 对话 Actions
   createConversation: () => string;
-  setCurrentConversation: (conversationId: string | null) => void;
+  setCurrentConversation: (conversationId: string | null) => Promise<void>;
   addMessage: (message: Omit<AiMessage, 'id' | 'timestamp'>) => void;
   updateMessage: (messageId: string, updates: Partial<AiMessage>) => void;
+  updateConversationTitle: (conversationId: string, title: string) => Promise<void>;
   deleteConversation: (conversationId: string) => void;
   clearAllConversations: () => void;
   cleanupOldConversations: (daysToKeep?: number) => void;
   setAiChatLoading: (loading: boolean) => void;
+  setAiChatLoadingConversation: (loading: boolean) => void;
   setAiChatError: (error: string | null) => void;
   
   // AI 智能体 Actions
@@ -115,6 +126,9 @@ interface AppStore extends AppState {
   addAgent: (agent: Omit<AiAgent, 'id' | 'createdAt' | 'updatedAt'>) => void;
   updateAgent: (agentId: string, updates: Partial<Omit<AiAgent, 'id' | 'isBuiltIn' | 'createdAt'>>) => void;
   deleteAgent: (agentId: string) => void;
+
+  // 知识库 Actions
+  setLastUsedKnowledgeBaseId: (id: string | null) => void;
   
   // 初始化应用
   initializeApp: () => Promise<void>;
@@ -157,9 +171,12 @@ export const useAppStore = create<AppStore>()(
         // 主题状态
         gradientTheme: 'pastel',
         noiseLevel: 50,
-        transparencyLevel: 50,  // 默认透明度50%
         gradientAngle: 135,  // 默认135度
         blendMode: 50,       // 默认原色
+
+        // 字体状态
+        fontFamily: 'system',     // 默认系统字体
+        editorFontFamily: 'default', // 默认编辑器字体
         
         // 设置弹窗状态
         settingsModalOpen: false,
@@ -172,10 +189,14 @@ export const useAppStore = create<AppStore>()(
           conversations: [],
           currentConversationId: null,
           isLoading: false,
+          isLoadingConversation: false,
           error: null,
           contextEnabled: true,
           activeContextId: null
         },
+
+        // 知识库状态
+        lastUsedKnowledgeBaseId: null,
         
         // Actions
         setCurrentNote: (note) => set({ currentNote: note }),
@@ -207,20 +228,22 @@ export const useAppStore = create<AppStore>()(
         
         toggleTheme: () => {
           const newTheme = get().theme === 'light' ? 'dark' : 'light';
-          
+
           // 添加切换动画效果
           document.documentElement.classList.add('theme-switching');
-          
+
           // 更新主题
           set({ theme: newTheme });
-          
-          // 更新DOM类名
+
+          // 更新DOM类名和data-theme属性
           if (newTheme === 'dark') {
             document.documentElement.classList.add('dark');
+            document.documentElement.setAttribute('data-theme', 'dark');
           } else {
             document.documentElement.classList.remove('dark');
+            document.documentElement.setAttribute('data-theme', 'light');
           }
-          
+
           // 移除动画效果
           setTimeout(() => {
             document.documentElement.classList.remove('theme-switching');
@@ -229,19 +252,23 @@ export const useAppStore = create<AppStore>()(
         
         setTheme: (theme) => {
           set({ theme });
-          
-          // 更新DOM类名
+
+          // 更新DOM类名和data-theme属性
           if (theme === 'dark') {
             document.documentElement.classList.add('dark');
+            document.documentElement.setAttribute('data-theme', 'dark');
           } else if (theme === 'light') {
             document.documentElement.classList.remove('dark');
+            document.documentElement.setAttribute('data-theme', 'light');
           } else {
             // auto模式: 根据系统偏好
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             if (prefersDark) {
               document.documentElement.classList.add('dark');
+              document.documentElement.setAttribute('data-theme', 'dark');
             } else {
               document.documentElement.classList.remove('dark');
+              document.documentElement.setAttribute('data-theme', 'light');
             }
           }
         },
@@ -249,12 +276,14 @@ export const useAppStore = create<AppStore>()(
         setGradientTheme: (theme) => set({ gradientTheme: theme }),
         
         setNoiseLevel: (level) => set({ noiseLevel: level }),
-        
-        setTransparencyLevel: (level) => set({ transparencyLevel: level }),
-        
+
         setGradientAngle: (angle) => set({ gradientAngle: angle }),
         
         setBlendMode: (mode) => set({ blendMode: mode }),
+
+        // 字体设置
+        setFontFamily: (font) => set({ fontFamily: font }),
+        setEditorFontFamily: (font) => set({ editorFontFamily: font }),
 
         // 左侧面板 Actions
         setLeftSidebarWidth: (width) => set({ leftSidebarWidth: width }),
@@ -422,13 +451,56 @@ export const useAppStore = create<AppStore>()(
           return conversationId;
         },
         
-        setCurrentConversation: (conversationId) => {
+        setCurrentConversation: async (conversationId) => {
+          if (!conversationId) {
+            set((state) => ({
+              aiChat: {
+                ...state.aiChat,
+                currentConversationId: null
+              }
+            }));
+            return;
+          }
+
+          // 先设置当前对话ID
           set((state) => ({
             aiChat: {
               ...state.aiChat,
               currentConversationId: conversationId
             }
           }));
+
+          // 检查对话是否已经有消息，如果没有则从数据库加载
+          const state = get();
+          const conversation = state.aiChat.conversations.find(c => c.id === conversationId);
+
+          if (conversation && conversation.messages.length === 0) {
+            // 设置加载状态
+            get().setAiChatLoadingConversation(true);
+
+            try {
+              // 从数据库加载完整对话详情
+              const detailConversation = await AiDatabaseSync.loadConversationDetail(conversationId);
+
+              if (detailConversation && detailConversation.messages.length > 0) {
+                // 更新对话数据，包含消息
+                set((state) => ({
+                  aiChat: {
+                    ...state.aiChat,
+                    conversations: state.aiChat.conversations.map(conv =>
+                      conv.id === conversationId ? detailConversation : conv
+                    )
+                  }
+                }));
+              }
+            } catch (error) {
+              console.error('加载对话详情失败:', error);
+              get().setAiChatError('加载对话失败，请重试');
+            } finally {
+              // 清除加载状态
+              get().setAiChatLoadingConversation(false);
+            }
+          }
         },
         
         addMessage: (message) => {
@@ -522,18 +594,47 @@ export const useAppStore = create<AppStore>()(
           }));
         },
         
+        updateConversationTitle: async (conversationId, title) => {
+          try {
+            // 校验标题
+            const trimmedTitle = title.trim();
+            if (!trimmedTitle || trimmedTitle.length > 50) {
+              throw new Error('标题长度必须在1-50字符之间');
+            }
+
+            // 更新数据库
+            await AiDatabaseSync.updateConversationTitle(conversationId, trimmedTitle);
+
+            // 更新本地状态
+            set((state) => ({
+              aiChat: {
+                ...state.aiChat,
+                conversations: state.aiChat.conversations.map(conv =>
+                  conv.id === conversationId
+                    ? { ...conv, title: trimmedTitle, updatedAt: Date.now() }
+                    : conv
+                )
+              }
+            }));
+
+          } catch (error) {
+            console.error('更新对话标题失败:', error);
+            throw error;
+          }
+        },
+
         deleteConversation: (conversationId) => {
           // 从数据库删除对话
           AiDatabaseSync.deleteConversation(conversationId).catch(() => {
             // 忽略删除错误
           });
-          
+
           set((state) => {
             const newConversations = state.aiChat.conversations.filter(conv => conv.id !== conversationId);
-            const newCurrentId = state.aiChat.currentConversationId === conversationId 
+            const newCurrentId = state.aiChat.currentConversationId === conversationId
               ? (newConversations.length > 0 ? newConversations[0].id : null)
               : state.aiChat.currentConversationId;
-              
+
             return {
               aiChat: {
                 ...state.aiChat,
@@ -562,7 +663,16 @@ export const useAppStore = create<AppStore>()(
             }
           }));
         },
-        
+
+        setAiChatLoadingConversation: (loading) => {
+          set((state) => ({
+            aiChat: {
+              ...state.aiChat,
+              isLoadingConversation: loading
+            }
+          }));
+        },
+
         setAiChatError: (error) => {
           set((state) => ({
             aiChat: {
@@ -658,7 +768,12 @@ export const useAppStore = create<AppStore>()(
             console.error('从数据库删除AI智能体失败', error);
           });
         },
-        
+
+        // 知识库 Actions
+        setLastUsedKnowledgeBaseId: (id) => {
+          set({ lastUsedKnowledgeBaseId: id });
+        },
+
         cleanupOldConversations: (daysToKeep = 30) => {
           const cutoffTime = Date.now() - (daysToKeep * 24 * 60 * 60 * 1000);
           
@@ -686,7 +801,6 @@ export const useAppStore = create<AppStore>()(
         
         initializeApp: async () => {
           try {
-            console.log('🔄 appStore 初始化开始');
             
             // 批量状态更新- 一次性更新所有初始状态，减少渲染
             const { theme, currentModule } = get();
@@ -698,9 +812,9 @@ export const useAppStore = create<AppStore>()(
             // 应用主题到DOM
             if (theme === 'dark') {
               document.documentElement.classList.add('dark');
-              console.log('🌙 深色主题已应用');
+              document.documentElement.setAttribute('data-theme', 'dark');
             } else {
-              console.log('☀️ 浅色主题已应用');
+              document.documentElement.setAttribute('data-theme', 'light');
             }
             
             // 批量更新状态，只触发一次渲染
@@ -710,7 +824,6 @@ export const useAppStore = create<AppStore>()(
               navigationIndex: 0
             });
             
-            console.log('✅ appStore 主要状态更新完成');
             
             // 使用微任务队列延迟非关键初始化，避免阻塞渲染
             queueMicrotask(async () => {
@@ -724,7 +837,7 @@ export const useAppStore = create<AppStore>()(
                 ]);
                 
                 if (databasePromise.status === 'rejected') {
-                  console.warn('数据库初始化失败:', databasePromise.reason);
+                  console.warn('Database initialization failed:', databasePromise.reason);
                 }
                 
                 // 并行执行AI配置相关任务
@@ -733,7 +846,6 @@ export const useAppStore = create<AppStore>()(
                   get().loadAiConfigFromDatabase()
                 ]);
                 
-                console.log('🔧 非关键初始化任务完成');
                 
                 // 后台异步任务，不影响用户体验
                 queueMicrotask(() => {
@@ -846,13 +958,14 @@ export const useAppStore = create<AppStore>()(
           theme: state.theme,
           gradientTheme: state.gradientTheme,
           noiseLevel: state.noiseLevel,
-          transparencyLevel: state.transparencyLevel,
           gradientAngle: state.gradientAngle,
           blendMode: state.blendMode,
           sidebarOpen: state.sidebarOpen,
           // currentModule: state.currentModule, // 不持久化当前模块，每次启动都显示主页
           aiConfig: state.aiConfig,
           // rightPanelOpen: state.rightPanelOpen, // 不持久化右侧栏状态，每次启动都默认折叠
+          // 知识库相关持久化
+          lastUsedKnowledgeBaseId: state.lastUsedKnowledgeBaseId,
           // 添加AI对话历史持久化
           aiChat: {
             conversations: state.aiChat.conversations,

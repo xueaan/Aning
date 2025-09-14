@@ -65,15 +65,33 @@ export const CardFullEditor: React.FC<CardFullEditorProps> = ({
   useEffect(() => {
     if (isOpen) {
       const initialContent = card?.content || "";
-      setTitle(card?.title || "");
+      const initialTitle = card?.title || "";
+
+      setTitle(initialTitle);
       setEditorContent(initialContent);
       setHasChanges(false);
 
-      setTimeout(() => {
-        if (editorRef.current && initialContent) {
-          editorRef.current.setValue(initialContent);
+      // 延迟设置编辑器内容确保编辑器已完全初始化
+      const timer = setTimeout(() => {
+        if (editorRef.current) {
+          try {
+            editorRef.current.setValue(initialContent);
+            updateOutline(initialContent);
+          } catch (error) {
+            console.error('Failed to set editor content:', error);
+          }
         }
-      }, 100);
+      }, 150);
+
+      return () => clearTimeout(timer);
+    } else {
+      // 编辑器关闭时清理状态
+      setTitle("");
+      setEditorContent("");
+      setHasChanges(false);
+      setHeadings([]);
+      setActiveHeadingId(null);
+      setIsOutlineVisible(false);
     }
   }, [isOpen, card]);
 
@@ -219,7 +237,7 @@ export const CardFullEditor: React.FC<CardFullEditorProps> = ({
   return (
     <div className={cn("h-full flex flex-col relative", className)}>
       {/* 头部工具栏 */}
-      <div className="flex items-center justify-start gap-4 p-4 border-b theme-border">
+      <div className="flex items-center justify-start gap-4 p-2 theme-border">
         <button
           onClick={handleClose}
           className="p-2 rounded-lg hover:theme-bg-tertiary transition-colors"
@@ -249,7 +267,7 @@ export const CardFullEditor: React.FC<CardFullEditorProps> = ({
           <Eye size={18} className="theme-text-secondary" />
         </button>
       </div>
-      <div className="px-6 py-4 border-b theme-border">
+      <div className="px-6 py-2  theme-border">
         <input
           type="text"
           value={title}

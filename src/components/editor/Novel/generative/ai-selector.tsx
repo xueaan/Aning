@@ -5,7 +5,6 @@ import { useEditor } from "novel";
 import { useState } from "react";
 import { useAppStore } from "@/stores";
 import { callAiService } from "@/utils/aiUtils";
-import AISelectorCommands from "./ai-selector-commands";
 
 interface AISelectorProps {
   open: boolean;
@@ -65,47 +64,9 @@ export const AISelector = ({ open: _open, onOpenChange }: AISelectorProps) => {
     }
   };
 
-  const handleCommand = async (value: string, _option: string) => {
-    const currentProvider = aiConfig.currentProvider;
-    const config = aiConfig[currentProvider];
-    
-    if (!config.enabled || !config.apiKey) {
-      console.warn("AI service not configured or disabled");
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const selectedText = editor.state.doc.textBetween(
-        editor.state.selection.from,
-        editor.state.selection.to
-      );
-      
-      if (!selectedText) {
-        console.warn("No text selected for AI command");
-        setIsLoading(false);
-        return;
-      }
-
-      const prompt = `请${value}以下文本：\n\n${selectedText}`;
-      const result = await callAiService(currentProvider, config, prompt);
-      
-      if (result.success && result.content) {
-        // 替换选中文本
-        editor.chain().focus().deleteSelection().insertContent(result.content).run();
-        setHasCompletion(true);
-      } else {
-        console.error("AI command failed:", result.message);
-      }
-    } catch (error) {
-      console.error("AI command error:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
-    <Command className="w-[350px]">
+    <Command className="bg-transparent w-[400px] border-0">
       {isLoading && (
         <div className="flex h-12 w-full items-center px-4 text-sm font-medium text-muted-foreground text-purple-500">
           <div className="mr-2 h-4 w-4 shrink-0">✨</div>
@@ -118,27 +79,26 @@ export const AISelector = ({ open: _open, onOpenChange }: AISelectorProps) => {
       {!isLoading && (
         <>
           <div className="relative">
-            <CommandInput 
-              value={inputValue} 
+            <CommandInput
+              value={inputValue}
               onValueChange={setInputValue}
               autoFocus
               placeholder={hasCompletion ? "告诉AI接下来要做什么" : "让AI编辑或生成内容..."}
+              className="bg-transparent border-0 border-b border-white/20 focus:border-white/40 rounded-none"
             />
-            <Button 
+            <Button
               size="icon"
-              className="absolute right-2 top-1/2 h-6 w-6 -translate-y-1/2 rounded-full bg-purple-500 hover:bg-purple-900"
+              className="bg-purple-500/80 hover:bg-purple-600/80 absolute right-2 top-1/2 h-6 w-6 -translate-y-1/2 rounded-full border-0"
               onClick={handleSubmit}
             >
               <ArrowUp className="h-4 w-4" />
             </Button>
           </div>
-          {!hasCompletion && (
-            <AISelectorCommands onSelect={handleCommand} />
-          )}
           {hasCompletion && (
             <div className="flex items-center justify-between p-2">
               <span className="text-sm text-muted-foreground">AI处理完成</span>
-              <Button 
+              <Button
+                className="bg-transparent hover:bg-white/10 border-0"
                 variant="ghost"
                 size="sm"
                 onClick={() => {

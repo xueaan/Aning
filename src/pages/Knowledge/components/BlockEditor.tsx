@@ -35,6 +35,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
   const editorRef = useRef<NovelEditorRef>(null);
   const [editorContent, setEditorContent] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [activeFormats, setActiveFormats] = useState<string[]>([]);
 
   // 大纲相关状态
@@ -50,11 +51,8 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
 
     try {
       setIsLoading(true);
-      console.log('🔄 Loading page content for:', pid);
-
       // 从数据库加载页面的块内容
       const blocks = await DatabaseAPI.getBlocks(pid);
-      console.log('📊 Retrieved blocks for page', pid, ':', blocks);
 
       if (blocks && blocks.length > 0) {
         // 如果有块数据，合并所有块的内容
@@ -73,7 +71,6 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
           .join('\n');
 
         const finalContent = htmlContent || '<p></p>';
-        console.log('✅ Setting editor content:', finalContent);
         setEditorContent(finalContent);
 
         // 立即提取标题
@@ -82,7 +79,6 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
             const headings = extractHeadings(finalContent);
             onHeadingsChange(headings);
           } catch (error) {
-            console.warn('Failed to extract initial headings:', error);
             onHeadingsChange([]);
           }
         }
@@ -93,7 +89,6 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
             const outlineHeadings = extractHeadings(finalContent);
             setHeadings(outlineHeadings);
           } catch (error) {
-            console.warn('Failed to extract initial headings for outline:', error);
             setHeadings([]);
           }
         } else {
@@ -101,14 +96,12 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
         }
       } else {
         // 如果没有块数据，尝试从页面标题创建初始内容
-        console.log('⚠️  No blocks found for page', pid);
         
         // 尝试从知识库操作中获取当前页面信息
         const currentPage = knowledgeOps.pages.find(p => p.id === pid);
         if (currentPage && currentPage.title && currentPage.title.trim() !== '' && !currentPage.title.startsWith('新页面')) {
           // 如果页面有标题且不是默认的"新页面"，使用标题作为初始内容
           const initialContent = `<h2>${currentPage.title}</h2><p></p>`;
-          console.log('✨ Creating initial content from page title:', initialContent);
           setEditorContent(initialContent);
           
           // 自动保存这个初始内容到数据库
@@ -116,11 +109,9 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
             await DatabaseAPI.createBlock(pid, 'heading', currentPage.title);
             await DatabaseAPI.createBlock(pid, 'paragraph', '');
           } catch (error) {
-            console.warn('Failed to create initial blocks:', error);
           }
         } else {
           // 显示空内容
-          console.log('📝 Setting empty content (no valid title)');
           setEditorContent('<p></p>');
         }
         
@@ -141,11 +132,10 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
 
   // 保存页面内容
   const saveContent = async (content: string) => {
-    if (!pageId) return;
+    if (!pageId || isSaving) return;
 
+    setIsSaving(true);
     try {
-      // No need to set saving state here
-
       // 获取现有的块
       const existingBlocks = await DatabaseAPI.getBlocks(pageId);
 
@@ -176,22 +166,24 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
       }
 
       // Content saved successfully
-
-      // 更新页面的修改时间
-      await DatabaseAPI.updatePage(pageId);
     } catch (error) {
       console.error('Failed to save page content:', error);
       throw error;
     } finally {
-      // Save operation completed
+      setIsSaving(false);
     }
   };
 
   // 防抖自动保存函数
   const debouncedAutoSave = useCallback(
     debounce(async (content: string) => {
-      if (knowledgeOps.autoSaveEnabled && !readOnly) {
-        await saveContent(content);
+      if (knowledgeOps.autoSaveEnabled && !readOnly && content.trim()) {
+        try {
+          await saveContent(content);
+        } catch (error) {
+          console.warn('Auto-save failed:', error);
+          // 自动保存失败时不抛出错误，避免影响用户体验
+        }
       }
     }, 2000), // 2秒防抖
     [pageId, knowledgeOps.autoSaveEnabled, readOnly]
@@ -205,7 +197,6 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
           const headings = extractHeadings(content);
           onHeadingsChange(headings);
         } catch (error) {
-          console.warn('Failed to extract headings:', error);
           onHeadingsChange([]);
         }
       }
@@ -264,7 +255,6 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
           const extractedHeadings = extractHeadings(content);
           setHeadings(extractedHeadings);
         } catch (error) {
-          console.warn('Failed to extract headings for outline:', error);
           setHeadings([]);
         }
       } else {
@@ -312,14 +302,12 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
 
   // 当 pageId 变化时加载内容
   useEffect(() => {
-    console.log('🎯 PageId changed to:', pageId);
     if (pageId) {
       // 重置状态（managing locally since we don't have direct setter)
       // 加载页面内容
       loadContent(pageId);
     } else {
       // 清空编辑器内容
-      console.log('🗑️  Clearing editor content (no pageId)');
       setEditorContent('');
       // 清空标题
       if (onHeadingsChange) {
@@ -400,11 +388,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
     if (!editorRef.current) return;
 
     editorRef.current.insertImage(base64);
-    // 更新内容后也需要触发自动保存
-    setTimeout(() => {
-      const content = editorRef.current?.getHTML() || '';
-      debouncedAutoSave(content);
-    }, 100);
+    // 图片插入后，编辑器内容变化会自动触发 handleContentChange 中的自动保存
   };
 
   // 处理工具栏格式化

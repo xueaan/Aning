@@ -57,7 +57,7 @@ export const CardBoxSelector: React.FC<CardBoxSelectorProps> = ({
     // 如果是有效的图标名称，返回React组件
     if (isValidIcon(trimmedIconName)) {
       const IconComponent = getIconComponent(trimmedIconName);
-      return <IconComponent size={16} className="theme-text-primary" />;
+      return <IconComponent className="w-4 h-4 theme-text-primary" />;
     }
 
     // 如果不是有效图标名称，可能是emoji，直接返回
@@ -159,7 +159,7 @@ export const CardBoxSelector: React.FC<CardBoxSelectorProps> = ({
         onClick={toggleDropdown}
         className={cn(
           'flex items-center gap-2 px-2 py-1.5 text-sm font-normal rounded transition-all duration-200',
-          'min-w-[120px] max-w-[280px] theme-text-primary h-8',
+          'min-w-[120px] max-w-[280px] theme-text-primary h-6',
           'hover:scale-[1.02] active:scale-[0.98] feather-glass-deco'
         )}
       >
@@ -172,7 +172,7 @@ export const CardBoxSelector: React.FC<CardBoxSelectorProps> = ({
           </>
         ) : (
           <>
-            <FileText size={16} className="theme-text-secondary flex-shrink-0" />
+            <FileText className="w-4 h-4 theme-text-secondary flex-shrink-0" />
             <span className="theme-text-primary">全部笔记</span>
           </>
         )}
@@ -213,12 +213,12 @@ export const CardBoxSelector: React.FC<CardBoxSelectorProps> = ({
             <button 
               onClick={() => handleSelectBox(null)}
               className={cn(
-                'w-full flex items-center gap-3 px-4 py-3 text-sm text-left transition-all duration-200',
+                'w-full flex items-center gap-3 px-4 py-1.5 text-sm text-left transition-all duration-200',
                 'hover:bg-white/10 dark:hover:bg-white/5',
                 activeBoxId === null && 'theme-bg-accent/20 theme-text-accent'
               )}
             >
-              <FileText className="w-4 h-4 theme-text-secondary" />
+              <FileText className="w-4 h-4 theme-text-secondary flex-shrink-0" />
               <div className="flex-1">
                 <span className="font-medium">全部笔记</span>
                 <div className="text-xs theme-text-tertiary mt-0.5">

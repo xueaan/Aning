@@ -88,8 +88,8 @@ export const PagesCatalog: React.FC<PagesCatalogProps> = ({
           onClick={() => onSelect(page.id)}
         >
           <div className="flex items-center gap-3 flex-1 min-w-0">
-            <FileText className="w-4 h-4 text-white/60 flex-shrink-0" />
-            <span className="text-sm text-white/80 truncate">
+            <FileText className="w-4 h-4 theme-text-tertiary flex-shrink-0" />
+            <span className="text-sm theme-text-primary truncate">
               {page.title}
             </span>
             {hasChildren && (
@@ -99,7 +99,7 @@ export const PagesCatalog: React.FC<PagesCatalogProps> = ({
             )}
           </div>
 
-          <div className="flex items-center gap-2 text-xs text-white/50">
+          <div className="flex items-center gap-2 text-xs theme-text-tertiary">
             <Clock className="w-3 h-3" />
             <span className="font-mono whitespace-nowrap">
               {formatSmartTime(page.updated_at)}

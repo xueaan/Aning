@@ -64,7 +64,7 @@ export const usePageStore = create<PageStore>((set, get) => ({
   isLoading: false,
 
   // Actions
-  loadPages: async (knowledgeBaseId: string, parentId?: string) => {
+  loadPages: async (knowledgeBaseId: string) => {
     set({ isLoading: true });
     try {
       // 始终获取知识库下的所有页面，然后在前端构建树结构
@@ -78,16 +78,12 @@ export const usePageStore = create<PageStore>((set, get) => ({
   },
 
   createPage: async (knowledgeBaseId: string, title: string, parentId?: string) => {
-    console.log('💾 pageStore.createPage called:', { knowledgeBaseId, title, parentId });
     
     try {
       const id = await DatabaseAPI.createPage(knowledgeBaseId, title, parentId);
-      console.log('💾 DatabaseAPI.createPage returned ID:', id);
       
       // 重新加载页面数据确保一致性
-      console.log('🔄 Reloading pages...');
       await get().loadPages(knowledgeBaseId);
-      console.log('✅ Pages reloaded successfully');
       
       return id;
     } catch (error) {

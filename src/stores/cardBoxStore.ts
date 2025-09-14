@@ -61,17 +61,9 @@ interface CardBoxStore {
   isLoading: boolean;
   error: string | null;
   
-  // 编辑器相关状态
-  editorModalOpen: boolean;
-  editingCard: Card | null;
-  
   // 全屏编辑器相关状态
   fullEditorOpen: boolean;
   fullEditingCard: Card | null;
-  
-  // 展开视图相关状态
-  expandedViewOpen: boolean;
-  expandedCard: Card | null;
   
   // 笔记盒操作
   loadBoxes: () => Promise<void>;
@@ -82,25 +74,16 @@ interface CardBoxStore {
   
   // 笔记操作
   loadCards: (boxId?: string) => Promise<void>;
+  getCard: (cardId: string) => Promise<Card | null>;
   createCard: (boxId: string, title: string, content: string) => Promise<Card>;
   updateCard: (id: string, updates: CardUpdate) => Promise<void>;
   deleteCard: (id: string) => Promise<void>;
   moveCard: (cardId: string, targetBoxId: string) => Promise<void>;
   
-  // 编辑器操作
-  openEditor: (card?: Card, boxId?: string) => void;
-  closeEditor: () => void;
-  saveCard: (title: string, content: string) => Promise<void>;
-  
   // 全屏编辑器操作
   openFullEditor: (card?: Card, boxId?: string) => void;
   closeFullEditor: () => void;
   saveFullCard: (title: string, content: string, shouldClose?: boolean) => Promise<void>;
-  
-  // 展开视图操作
-  openExpandedView: (card: Card) => void;
-  closeExpandedView: () => void;
-  saveExpandedCard: (cardId: string, updates: Partial<Card>) => Promise<void>;
   
   // 搜索和视图
   searchCards: (query: string) => Promise<void>;
@@ -123,12 +106,8 @@ export const useCardBoxStore = create<CardBoxStore>()(
       searchQuery: '',
       isLoading: false,
       error: null,
-      editorModalOpen: false,
-      editingCard: null,
       fullEditorOpen: false,
       fullEditingCard: null,
-      expandedViewOpen: false,
-      expandedCard: null,
 
       // 笔记盒操作
       loadBoxes: async () => {
@@ -247,6 +226,20 @@ export const useCardBoxStore = create<CardBoxStore>()(
         }
       },
 
+      getCard: async (cardId: string): Promise<Card | null> => {
+        try {
+          set({ error: null });
+          const card = await invoke<Card | null>('get_card_by_id', { cardId });
+          return card;
+        } catch (error) {
+          console.error('Failed to get card:', error);
+          set({
+            error: error instanceof Error ? error.message : '获取卡片失败'
+          });
+          return null;
+        }
+      },
+
       createCard: async (boxId: string, title: string, content: string) => {
         try {
           set({ error: null });
@@ -276,10 +269,8 @@ export const useCardBoxStore = create<CardBoxStore>()(
       updateCard: async (id: string, updates: CardUpdate) => {
         try {
           set({ error: null });
-          console.log('调用 updateCard Tauri 命令:', { id, updates });
           await invoke('update_card', { id, updates });
           
-          console.log('updateCard 成功，更新本地状态');
           set((state) => ({
             cards: state.cards.map((card) =>
               card.id === id
@@ -291,7 +282,6 @@ export const useCardBoxStore = create<CardBoxStore>()(
                 : card
             )
           }));
-          console.log('本地状态更新完成');
         } catch (error) {
           console.error('Failed to update card:', error);
           set({ error: error instanceof Error ? error.message : '更新卡片失败' });
@@ -354,58 +344,35 @@ export const useCardBoxStore = create<CardBoxStore>()(
         }
       },
 
-      // 编辑器操作
-      openEditor: (card?: Card, boxId?: string) => {
-        set({
-          editorModalOpen: true,
-          editingCard: card || null,
-          activeBoxId: boxId || get().activeBoxId
-        });
-      },
-
-      closeEditor: () => {
-        set({
-          editorModalOpen: false,
-          editingCard: null
-        });
-      },
-
-      saveCard: async (title: string, content: string) => {
+      // 全屏编辑器操作
+      openFullEditor: async (card?: Card, boxId?: string) => {
         try {
-          const { editingCard, activeBoxId } = get();
-          console.log('Store saveCard:', { editingCard: !!editingCard, activeBoxId, title, content });
-          
-          if (editingCard) {
-            console.log('更新现有卡片:', editingCard.id);
-            // 更新现有卡片
-            await get().updateCard(editingCard.id, { 
-              title, 
-              content
-            });
-          } else if (activeBoxId) {
-            console.log('创建新卡片到盒子:', activeBoxId);
-            // 创建新卡片
-            await get().createCard(activeBoxId, title, content);
-          } else {
-            throw new Error('无法保存卡片：缺少必要信息');
+          let cardToEdit = card;
+
+          // 如果传入了卡片，重新获取最新的完整数据确保内容不丢失
+          if (card?.id) {
+            const latestCard = await get().getCard(card.id);
+            if (latestCard) {
+              cardToEdit = latestCard;
+            }
           }
 
-          console.log('保存成功，关闭编辑器');
-          get().closeEditor();
+          set({
+            fullEditorOpen: true,
+            fullEditingCard: cardToEdit || null,
+            activeBoxId: boxId || get().activeBoxId,
+            isLoading: false,
+          });
         } catch (error) {
-          console.error('Failed to save card:', error);
-          throw error;
+          console.error('Failed to open editor:', error);
+          // 即使获取最新数据失败，也要打开编辑器
+          set({
+            fullEditorOpen: true,
+            fullEditingCard: card || null,
+            activeBoxId: boxId || get().activeBoxId,
+            isLoading: false,
+          });
         }
-      },
-
-      // 全屏编辑器操作
-      openFullEditor: (card?: Card, boxId?: string) => {
-        set({
-          fullEditorOpen: true,
-          fullEditingCard: card || null,
-          activeBoxId: boxId || get().activeBoxId,
-          isLoading: false, // 重置加载状态
-        });
       },
 
       closeFullEditor: () => {
@@ -418,10 +385,8 @@ export const useCardBoxStore = create<CardBoxStore>()(
       saveFullCard: async (title: string, content: string, shouldClose = true) => {
         try {
           const { fullEditingCard, activeBoxId, boxes } = get();
-          console.log('Store saveFullCard:', { fullEditingCard: !!fullEditingCard, activeBoxId, title, content, shouldClose });
           
           if (fullEditingCard) {
-            console.log('更新现有卡片:', fullEditingCard.id);
             // 更新现有卡片
             await get().updateCard(fullEditingCard.id, { 
               title, 
@@ -434,19 +399,16 @@ export const useCardBoxStore = create<CardBoxStore>()(
             if (!targetBoxId && boxes.length > 0) {
               // 如果没有活动盒子但有盒子存在，使用第一个盒子
               targetBoxId = boxes[0].id;
-              console.log('使用默认盒子:', targetBoxId);
             }
 
             if (!targetBoxId) {
               // 如果完全没有盒子，创建一个默认盒子
-              console.log('创建默认盒子');
               const defaultBox = await get().createBox('默认笔记盒', '系统自动创建的默认笔记盒');
               targetBoxId = defaultBox.id;
               // 更新activeBoxId
               set({ activeBoxId: targetBoxId });
             }
 
-            console.log('创建新卡片到盒子:', targetBoxId);
             // 创建新卡片
             const newCard = await get().createCard(targetBoxId, title, content);
             
@@ -457,10 +419,8 @@ export const useCardBoxStore = create<CardBoxStore>()(
           }
 
           if (shouldClose) {
-            console.log('保存成功，关闭全屏编辑器');
             get().closeFullEditor();
           } else {
-            console.log('保存成功，保持编辑器打开');
           }
         } catch (error) {
           console.error('Failed to save full card:', error);
@@ -491,52 +451,6 @@ export const useCardBoxStore = create<CardBoxStore>()(
 
       setSelectedCard: (card: Card | null) => {
         set({ selectedCard: card });
-      },
-
-      // 展开视图操作
-      openExpandedView: (card: Card) => {
-        set({
-          expandedViewOpen: true,
-          expandedCard: card
-        });
-      },
-
-      closeExpandedView: () => {
-        set({
-          expandedViewOpen: false,
-          expandedCard: null
-        });
-      },
-
-      saveExpandedCard: async (cardId: string, updates: Partial<Card>) => {
-        try {
-          set({ error: null });
-          
-          // 构建更新参数
-          const updateData: CardUpdate = {};
-          if (updates.title !== undefined) updateData.title = updates.title;
-          if (updates.content !== undefined) updateData.content = updates.content;
-          if (updates.tags !== undefined) updateData.tags = updates.tags;
-          if (updates.is_pinned !== undefined) updateData.is_pinned = updates.is_pinned;
-          if (updates.is_archived !== undefined) updateData.is_archived = updates.is_archived;
-
-          await invoke('update_card', { id: cardId, updates: updateData });
-          
-          // 更新本地状态
-          set((state) => ({
-            cards: state.cards.map(card => 
-              card.id === cardId ? { ...card, ...updates } : card
-            ),
-            expandedCard: state.expandedCard ? { ...state.expandedCard, ...updates } : null
-          }));
-          
-        } catch (error) {
-          console.error('Failed to save expanded card:', error);
-          set({ 
-            error: error instanceof Error ? error.message : '保存卡片失败'
-          });
-          throw error;
-        }
       },
 
       // 工具方法

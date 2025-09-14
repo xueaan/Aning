@@ -121,11 +121,14 @@ export const PasswordForm: React.FC = () => {
                 value={formData.category_id?.toString() || ''}
                 onChange={(value) => updateField('category_id', value ? Number(value) : undefined)}
                 placeholder="选择分类"
-                options={categories.map(category => ({
-                  value: category.id?.toString() || '',
-                  label: category.name,
-                  icon: getIconComponent(category.icon || 'folder')
-                }))}
+                options={categories.map(category => {
+                  const IconComponent = getIconComponent(category.icon || 'folder');
+                  return {
+                    value: category.id?.toString() || '',
+                    label: category.name,
+                    icon: React.createElement(IconComponent, { size: 16 })
+                  };
+                })}
                 error={!!errors.category_id}
               />
               {errors.category_id && <p className="mt-1 text-xs theme-text-error">{errors.category_id}</p>}

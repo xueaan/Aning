@@ -3,6 +3,7 @@ import { Handle, Position, NodeProps, useReactFlow } from 'reactflow';
 import { Target, Edit, Trash2 } from 'lucide-react';
 import { Paintbrush2 } from 'lucide-react';
 import { useMindBoardStore } from '@/stores/mindBoardStore';
+import { ConfirmDeleteModal } from '@/components/common/ConfirmDeleteModal';
 
 const colors = [
   { name: 'yellow', bg: 'bg-yellow-200 dark:bg-yellow-700/50', border: 'border-yellow-400', text: 'text-yellow-800 dark:text-yellow-200' },
@@ -23,7 +24,13 @@ export const StickyNote: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos
     height: data.height || 180
   });
   const [isResizing, setIsResizing] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
+  const startMousePosRef = useRef<{x: number, y: number} | null>(null);
+  const startDimensionsRef = useRef<{width: number, height: number} | null>(null);
+  const handleResizeRef = useRef<((e: MouseEvent) => void) | null>(null);
+  const handleResizeEndRef = useRef<(() => void) | null>(null);
   const { currentBoard, updateBoard, deleteNode } = useMindBoardStore();
   const { fitBounds } = useReactFlow();
 
@@ -54,8 +61,20 @@ export const StickyNote: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos
   }, [updateNodeData]);
 
   const handleDelete = () => {
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = async () => {
     if (currentBoard && deleteNode) {
-      deleteNode(id);
+      setIsDeleting(true);
+      try {
+        deleteNode(id);
+        setShowDeleteConfirm(false);
+      } catch (error) {
+        console.error('Failed to delete sticky note:', error);
+      } finally {
+        setIsDeleting(false);
+      }
     }
   };
 
@@ -71,27 +90,33 @@ export const StickyNote: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos
   };
 
   // 流畅的大小调整处理
-  const handleResize = useCallback((e: MouseEvent) => {
-    if (!isResizing || !cardRef.current) return;
+  // 创建稳定的 handleResize 函数
+  useEffect(() => {
+    handleResizeRef.current = (e: MouseEvent) => {
+      if (!cardRef.current || !startMousePosRef.current || !startDimensionsRef.current) return;
 
-    e.preventDefault();
+      e.preventDefault();
 
-    // 直接操作DOM，避免React状态更新导致的卡顿
-    requestAnimationFrame(() => {
-      if (!cardRef.current) return;
+      // 直接操作DOM，避免React状态更新导致的卡顿
+      requestAnimationFrame(() => {
+        if (!cardRef.current || !startMousePosRef.current || !startDimensionsRef.current) return;
 
-      const rect = cardRef.current.getBoundingClientRect();
-      const newWidth = Math.max(150, e.clientX - rect.left);
-      const newHeight = Math.max(100, e.clientY - rect.top);
+        // 使用相对位移计算新尺寸（更稳定）
+        const deltaX = e.clientX - startMousePosRef.current.x;
+        const deltaY = e.clientY - startMousePosRef.current.y;
 
-      // 直接更新DOM样式，流畅无卡顿
-      cardRef.current.style.width = `${newWidth}px`;
-      cardRef.current.style.height = `${newHeight}px`;
+        const newWidth = Math.max(150, startDimensionsRef.current.width + deltaX);
+        const newHeight = Math.max(100, startDimensionsRef.current.height + deltaY);
 
-      // 显示实时尺寸提示
-      showResizeTooltip(newWidth, newHeight);
-    });
-  }, [isResizing]);
+        // 直接更新DOM样式，流畅无卡顿
+        cardRef.current.style.width = `${newWidth}px`;
+        cardRef.current.style.height = `${newHeight}px`;
+
+        // 显示实时尺寸提示
+        showResizeTooltip(newWidth, newHeight);
+      });
+    };
+  });
 
   // 显示调整大小时的实时尺寸提示
   const showResizeTooltip = (width: number, height: number) => {
@@ -108,54 +133,72 @@ export const StickyNote: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos
     tooltip.style.opacity = '1';
   };
 
-  const handleResizeEnd = useCallback(() => {
-    setIsResizing(false);
+  // 创建稳定的 handleResizeEnd 函数
+  useEffect(() => {
+    handleResizeEndRef.current = () => {
+      setIsResizing(false);
+      startMousePosRef.current = null;
+      startDimensionsRef.current = null;
 
-    if (!cardRef.current) return;
+      // 恢复正常光标
+      document.body.style.cursor = '';
 
-    // 从DOM读取最终尺寸，同步到React状态
-    const finalWidth = parseInt(cardRef.current.style.width) || dimensions.width;
-    const finalHeight = parseInt(cardRef.current.style.height) || dimensions.height;
+      if (!cardRef.current) return;
 
-    // 更新React状态
-    setDimensions({
-      width: finalWidth,
-      height: finalHeight
-    });
+      // 从DOM读取最终尺寸，同步到React状态
+      const finalWidth = parseInt(cardRef.current.style.width) || dimensions.width;
+      const finalHeight = parseInt(cardRef.current.style.height) || dimensions.height;
 
-    // 隐藏尺寸提示
-    const tooltip = cardRef.current.querySelector('.resize-tooltip') as HTMLElement;
-    if (tooltip) {
-      tooltip.style.opacity = '0';
-      setTimeout(() => tooltip?.remove(), 200);
-    }
+      // 更新React状态
+      setDimensions({
+        width: finalWidth,
+        height: finalHeight
+      });
 
-    // 更新存储的数据
-    if (currentBoard) {
-      const updatedNodes = currentBoard.nodes.map(node =>
-        node.id === id
-          ? {
-            ...node,
-            data: { ...node.data, text, colorIndex, width: finalWidth, height: finalHeight },
-            style: { ...node.style, width: finalWidth, height: finalHeight }
-          }
-          : node
-      );
-      updateBoard(currentBoard.id, { nodes: updatedNodes });
-    }
-  }, [text, colorIndex, dimensions, id, currentBoard, updateBoard]);
+      // 隐藏尺寸提示
+      const tooltip = cardRef.current.querySelector('.resize-tooltip') as HTMLElement;
+      if (tooltip) {
+        tooltip.style.opacity = '0';
+        setTimeout(() => tooltip?.remove(), 200);
+      }
+
+      // 更新存储的数据
+      if (currentBoard) {
+        const updatedNodes = currentBoard.nodes.map(node =>
+          node.id === id
+            ? {
+              ...node,
+              data: { ...node.data, text, colorIndex, width: finalWidth, height: finalHeight },
+              style: { ...node.style, width: finalWidth, height: finalHeight }
+            }
+            : node
+        );
+        updateBoard(currentBoard.id, { nodes: updatedNodes });
+      }
+    };
+  });
 
   useEffect(() => {
-    if (isResizing) {
-      document.addEventListener('mousemove', handleResize);
-      document.addEventListener('mouseup', handleResizeEnd);
+    if (isResizing && handleResizeRef.current && handleResizeEndRef.current) {
+      // 设置全局调整大小光标
+      document.body.style.cursor = 'nw-resize';
+      document.addEventListener('mousemove', handleResizeRef.current, { passive: false });
+      document.addEventListener('mouseup', handleResizeEndRef.current);
+      // 防止选中文本
+      document.addEventListener('selectstart', (e) => e.preventDefault());
     }
 
     return () => {
-      document.removeEventListener('mousemove', handleResize);
-      document.removeEventListener('mouseup', handleResizeEnd);
+      document.body.style.cursor = '';
+      if (handleResizeRef.current) {
+        document.removeEventListener('mousemove', handleResizeRef.current);
+      }
+      if (handleResizeEndRef.current) {
+        document.removeEventListener('mouseup', handleResizeEndRef.current);
+      }
+      document.removeEventListener('selectstart', (e) => e.preventDefault());
     };
-  }, [isResizing, handleResize, handleResizeEnd]);
+  }, [isResizing]);
 
   const handleFocus = () => {
     const padding = 50;
@@ -189,10 +232,18 @@ export const StickyNote: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos
 
   return (
     <div className="sticky-note-node relative group">
-      <Handle type="target" position={Position.Top} 
-        className="opacity-0" />
-      <Handle type="target" position={Position.Left} 
-        className="opacity-0" />
+      <Handle
+        type="target"
+        position={Position.Top}
+        id="sticky-target-top"
+        className="!w-3 !h-3 !bg-white/90 !border-2 !border-gray-400 hover:!border-blue-500 hover:!scale-110 transition-all"
+      />
+      <Handle
+        type="target"
+        position={Position.Left}
+        id="sticky-target-left"
+        className="!w-3 !h-3 !bg-white/90 !border-2 !border-gray-400 hover:!border-blue-500 hover:!scale-110 transition-all"
+      />
       
       {/* Floating operation buttons - only show when selected */}
       {selected && (
@@ -271,6 +322,8 @@ export const StickyNote: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos
             onMouseDown={(e) => {
               e.preventDefault();
               e.stopPropagation();
+              startMousePosRef.current = { x: e.clientX, y: e.clientY };
+              startDimensionsRef.current = { width: dimensions.width, height: dimensions.height };
               setIsResizing(true);
             }}
             title="拖拽调整大小"
@@ -308,10 +361,28 @@ export const StickyNote: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos
         </div>
       </div>
 
-      <Handle type="source" position={Position.Bottom} 
-        className="opacity-0" />
-      <Handle type="source" position={Position.Right} 
-        className="opacity-0" />
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        id="sticky-source-bottom"
+        className="!w-3 !h-3 !bg-white/90 !border-2 !border-gray-400 hover:!border-blue-500 hover:!scale-110 transition-all"
+      />
+      <Handle
+        type="source"
+        position={Position.Right}
+        id="sticky-source-right"
+        className="!w-3 !h-3 !bg-white/90 !border-2 !border-gray-400 hover:!border-blue-500 hover:!scale-110 transition-all"
+      />
+
+      {/* 删除确认弹窗 */}
+      <ConfirmDeleteModal
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleConfirmDelete}
+        title="删除便签"
+        itemName="这个便签"
+        isLoading={isDeleting}
+      />
     </div>
   );
 };

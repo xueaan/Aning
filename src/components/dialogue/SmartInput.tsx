@@ -111,7 +111,9 @@ export const SmartInput: React.FC<SmartInputProps> = ({
 
   // 处理建议选择
   const handleSelectSuggestion = useCallback(async (suggestionValue: string, _displayText?: string) => {
-    if (!currentMention || !textareaRef.current) return;
+    if (!currentMention || !textareaRef.current) {
+      return;
+    }
 
     const textarea = textareaRef.current;
     const beforeMention = value.substring(0, currentMention.start);
@@ -125,9 +127,12 @@ export const SmartInput: React.FC<SmartInputProps> = ({
 
     // 尝试加载上下文
     try {
-      await loadContextFromMention(suggestionValue);
+      const contextResult = await loadContextFromMention(suggestionValue);
+      if (!contextResult.success) {
+        console.error('❌ 上下文添加失败:', contextResult.error);
+      }
     } catch (error) {
-      console.error('加载上下文失败:', error);
+      console.error('加载上下文异常:', error);
     }
 
     // 重新聚焦并设置光标位置
@@ -271,8 +276,7 @@ export const SmartInput: React.FC<SmartInputProps> = ({
         // 阻止默认粘贴行为，因为我们已经添加到上下文了
         e.preventDefault();
 
-        // 可选：显示一个简短的提示
-        console.log('已将长文本添加到上下文:', text.substring(0, 50) + '...');
+        // 长文本已添加到上下文
 
       } catch (error) {
         console.error('添加剪贴板内容到上下文失败:', error);
@@ -301,10 +305,7 @@ export const SmartInput: React.FC<SmartInputProps> = ({
       )}
 
       {/* 输入区域 */}
-      <div className="relative rounded-lg focus-within:theme-border-accent transition-colors"
-        style={{
-          border: '1px solid rgba(var(--border-primary), 0.2)'
-        }}
+      <div className="relative rounded-lg focus-within:theme-border-accent transition-colors feather-glass-panel"
       >
         <textarea 
           ref={textareaRef} 

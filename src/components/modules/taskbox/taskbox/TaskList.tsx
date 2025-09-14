@@ -319,6 +319,7 @@ return (
                       }
                     }
 
+
                     return compact ? (
                       <CompactTaskItem key={task.id} task={task}
                       projects={projects}

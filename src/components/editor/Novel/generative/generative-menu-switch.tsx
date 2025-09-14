@@ -1,7 +1,7 @@
 import { EditorBubble, useEditor } from "novel";
 import { Fragment, type ReactNode, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import Magic from "../ui/icons/magic";
+import { Bot } from "lucide-react";
 import { useAppStore } from "@/stores";
 import { getAiProviderStatus } from "@/utils/aiUtils";
 import { AISelector } from "./ai-selector";
@@ -37,26 +37,21 @@ const GenerativeMenuSwitch = ({ children, open, onOpenChange }: GenerativeMenuSw
           }
         }
       }}
-      className="flex w-fit max-w-[90vw] overflow-hidden rounded-md border border-muted bg-background shadow-xl"
+      className="feather-glass-deco flex items-center gap-1 px-3 py-2 rounded-xl"
     >
       {open && <AISelector open={open} onOpenChange={onOpenChange} />}
       {!open && (
         <Fragment>
-          <Button 
-            className={`gap-1 rounded-none transition-colors ${
+          <Button
+            className={`h-8 w-8 p-0 bg-transparent border-none hover:bg-transparent ${
               aiStatus === 'ready' ? 'text-purple-500 hover:text-purple-600' : 'text-gray-400'
             }`}
             variant="ghost"
-            onClick={() => aiStatus === 'ready' && onOpenChange(true)} 
-            size="sm"
-            disabled={aiStatus !== 'ready'} 
+            onClick={() => aiStatus === 'ready' && onOpenChange(true)}
+            disabled={aiStatus !== 'ready'}
             title={aiStatus === 'ready' ? '询问AI' : 'AI未配置或未启用'}
           >
-            <Magic className="h-5 w-5" />
-            询问AI
-            {aiStatus === 'ready' && (
-              <div className="w-1.5 h-1.5 bg-green-500 rounded-full ml-1" />
-            )}
+            <Bot className="h-4 w-4" />
           </Button>
           {children}
         </Fragment>

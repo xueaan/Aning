@@ -4,7 +4,7 @@ import {
   PasswordEntryDisplay
 } from '@/types/password';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
-import { Check, Trash2, User, Lock, Edit2 } from 'lucide-react';
+import { Check, Trash2, UserCheck, Lock, Pencil } from 'lucide-react';
 
 interface PasswordCardProps {
   entry: PasswordEntryDisplay;
@@ -21,6 +21,8 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
   const [isLoadingPassword, setIsLoadingPassword] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isCopiedUsername, setIsCopiedUsername] = useState(false);
+  const [isCopiedPassword, setIsCopiedPassword] = useState(false);
 
   const {
     getDecryptedPassword,
@@ -32,7 +34,15 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
   const copyToClipboard = async (text: string, type: 'username' | 'password' | 'url') => {
     try {
       await navigator.clipboard.writeText(text);
-      console.log(`${type} copied to clipboard`);
+
+      // 显示复制成功反馈
+      if (type === 'username') {
+        setIsCopiedUsername(true);
+        setTimeout(() => setIsCopiedUsername(false), 2000);
+      } else if (type === 'password') {
+        setIsCopiedPassword(true);
+        setTimeout(() => setIsCopiedPassword(false), 2000);
+      }
     } catch (error) {
       console.error('Failed to copy to clipboard:', error);
     }
@@ -171,10 +181,18 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
           e.stopPropagation();
           copyToClipboard(getUsername(), 'username');
         }}
-        className="flex-1 h-10 rounded-lg transition-all hover:scale-105 theme-text-secondary hover:theme-text-primary flex items-center justify-center feather-glass-deco"
-        title="复制用户名"
+        className={`flex-1 h-10 rounded-lg transition-all hover:scale-105 flex items-center justify-center feather-glass-deco ${
+          isCopiedUsername
+            ? 'theme-text-success'
+            : 'theme-text-secondary hover:theme-text-primary'
+        }`}
+        title={isCopiedUsername ? "已复制" : "复制用户名"}
       >
-        <User size={16} fill="currentColor" strokeWidth={2} />
+        {isCopiedUsername ? (
+          <Check size={16} strokeWidth={2} />
+        ) : (
+          <UserCheck size={16} strokeWidth={2} />
+        )}
       </button>
         )}
         <button onClick={(e) => {
@@ -182,20 +200,26 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
             handleCopyPassword();
           }}
           disabled={isLoadingPassword}
-          className="flex-1 h-10 rounded-lg theme-text-accent transition-all hover:scale-105 flex items-center justify-center feather-glass-deco"
-          title="复制密码"
+          className={`flex-1 h-10 rounded-lg transition-all hover:scale-105 flex items-center justify-center feather-glass-deco ${
+            isCopiedPassword
+              ? 'theme-text-success'
+              : 'theme-text-accent'
+          }`}
+          title={isCopiedPassword ? "已复制" : "复制密码"}
         >
           {isLoadingPassword ? (
             <div className="animate-spin w-4 h-4 border-2 border-current/30 border-t-current rounded-full" />
+          ) : isCopiedPassword ? (
+            <Check size={16} strokeWidth={2} />
           ) : (
-            <Lock size={16} fill="currentColor" strokeWidth={2} />
+            <Lock size={16} strokeWidth={2} />
           )}
         </button>
         <button onClick={handleEdit}
             className="flex-1 h-10 rounded-lg transition-all hover:scale-105 theme-text-secondary hover:theme-text-primary flex items-center justify-center feather-glass-deco"
           title="编辑"
         >
-          <Edit2 size={18} />
+          <Pencil size={18} />
         </button>
       </div>
       <ConfirmDialog

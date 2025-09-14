@@ -24,11 +24,19 @@
         /* 默认浅色主题变量 */
         --bg-primary: 255, 255, 255;
         --bg-secondary: 250, 251, 254;
+        --bg-tertiary: 241, 245, 249;
         --text-primary: 15, 23, 42;
         --text-secondary: 71, 85, 105;
+        --text-tertiary: 148, 163, 184;
+        --text-inverse: 255, 255, 255;
         --border-primary: 226, 232, 240;
+        --border-secondary: 203, 213, 225;
         --color-primary: 102, 126, 234;
         --color-secondary: 240, 147, 251;
+        --color-accent: 102, 126, 234;
+        --color-success: 34, 197, 94;
+        --color-warning: 245, 158, 11;
+        --color-error: 239, 68, 68;
       }
       
       /* 深色主题检测 */
@@ -36,9 +44,19 @@
         :root {
           --bg-primary: 15, 23, 42;
           --bg-secondary: 30, 41, 59;
+          --bg-tertiary: 51, 65, 85;
           --text-primary: 248, 250, 252;
           --text-secondary: 203, 213, 225;
+          --text-tertiary: 148, 163, 184;
+          --text-inverse: 15, 23, 42;
           --border-primary: 71, 85, 105;
+          --border-secondary: 100, 116, 139;
+          --color-primary: 129, 140, 248;
+          --color-secondary: 240, 171, 252;
+          --color-accent: 129, 140, 248;
+          --color-success: 74, 222, 128;
+          --color-warning: 251, 191, 36;
+          --color-error: 248, 113, 113;
         }
       }
       
@@ -46,17 +64,37 @@
       [data-theme="light"] {
         --bg-primary: 255, 255, 255;
         --bg-secondary: 250, 251, 254;
+        --bg-tertiary: 241, 245, 249;
         --text-primary: 15, 23, 42;
         --text-secondary: 71, 85, 105;
+        --text-tertiary: 148, 163, 184;
+        --text-inverse: 255, 255, 255;
         --border-primary: 226, 232, 240;
+        --border-secondary: 203, 213, 225;
+        --color-primary: 102, 126, 234;
+        --color-secondary: 240, 147, 251;
+        --color-accent: 102, 126, 234;
+        --color-success: 34, 197, 94;
+        --color-warning: 245, 158, 11;
+        --color-error: 239, 68, 68;
       }
-      
+
       [data-theme="dark"] {
         --bg-primary: 15, 23, 42;
         --bg-secondary: 30, 41, 59;
+        --bg-tertiary: 51, 65, 85;
         --text-primary: 248, 250, 252;
         --text-secondary: 203, 213, 225;
+        --text-tertiary: 148, 163, 184;
+        --text-inverse: 15, 23, 42;
         --border-primary: 71, 85, 105;
+        --border-secondary: 100, 116, 139;
+        --color-primary: 129, 140, 248;
+        --color-secondary: 240, 171, 252;
+        --color-accent: 129, 140, 248;
+        --color-success: 74, 222, 128;
+        --color-warning: 251, 191, 36;
+        --color-error: 248, 113, 113;
       }
       
       /* 立即应用样式，避免白屏 */

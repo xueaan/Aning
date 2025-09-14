@@ -46,9 +46,9 @@ export const IconPicker: React.FC<IconPickerProps> = ({
       text: 'text-xs'
     },
     md: {
-      iconSize: 20,
-      iconContainer: 'w-10 h-10',
-      grid: 'grid-cols-5',
+      iconSize: 18,
+      iconContainer: 'w-11 h-11',
+      grid: 'grid-cols-6',
       text: 'text-sm'
     },
     lg: {
@@ -97,19 +97,17 @@ export const IconPicker: React.FC<IconPickerProps> = ({
         key={iconName} 
         onClick={() => handleIconClick(iconName)}
         className={`
-          ${config.iconContainer} rounded-lg transition-all duration-300 ease-out
+          ${config.iconContainer} rounded-xl transition-all duration-300 ease-out
           flex items-center justify-center relative group transform-gpu
           ${isSelected
             ? 'theme-bg-accent theme-text-on-accent shadow-xl scale-110 ring-2 ring-accent/30'
-            : 'hover:scale-105 hover:shadow-sm theme-text-secondary hover:theme-text-primary feather-glass-content'
+            : 'hover:scale-105 hover:shadow-md theme-text-secondary hover:theme-text-primary feather-glass-content hover:feather-glass-panel'
           }
         `}
         title={iconName}
       >
-        <IconComponent 
-          theme="outline"
-          size={config.iconSize} 
-          fill="currentColor"
+        <IconComponent
+          size={config.iconSize}
           strokeWidth={2}
           className={isSelected ? 'theme-text-on-accent' : 'theme-text-secondary group-hover:theme-text-primary'}
         />
@@ -151,26 +149,26 @@ export const IconPicker: React.FC<IconPickerProps> = ({
             placeholder={placeholder} 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-lg outline-none theme-text-primary placeholder:theme-text-tertiary transition-all feather-glass-content"
+            className="w-full pl-10 pr-4 py-2 rounded-lg outline-none theme-text-primary placeholder:theme-text-tertiary transition-all feather-glass-input"
           />
         </div>
       )}
 
       {/* 图标网格 */}
-      <div className={`${maxHeight} overflow-y-auto scrollbar-hidden p-4`}>
+      <div className={`${maxHeight} overflow-y-auto scrollbar-hidden`}>
         {filteredCategories.length === 0 ? (
           <div className="text-center py-8">
             <div className="theme-text-secondary mb-2">未找到匹配的图标</div>
             <div className={`${config.text} theme-text-tertiary`}>请尝试其他搜索词</div>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-5">
             {filteredCategories.map(category => (
               <div key={category.name}>
-                <h4 className={`${config.text} font-medium theme-text-secondary mb-2`}>
+                <h4 className={`${config.text} font-medium theme-text-secondary mb-3 px-1`}>
                   {category.label} ({category.icons.length})
                 </h4>
-                <div className={`grid ${config.grid} gap-2`}>
+                <div className={`grid ${config.grid} gap-3`}>
                   {category.icons.map(renderIconButton)}
                 </div>
               </div>
@@ -247,10 +245,8 @@ export const IconButton: React.FC<IconButtonProps> = ({
       `}
       title={iconName}
     >
-      <IconComponent 
-        theme="outline"
-        size={config.iconSize} 
-        fill="currentColor"
+      <IconComponent
+        size={config.iconSize}
         strokeWidth={2}
       />
     </button>

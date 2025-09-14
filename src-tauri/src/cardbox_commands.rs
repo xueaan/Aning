@@ -251,6 +251,40 @@ pub async fn get_cards(database: State<'_, Arc<Database>>, box_id: Option<String
 }
 
 #[tauri::command]
+pub async fn get_card_by_id(database: State<'_, Arc<Database>>, card_id: String) -> Result<Option<Card>, String> {
+    database.with_connection(|conn| {
+        let sql = "SELECT id, box_id, title, content, preview, color, tags, is_pinned, is_archived, sort_order, created_at, updated_at
+                   FROM cards WHERE id = ?";
+
+        let result = conn.query_row(sql, params![card_id], |row| {
+            let tags_str: Option<String> = row.get(6)?;
+            let tags = tags_str.and_then(|s| serde_json::from_str(&s).ok());
+
+            Ok(Card {
+                id: row.get(0)?,
+                box_id: row.get(1)?,
+                title: row.get(2)?,
+                content: row.get(3)?,
+                preview: row.get(4)?,
+                color: row.get(5)?,
+                tags,
+                is_pinned: row.get::<_, i32>(7)? != 0,
+                is_archived: row.get::<_, i32>(8)? != 0,
+                sort_order: row.get(9)?,
+                created_at: row.get(10)?,
+                updated_at: row.get(11)?,
+            })
+        });
+
+        match result {
+            Ok(card) => Ok(Some(card)),
+            Err(rusqlite::Error::QueryReturnedNoRows) => Ok(None),
+            Err(e) => Err(e)
+        }
+    }).map_err(|e| format!("Database operation failed: {}", e))
+}
+
+#[tauri::command]
 pub async fn create_card(
     database: State<'_, Arc<Database>>,
     box_id: String,

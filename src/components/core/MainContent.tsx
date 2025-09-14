@@ -27,12 +27,13 @@ import {
   AlertTriangle,
   Check,
   Chrome,
-  Grid3X3,
-  Shield,
+  MonitorStop,
+  LayoutGrid,
+  DatabaseZap,
   X,
   List,
   TrendingUp,
-  Menu,
+  WalletCards,
   Network,
   BarChart3
 } from 'lucide-react';
@@ -43,10 +44,33 @@ import { EditKnowledgeBaseModal } from '@/components/modals/EditKnowledgeBaseMod
 import { EditCardBoxModal } from '@/components/modals/EditCardBoxModal';
 import { CreateCardBoxModal } from '@/components/modals/CreateCardBoxModal';
 import { HabitForm } from '@/components/features/habit/HabitForm';
+import { isTauriEnvironment, showBrowserLimitation } from '@/utils/environmentUtils';
 
 export const MainContent: React.FC = () => {
   const [isMaximized, setIsMaximized] = useState(false);
-  const appWindow = getCurrentWebviewWindow();
+  const [appWindow, setAppWindow] = useState<any>(null);
+  const [isTauriEnv, setIsTauriEnv] = useState(false);
+
+  // 在 useEffect 中安全地获取 webview window
+  useEffect(() => {
+    const initializeWindow = () => {
+      const isInTauri = isTauriEnvironment();
+      setIsTauriEnv(isInTauri);
+
+      if (isInTauri) {
+        try {
+          const window = getCurrentWebviewWindow();
+          setAppWindow(window);
+        } catch (error) {
+          setAppWindow(null);
+        }
+      } else {
+        showBrowserLimitation('窗口控制功能');
+      }
+    };
+
+    initializeWindow();
+  }, []);
 
   const {
     currentModule,
@@ -127,34 +151,59 @@ export const MainContent: React.FC = () => {
 
   // 监听窗口状态变化
   useEffect(() => {
+    // 检查是否在Tauri环境中
+    if (!appWindow) {
+      return;
+    }
+
     const checkMaximized = async () => {
-      const maximized = await appWindow.isMaximized();
-      setIsMaximized(maximized);
+      try {
+        const maximized = await appWindow.isMaximized();
+        setIsMaximized(maximized);
+      } catch (error) {
+        console.error('检查窗口状态失败:', error);
+      }
     };
 
     checkMaximized();
 
     const unlisten = appWindow.listen('tauri://resize', async () => {
-      const maximized = await appWindow.isMaximized();
-      setIsMaximized(maximized);
+      try {
+        const maximized = await appWindow.isMaximized();
+        setIsMaximized(maximized);
+      } catch (error) {
+        console.error('监听窗口状态变化失败:', error);
+      }
     });
 
     return () => {
-      unlisten.then(fn => fn());
+      unlisten.then((fn: () => void) => fn());
     };
-  }, []);
+  }, [appWindow]);
 
   // 窗口控制函数
   const handleMinimize = () => {
-    appWindow.minimize();
+    if (appWindow) {
+      appWindow.minimize();
+    } else {
+      // Window controls only available in Tauri environment
+    }
   };
 
   const handleMaximize = () => {
-    appWindow.toggleMaximize();
+    if (appWindow) {
+      appWindow.toggleMaximize();
+    } else {
+      // Window controls only available in Tauri environment
+    }
   };
 
   const handleClose = () => {
-    appWindow.hide();
+    if (appWindow) {
+      appWindow.hide();
+    } else {
+      // Window controls only available in Tauri environment
+    }
   };
 
   // Knowledge 相关状态
@@ -437,7 +486,7 @@ export const MainContent: React.FC = () => {
                     }`}
                     title="全部"
                   >
-                    <Menu size={16} />
+                    <WalletCards size={16} />
                   </button>
                   
                   <button onClick={() => selectCategory(categories.find(c => c.name === '网站'))}
@@ -459,29 +508,29 @@ export const MainContent: React.FC = () => {
                     }`}
                     title="APP"
                   >
-                    <Grid3X3 size={16} />
+                    <LayoutGrid size={16} />
                   </button>
 
-                  <button onClick={() => selectCategory(categories.find(c => c.name === '服务'))}
+                  <button onClick={() => selectCategory(categories.find(c => c.name === '服务器'))}
                     className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium transition-colors ${
-                      selectedCategory?.name === '服务'
+                      selectedCategory?.name === '服务器'
                         ? 'status-warning theme-text-smart-contrast'
                         : 'theme-text-secondary hover:theme-bg-secondary'
                     }`}
                     title="Machine"
                   >
-                    <Grid3X3 size={16} />
+                    <MonitorStop size={16} />
                   </button>
 
-                  <button onClick={() => selectCategory(categories.find(c => c.name === '数据'))}
+                  <button onClick={() => selectCategory(categories.find(c => c.name === '数据库'))}
                     className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium transition-colors ${
-                      selectedCategory?.name === '数据'
+                      selectedCategory?.name === '数据库'
                         ? 'status-error theme-text-smart-contrast'
                         : 'theme-text-secondary hover:theme-bg-secondary'
                     }`}
                     title="Database"
                   >
-                    <Shield size={16} />
+                    <DatabaseZap size={16} />
                   </button>
                 </div>
               </>
@@ -646,41 +695,43 @@ export const MainContent: React.FC = () => {
             </div>
           )}
 
-          {/* 窗口控制按钮 */}
-          <div className="flex items-center gap-1 ml-2">
-            {/* 最小化按钮 */}
-            <button className="titlebar-button titlebar-button-minimize"
-              onClick={handleMinimize}
-              aria-label="最小化"
-            >
-              <svg width="10" height="1" viewBox="0 0 10 1">
-                <rect width="10" height="1" fill="currentColor" />
-              </svg>
-            </button>
+          {/* 窗口控制按钮 - 仅在Tauri环境中显示 */}
+          {isTauriEnv && appWindow && (
+            <div className="flex items-center gap-1 ml-2">
+              {/* 最小化按钮 */}
+              <button className="titlebar-button titlebar-button-minimize"
+                onClick={handleMinimize}
+                aria-label="最小化"
+              >
+                <svg width="10" height="1" viewBox="0 0 10 1">
+                  <rect width="10" height="1" fill="currentColor" />
+                </svg>
+              </button>
 
-            {/* 最大化按钮 */}
-            <button className="titlebar-button titlebar-button-maximize"
-              onClick={handleMaximize}
-              aria-label={isMaximized ? "还原" : "最大化"}
-            >
-              <svg width="10" height="10" viewBox="0 0 10 10">
-                <rect x="0.5" y="0.5" width="9" height="9" stroke="currentColor" strokeWidth="1" fill="none" />
-              </svg>
-            </button>
+              {/* 最大化按钮 */}
+              <button className="titlebar-button titlebar-button-maximize"
+                onClick={handleMaximize}
+                aria-label={isMaximized ? "还原" : "最大化"}
+              >
+                <svg width="10" height="10" viewBox="0 0 10 10">
+                  <rect x="0.5" y="0.5" width="9" height="9" stroke="currentColor" strokeWidth="1" fill="none" />
+                </svg>
+              </button>
 
-            {/* 关闭按钮 */}
-            <button className="titlebar-button titlebar-button-close"
-              onClick={handleClose}
-              aria-label="关闭"
-            >
-              <svg width="10" height="10" viewBox="0 0 10 10">
-                <path d="M 0 0 L 10 10 M 10 0 L 0 10"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                />
-              </svg>
-            </button>
-          </div>
+              {/* 关闭按钮 */}
+              <button className="titlebar-button titlebar-button-close"
+                onClick={handleClose}
+                aria-label="关闭"
+              >
+                <svg width="10" height="10" viewBox="0 0 10 10">
+                  <path d="M 0 0 L 10 10 M 10 0 L 0 10"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
+                </svg>
+              </button>
+            </div>
+          )}
         </div>
       </header>
 

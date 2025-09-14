@@ -1,10 +1,11 @@
 ﻿import React, { useState, useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { useAppStore } from '@/stores';
-import { X, Palette, Cpu, Bot, Info, Settings } from 'lucide-react';
+import { X, Palette, Cpu, Bot, Info, Settings, Type } from 'lucide-react';
 import { Ais as AiSettings } from '../features/ai/AiSettings';
 import { AiAgents } from '../features/ai/AiAgentSettings';
 import { Abouts } from '../features/settings/AboutSettings';
+import { getBlendModeLabel } from '@/utils/colorBlend';
 
 // 设置页面类型
 type SettingsPage = 'appearance' | 'ai' | 'agents' | 'about';
@@ -163,17 +164,30 @@ const AppearanceSettings: React.FC = () => {
   const {
     theme,
     noiseLevel,
-    transparencyLevel,
+    gradientAngle,
+    blendMode,
+    fontFamily,
     setTheme,
     setNoiseLevel,
-    setTransparencyLevel
+    setGradientAngle,
+    setBlendMode,
+    setFontFamily
   } = useAppStore();
 
   const themes = [
-    { key: 'light', name: '浅色', icon: '☀️' },
-    { key: 'dark', name: '深色', icon: '🌙' },
-    { key: 'auto', name: '跟随系统', icon: '🔄' }
+    { key: 'auto', name: '通用', icon: '🔄' },
+    { key: 'light', name: '亮色', icon: '☀️' },
+    { key: 'dark', name: '暗色', icon: '🌙' }
   ];
+
+
+  const handleAngleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setGradientAngle(Number(e.target.value));
+  };
+
+  const handleBlendModeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setBlendMode(Number(e.target.value));
+  };
 
   return (
     <div className="space-y-4">
@@ -209,31 +223,16 @@ const AppearanceSettings: React.FC = () => {
             ))}
           </div>
         </div>
+
+        {/* 视觉效果控制 */}
         <div className="p-4 rounded-xl feather-glass-content">
           <div className="flex items-center gap-2 mb-3">
-            <Settings size={16} 
-            className="theme-text-accent" />
+            <Settings size={16} className="theme-text-accent" />
             <h4 className="text-base font-medium theme-text-primary">视觉效果</h4>
           </div>
 
           <div className="space-y-3">
-            {/* 透明度 */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-sm theme-text-primary">透明度</label>
-                <span className="text-xs theme-text-accent px-2 py-1 rounded bg-white/10">
-                  {transparencyLevel}%
-                </span>
-              </div>
-              <input 
-                type="range"
-                min="0"
-                max="100"
-                value={transparencyLevel} 
-                onChange={(e) => setTransparencyLevel(Number(e.target.value))}
-                className="theme-slider w-full"
-              />
-            </div>
+            {/* 噪点强度 */}
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="text-sm theme-text-primary">噪点强度</label>
@@ -241,14 +240,98 @@ const AppearanceSettings: React.FC = () => {
                   {noiseLevel}%
                 </span>
               </div>
-              <input 
+              <input
                 type="range"
                 min="0"
                 max="100"
-                value={noiseLevel} 
+                value={noiseLevel}
                 onChange={(e) => setNoiseLevel(Number(e.target.value))}
                 className="theme-slider w-full"
               />
+            </div>
+
+            {/* 角度设置 */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm theme-text-primary">角度</label>
+                <span className="text-xs theme-text-accent px-2 py-1 rounded bg-white/10">
+                  {gradientAngle}°
+                </span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="360"
+                value={gradientAngle}
+                onChange={handleAngleChange}
+                className="theme-slider w-full"
+              />
+            </div>
+
+            {/* 混合模式设置 */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm theme-text-primary">混合</label>
+                <span className="text-xs theme-text-accent px-2 py-1 rounded bg-white/10">
+                  {getBlendModeLabel(blendMode)}
+                </span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={blendMode}
+                onChange={handleBlendModeChange}
+                className="theme-slider w-full"
+              />
+            </div>
+          </div>
+        </div>
+
+
+        {/* 字体设置 */}
+        <div className="p-4 rounded-xl feather-glass-content">
+          <div className="flex items-center gap-2 mb-3">
+            <Type size={16} className="theme-text-accent" />
+            <h4 className="text-base font-medium theme-text-primary">字体设置</h4>
+          </div>
+
+          <div>
+            {/* 界面字体 */}
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                onClick={() => setFontFamily('system')}
+                className={`p-3 rounded-lg text-sm transition-colors flex flex-col items-center gap-2 ${
+                  fontFamily === 'system'
+                    ? 'theme-text-accent feather-glass-content'
+                    : 'theme-text-secondary hover:theme-text-primary hover:feather-glass-deco'
+                }`}
+              >
+                <span className="font-system">系统默认</span>
+                <span className="text-xs theme-text-secondary">System UI</span>
+              </button>
+              <button
+                onClick={() => setFontFamily('lxgw-neo-zhisong')}
+                className={`p-3 rounded-lg text-sm transition-colors flex flex-col items-center gap-2 ${
+                  fontFamily === 'lxgw-neo-zhisong'
+                    ? 'theme-text-accent feather-glass-content'
+                    : 'theme-text-secondary hover:theme-text-primary hover:feather-glass-deco'
+                }`}
+              >
+                <span className="font-lxgw-neo-zhisong">霞鹜新致宋</span>
+                <span className="text-xs theme-text-secondary">LXGW Neo ZhiSong</span>
+              </button>
+              <button
+                onClick={() => setFontFamily('lxgw-neo-xihei')}
+                className={`p-3 rounded-lg text-sm transition-colors flex flex-col items-center gap-2 ${
+                  fontFamily === 'lxgw-neo-xihei'
+                    ? 'theme-text-accent feather-glass-content'
+                    : 'theme-text-secondary hover:theme-text-primary hover:feather-glass-deco'
+                }`}
+              >
+                <span className="font-lxgw-neo-xihei">霞鹜新晰黑</span>
+                <span className="text-xs theme-text-secondary">LXGW Neo XiHei</span>
+              </button>
             </div>
           </div>
         </div>

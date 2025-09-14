@@ -1,10 +1,11 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Task, TaskProject, TaskPriority, TaskStatus } from '@/types';
 import { useTaskBoxStore } from '@/stores';
-import { Edit2, Trash2, Calendar, Check, X, Flag } from 'lucide-react';
+import { Edit2, Trash2, Calendar, Check, X, Flag, ChevronDown } from 'lucide-react';
 import { DatePicker } from '@/components/common/DatePicker/DatePicker';
 import { ConfirmDeleteModal } from '@/components/common/ConfirmDeleteModal';
 import { formatDate as formatDateUtil } from '@/utils/timeUtils';
+import { getIconComponent } from '@/constants/commonIcons';
 
 interface TaskItemProps {
   task: Task;
@@ -46,6 +47,23 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // 新增：现代化选择器的状态
+  const [showProjectPicker, setShowProjectPicker] = useState(false);
+  const [showPriorityPicker, setShowPriorityPicker] = useState(false);
+  const [showStatusPicker, setShowStatusPicker] = useState(false);
+
+  // 同步task数据到编辑状态
+  useEffect(() => {
+
+    setEditTitle(task.title);
+    setEditDescription(task.description || '');
+    setEditPriority(task.priority);
+    setEditStatus(task.status);
+    setEditDueDate(task.due_date || '');
+    setEditProjectId(task.project_id ?? null);
+
+  }, [task]);
+
   // 处理任务完成状态切换
   const handleToggleComplete = async () => {
     try {
@@ -55,24 +73,33 @@ export const TaskItem: React.FC<TaskItemProps> = ({
     }
   };
 
+  // 添加组件挂载日志
+  useEffect(() => {
+  }, []);
+
   // 处理任务编辑保存
   const handleSaveEdit = async () => {
-    if (!editTitle.trim()) return;
+
+    if (!editTitle.trim()) {
+      return;
+    }
+
+    const updates = {
+      title: editTitle.trim(),
+      description: editDescription.trim() || undefined,
+      priority: editPriority,
+      status: editStatus,
+      due_date: editDueDate && editDueDate.trim() ? editDueDate.trim() : undefined,
+      project_id: editProjectId
+    };
+
 
     try {
-      const updates = {
-        title: editTitle.trim(),
-        description: editDescription.trim() || undefined,
-        priority: editPriority,
-        status: editStatus,
-        due_date: editDueDate && editDueDate.trim() ? editDueDate.trim() : undefined,
-        project_id: editProjectId
-      };
-
       await onUpdate(updates);
+
       setIsEditing(false);
     } catch (error) {
-      console.error('Failed to update task:', error);
+      console.error('Task update failed:', error);
     }
   };
 
@@ -103,6 +130,28 @@ export const TaskItem: React.FC<TaskItemProps> = ({
     setEditDueDate(task.due_date || '');
     setEditProjectId(task.project_id ?? null);
     setIsEditing(false);
+    // 重置弹窗状态
+    setShowProjectPicker(false);
+    setShowPriorityPicker(false);
+    setShowStatusPicker(false);
+  };
+
+  // 处理项目选择
+  const handleProjectSelect = (project: TaskProject | null) => {
+    setEditProjectId(project ? project.id ?? null : null);
+    setShowProjectPicker(false);
+  };
+
+  // 处理优先级选择
+  const handlePrioritySelect = (priority: TaskPriority) => {
+    setEditPriority(priority);
+    setShowPriorityPicker(false);
+  };
+
+  // 处理状态选择
+  const handleStatusSelect = (status: TaskStatus) => {
+    setEditStatus(status);
+    setShowStatusPicker(false);
   };
 
   // 获取优先级选项
@@ -194,9 +243,9 @@ export const TaskItem: React.FC<TaskItemProps> = ({
         <input type="checkbox"
           checked={task.status === 'completed'} onChange={handleToggleComplete}
         
-            className={`w-4 h-4 rounded focus:ring-2 focus:ring-offset-0 ${isOverdue
+            className={`w-4 h-4 bg-transparent border-2 theme-border rounded focus:ring-2 focus:ring-offset-0 ${isOverdue
             ? 'theme-text-error focus:theme-ring-error'
-            : 'text-accent focus:ring-accent'
+            : 'theme-text-accent focus:theme-ring-accent'
           }`}
         />
       </div>
@@ -246,47 +295,132 @@ export const TaskItem: React.FC<TaskItemProps> = ({
               </div>
               <div className="space-y-1">
                 <label className="text-xs theme-text-tertiary flex items-center gap-1">
-                  <Flag size={12} 
+                  <Flag size={12}
             className="theme-text-tertiary" />
                   优先级
                 </label>
-                <select value={editPriority} onChange={(e) => setEditPriority(e.target.value as TaskPriority)}
-                
-            className="w-full px-2 py-1 text-xs rounded focus:outline-none transition-colors feather-glass-panel theme-text-primary"
-                >
-                {priorityOptions.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                <div className="relative">
+                  <button
+                    className="w-full flex items-center justify-between px-2 py-1 text-xs rounded bg-white/10 hover:bg-white/20 transition-all duration-200 theme-text-primary"
+                    onClick={() => setShowPriorityPicker(!showPriorityPicker)}
+                  >
+                    <span>{priorityOptions.find(p => p.value === editPriority)?.label || '选择优先级'}</span>
+                    <ChevronDown size={12} className="theme-text-tertiary" />
+                  </button>
+
+                  {showPriorityPicker && (
+                    <div className="absolute top-full left-0 mt-1 w-full z-50 rounded bg-white/10 backdrop-blur-md border border-white/20 shadow-lg">
+                      {priorityOptions.map(option => (
+                        <button
+                          key={option.value}
+                          onClick={() => handlePrioritySelect(option.value)}
+                          className={`w-full flex items-center px-2 py-1.5 text-xs hover:bg-white/10 transition-all duration-200 ${
+                            editPriority === option.value ? 'bg-white/20 theme-text-primary' : 'theme-text-secondary'
+                          }`}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
             </div>
             <div className="space-y-1">
               <label className="text-xs theme-text-tertiary">状态</label>
-              <select value={editStatus} onChange={(e) => setEditStatus(e.target.value as TaskStatus)}
-              
-            className="w-full px-2 py-1 text-xs rounded focus:outline-none transition-colors feather-glass-panel theme-text-primary"
+              <div className="relative">
+                <button
+                  className="w-full flex items-center justify-between px-2 py-1 text-xs rounded bg-white/10 hover:bg-white/20 transition-all duration-200 theme-text-primary"
+                  onClick={() => setShowStatusPicker(!showStatusPicker)}
                 >
-              {statusOptions.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+                  <span>{statusOptions.find(s => s.value === editStatus)?.label || '选择状态'}</span>
+                  <ChevronDown size={12} className="theme-text-tertiary" />
+                </button>
+
+                {showStatusPicker && (
+                  <div className="absolute top-full left-0 mt-1 w-full z-50 rounded bg-white/10 backdrop-blur-md border border-white/20 shadow-lg">
+                    {statusOptions.map(option => (
+                      <button
+                        key={option.value}
+                        onClick={() => handleStatusSelect(option.value)}
+                        className={`w-full flex items-center px-2 py-1.5 text-xs hover:bg-white/10 transition-all duration-200 ${
+                          editStatus === option.value ? 'bg-white/20 theme-text-primary' : 'theme-text-secondary'
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
           </div>
         <div className="space-y-1">
           <label className="text-xs theme-text-secondary">项目</label>
-          <select value={editProjectId || ''} onChange={(e) => setEditProjectId(e.target.value ? parseInt(e.target.value) : null)}
-          
-            className="w-full px-2 py-1 text-xs rounded focus:outline-none transition-colors feather-glass-panel theme-text-primary"
+          <div className="relative">
+            <button
+              className="w-full flex items-center justify-between px-2 py-1 text-xs rounded bg-white/10 hover:bg-white/20 transition-all duration-200 theme-text-primary"
+              onClick={() => setShowProjectPicker(!showProjectPicker)}
+            >
+              <span className="flex items-center gap-1">
+                {editProjectId ? (() => {
+                  const selectedProject = projects.find(p => p.id === editProjectId);
+                  return selectedProject ? (
+                    <>
+                      <span className="flex items-center justify-center w-3 h-3">
+                        {selectedProject.icon?.length === 1 ? (
+                          <span className="text-xs">{selectedProject.icon}</span>
+                        ) : (
+                          React.createElement(getIconComponent(selectedProject.icon || 'Folder'), {
+                            size: 12,
+                            className: 'theme-text-secondary'
+                          })
+                        )}
+                      </span>
+                      <span>{selectedProject.name}</span>
+                    </>
+                  ) : (
+                    <span className="theme-text-tertiary">选择项目</span>
+                  );
+                })() : (
+                  <span className="theme-text-tertiary">无</span>
+                )}
+              </span>
+              <ChevronDown size={12} className="theme-text-tertiary" />
+            </button>
+
+            {showProjectPicker && (
+              <div className="absolute top-full left-0 mt-1 w-full z-50 rounded bg-white/10 backdrop-blur-md border border-white/20 shadow-lg max-h-32 overflow-y-auto">
+                <button
+                  onClick={() => handleProjectSelect(null)}
+                  className={`w-full flex items-center px-2 py-1.5 text-xs hover:bg-white/10 transition-all duration-200 ${
+                    editProjectId === null ? 'bg-white/20 theme-text-primary' : 'theme-text-secondary'
+                  }`}
                 >
-          <option value="">无</option>
-          {projects.map(proj => (
-            <option key={proj.id} value={proj.id}>
-              {proj.icon} {proj.name}
-            </option>
-          ))}
-        </select>
+                  无
+                </button>
+                {projects.map(proj => (
+                  <button
+                    key={proj.id}
+                    onClick={() => handleProjectSelect(proj)}
+                    className={`w-full flex items-center gap-1 px-2 py-1.5 text-xs hover:bg-white/10 transition-all duration-200 ${
+                      editProjectId === proj.id ? 'bg-white/20 theme-text-primary' : 'theme-text-secondary'
+                    }`}
+                  >
+                    <span className="flex items-center justify-center w-3 h-3">
+                      {proj.icon?.length === 1 ? (
+                        <span className="text-xs">{proj.icon}</span>
+                      ) : (
+                        React.createElement(getIconComponent(proj.icon || 'Folder'), {
+                          size: 12,
+                          className: 'theme-text-secondary'
+                        })
+                      )}
+                    </span>
+                    <span>{proj.name}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
       </div>
     </div>{/* 操作按钮 */ }
   <div className="flex items-center justify-between pt-2 border-t theme-border-primary">

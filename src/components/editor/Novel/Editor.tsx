@@ -82,7 +82,24 @@ const EditorInner = forwardRef<NovelEditorRef, NovelEditorProps>(({
     },
 
     setValue: (newValue: string) => {
+      // 更新 React 状态
       setContent(newValue);
+
+      // 同步更新编辑器实例内容
+      if (editorInstance) {
+        // 获取编辑器实例的实际内容
+        const editorActualContent = editorInstance.getHTML();
+
+        // 比较新内容与编辑器实际内容（而不是 React 状态）
+        if (newValue !== editorActualContent) {
+          try {
+            // 使用编辑器的 setContent 命令来更新内容
+            editorInstance.commands.setContent(newValue);
+          } catch (error) {
+            console.error('Failed to update editor content:', error);
+          }
+        }
+      }
     },
 
     focus: () => {
@@ -225,9 +242,15 @@ const EditorInner = forwardRef<NovelEditorRef, NovelEditorProps>(({
           keydown: (_view, event) => handleCommandNavigation(event),
           paste: (view, event) => handleImagePaste(view, event, imageUploadHandler),
           drop: (view, event) => handleImageDrop(view, event, false, imageUploadHandler),
+          mousedown: (_view, _event) => {
+            return true;
+          },
+          mouseup: (_view, _event) => {
+            return true;
+          },
           click: (view, event) => {
             const target = event.target as HTMLElement;
-            
+
             // 避免与拖拽手柄冲突
             if (target.closest('.drag-handle')) {
               return false;

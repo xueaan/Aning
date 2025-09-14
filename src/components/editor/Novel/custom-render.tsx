@@ -13,6 +13,7 @@ import {
   SquareSplitVertical,
   Info,
   ImagePlus,
+  Table,
 } from "lucide-react";
 
 // IconPark 图标映射
@@ -28,6 +29,7 @@ const getIconComponent = (title: string, themeColors: any) => {
     引用: <Quote size={16} color={themeColors.text} />,
     代码块: <Braces size={16} color={themeColors.text} />,
     分割线: <SquareSplitVertical size={16} color={themeColors.text} />,
+    表格: <Table size={16} color={themeColors.text} />,
     信息提示: <Info size={16} color={themeColors.text} />,
     图片: <ImagePlus size={16} color={themeColors.text} />,
   };
@@ -192,7 +194,6 @@ export const createCustomRender = () => {
       },
 
       onKeyDown: (props: any) => {
-        console.log("⌨️ Custom render onKeyDown:", props.event.key);
         if (props.event.key === "Escape") {
           return true;
         }

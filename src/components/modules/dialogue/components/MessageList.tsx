@@ -113,9 +113,9 @@ export const MessageList: React.FC<MessageListProps> = ({
             {renderAvatar(message)}
             
             <div className={`flex-1 max-w-[80%] ${
-              message.role === 'user' 
-                ? 'bg-accent text-white rounded-2xl rounded-tr-sm p-4' 
-                : 'theme-bg-secondary rounded-2xl rounded-tl-sm p-4'
+              message.role === 'user'
+                ? 'bg-accent text-white rounded-2xl rounded-tr-sm p-4'
+                : 'feather-glass-deco rounded-2xl rounded-tl-sm p-4'
             }`}>
               {renderMessageContent(message)}
             </div>
@@ -129,7 +129,7 @@ export const MessageList: React.FC<MessageListProps> = ({
               <Bot size={16} />
             </div>
             
-            <div className="flex-1 max-w-[80%] theme-bg-secondary rounded-2xl rounded-tl-sm p-4">
+            <div className="flex-1 max-w-[80%] feather-glass-deco rounded-2xl rounded-tl-sm p-4">
               <div className="prose max-w-none theme-text-secondary">
                 <TypewriterMessage content={streamingResponse} />
               </div>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useKnowledgeOperations } from '@/stores/knowledgeStore';
 import { FolderOpen, Trash2, FileText, Plus, FolderMinus } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -62,34 +63,28 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
 
   // 创建新页面
   const handleCreate = async (parentId?: string) => {
-    console.log('🚀 handleCreate called with parentId:', parentId);
     
     if (!knowledgeOps.currentKnowledgeBase) {
-      console.warn('❌ No current knowledge base');
       return;
     }
 
     try {
       const newTitle = `新页面 ${new Date().toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' })}`;
-      console.log('📝 Creating page with title:', newTitle);
       
       const newId = await knowledgeOps.createPage?.(knowledgeOps.currentKnowledgeBase.id, newTitle, parentId);
-      console.log('✅ Page created with ID:', newId);
 
       // 确保知识库展开显示页面
       if (!expandedKnowledgeBases.has(knowledgeOps.currentKnowledgeBase.id)) {
         const newExpanded = new Set(expandedKnowledgeBases);
         newExpanded.add(knowledgeOps.currentKnowledgeBase.id);
         setExpandedKnowledgeBases(newExpanded);
-        console.log('📂 Expanded knowledge base');
       }
 
       if (newId && onSelect) {
         onSelect(newId);
-        console.log('🎯 Selected new page');
       }
     } catch (error) {
-      console.error('❌ 创建页面失败:', error);
+      console.error('创建页面失败:', error);
     }
   };
 
@@ -203,7 +198,7 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
       <div key={node.id} 
         className="space-y-2">
         <div className={cn(
-          'flex items-center justify-between group px-2 py-1.5 mx-0.5 my-0.5 rounded text-sm text-white/80 hover:bg-white/8 hover:text-white/95 transition-all cursor-pointer',
+          'flex items-center justify-between group px-2 py-1.5 mx-0.5 my-0.5 rounded text-sm theme-text-primary hover:theme-bg-tertiary hover:theme-text-primary transition-all cursor-pointer',
           selectedId === node.id && 'bg-blue-500/15 text-blue-200 border-l-2 border-blue-500 pl-1.5'
         )} style={{ marginLeft: paddingLeft }}
         >
@@ -256,13 +251,17 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
               />
             ) : (
               <div className="flex items-center gap-2 flex-1"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelect?.(node.id);
+                }}
                 onDoubleClick={(e) => {
                   e.stopPropagation();
                   setEditingId(node.id);
                   setEditingTitle(node.title);
                 }}
               >
-                <span className="text-sm font-semibold theme-text-primary truncate cursor-text">
+                <span className="text-sm font-semibold theme-text-primary truncate cursor-pointer">
                   {node.title}
                 </span>
                 {hasChildren && (
@@ -338,7 +337,7 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
                   <div 
                     key={page.id}
                     className={cn(
-                      'flex items-center px-2 py-1.5 mx-0.5 my-0.5 rounded text-sm text-white/80 hover:bg-white/8 hover:text-white/95 transition-all cursor-pointer group',
+                      'flex items-center px-2 py-1.5 mx-0.5 my-0.5 rounded text-sm theme-text-primary hover:theme-bg-tertiary hover:theme-text-primary transition-all cursor-pointer group',
                       selectedId === page.id && 'bg-blue-500/15 text-blue-200 border-l-2 border-blue-500 pl-1.5'
                     )}
                     onClick={() => onSelect?.(page.id)}
@@ -413,17 +412,20 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
       />
 
       {/* 删除页面确认对话框 */}
-      <ConfirmDeleteModal 
-        isOpen={showDeleteConfirm}
-        onClose={() => {
-          setShowDeleteConfirm(false);
-          setDeleteTarget(null);
-        }}
-        onConfirm={handleConfirmDeletePage}
-        title="删除页面"
-        itemName={deleteTarget?.title || ''}
-        isLoading={isDeleting}
-      />
+      {showDeleteConfirm && createPortal(
+        <ConfirmDeleteModal
+          isOpen={showDeleteConfirm}
+          onClose={() => {
+            setShowDeleteConfirm(false);
+            setDeleteTarget(null);
+          }}
+          onConfirm={handleConfirmDeletePage}
+          title="删除页面"
+          itemName={deleteTarget?.title || ''}
+          isLoading={isDeleting}
+        />,
+        document.body
+      )}
 
       {/* 创建知识库弹窗 */}
       <CreateKnowledgeBaseModal 

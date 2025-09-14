@@ -167,6 +167,7 @@ fn main() {
             cardbox_commands::update_card_box,
             cardbox_commands::delete_card_box,
             cardbox_commands::get_cards,
+            cardbox_commands::get_card_by_id,
             cardbox_commands::create_card,
             cardbox_commands::update_card,
             cardbox_commands::delete_card,

@@ -2,6 +2,7 @@
 import { Handle, Position, NodeProps } from 'reactflow';
 import { CheckSquare, Square, Plus, X, Palette } from 'lucide-react';
 import { useMindBoardStore } from '@/stores/mindBoardStore';
+import { ConfirmDeleteModal } from '@/components/common/ConfirmDeleteModal';
 
 const colors = [
   { name: 'indigo', border: 'border-indigo-200 dark:border-indigo-700', bg: 'bg-indigo-50 dark:bg-indigo-900/30', header: 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-700', progress: 'bg-indigo-500' },
@@ -24,6 +25,8 @@ export const TodoCard: React.FC<NodeProps> = ({ data, id }) => {
   const [isAddingTodo, setIsAddingTodo] = useState(false);
   const [colorIndex, setColorIndex] = useState(data.colorIndex || 0);
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { currentBoard, updateBoard, deleteNode } = useMindBoardStore();
   const currentColor = colors[colorIndex];
 
@@ -52,8 +55,20 @@ export const TodoCard: React.FC<NodeProps> = ({ data, id }) => {
   };
 
   const handleDelete = () => {
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = async () => {
     if (deleteNode) {
-      deleteNode(id);
+      setIsDeleting(true);
+      try {
+        deleteNode(id);
+        setShowDeleteConfirm(false);
+      } catch (error) {
+        console.error('Failed to delete todo card:', error);
+      } finally {
+        setIsDeleting(false);
+      }
     }
   };
 
@@ -102,8 +117,18 @@ export const TodoCard: React.FC<NodeProps> = ({ data, id }) => {
 
   return (
     <div className="todo-card-node relative group">
-      <Handle type="target" position={Position.Top} />
-      <Handle type="target" position={Position.Left} />
+      <Handle
+        type="target"
+        position={Position.Top}
+        id="todo-target-top"
+        className="!w-3 !h-3 !bg-white/90 !border-2 !border-gray-400 hover:!border-blue-500 hover:!scale-110 transition-all"
+      />
+      <Handle
+        type="target"
+        position={Position.Left}
+        id="todo-target-left"
+        className="!w-3 !h-3 !bg-white/90 !border-2 !border-gray-400 hover:!border-blue-500 hover:!scale-110 transition-all"
+      />
 
       {/* 操作按钮  */}
       <div className="absolute -top-2 -right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
@@ -224,8 +249,28 @@ export const TodoCard: React.FC<NodeProps> = ({ data, id }) => {
         </div>
       </div>
 
-      <Handle type="source" position={Position.Bottom} />
-      <Handle type="source" position={Position.Right} />
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        id="todo-source-bottom"
+        className="!w-3 !h-3 !bg-white/90 !border-2 !border-gray-400 hover:!border-blue-500 hover:!scale-110 transition-all"
+      />
+      <Handle
+        type="source"
+        position={Position.Right}
+        id="todo-source-right"
+        className="!w-3 !h-3 !bg-white/90 !border-2 !border-gray-400 hover:!border-blue-500 hover:!scale-110 transition-all"
+      />
+
+      {/* 删除确认弹窗 */}
+      <ConfirmDeleteModal
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleConfirmDelete}
+        title="删除待办卡片"
+        itemName="这个待办卡片"
+        isLoading={isDeleting}
+      />
     </div>
   );
 };

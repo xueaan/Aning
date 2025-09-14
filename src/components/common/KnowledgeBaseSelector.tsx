@@ -40,7 +40,7 @@ export const KnowledgeBaseSelector: React.FC<KnowledgeBaseSelectorProps> = ({
     // 如果是有效的图标名称，返回React组件
     if (isValidIcon(trimmedIconName)) {
       const IconComponent = getIconComponent(trimmedIconName);
-      return <IconComponent className="text-sm" />;
+      return <IconComponent className="w-4 h-4 flex-shrink-0" />;
     }
 
     // 如果不是有效图标名称，可能是emoji，直接返回
@@ -141,7 +141,7 @@ export const KnowledgeBaseSelector: React.FC<KnowledgeBaseSelectorProps> = ({
         onClick={toggleDropdown}
         className={cn(
           'flex items-center gap-2 px-2 py-1.5 text-sm font-normal rounded transition-all duration-200',
-          'min-w-[120px] max-w-[280px] theme-text-primary h-8',
+          'min-w-[120px] max-w-[280px] theme-text-primary h-6',
           'hover:scale-[1.02] active:scale-[0.98]',
           'feather-glass-deco'
         )}

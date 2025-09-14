@@ -1,5 +1,5 @@
-﻿import React from 'react';
-import { Star, StarOff, Clock } from 'lucide-react';
+﻿import React, { useState } from 'react';
+import { Clock } from 'lucide-react';
 import { Brain } from 'lucide-react';
 import { Board } from '@/types/mindBoard';
 import { useMindBoardStore } from '@/stores/mindBoardStore';
@@ -11,11 +11,37 @@ interface BoardCardProps {
 }
 
 export const BoardCard: React.FC<BoardCardProps> = ({ board, displayMode, onOpen }) => {
-  const { toggleFavorite } = useMindBoardStore();
-  // Store references removed - themeMode cleanup
-  const handleToggleFavorite = (e: React.MouseEvent) => {
+  const { updateBoard } = useMindBoardStore();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState(board.title);
+
+  const handleTitleDoubleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    toggleFavorite(board.id);
+    setEditTitle(board.title);
+    setIsEditing(true);
+  };
+
+  const handleSaveTitle = () => {
+    const trimmedTitle = editTitle.trim();
+    if (trimmedTitle && trimmedTitle !== board.title) {
+      updateBoard(board.id, { title: trimmedTitle });
+    } else if (!trimmedTitle) {
+      setEditTitle(board.title);
+    }
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSaveTitle();
+    } else if (e.key === 'Escape') {
+      setEditTitle(board.title);
+      setIsEditing(false);
+    }
+  };
+
+  const handleBlur = () => {
+    handleSaveTitle();
   };
 
   // const getBoardStats = () => {
@@ -53,9 +79,24 @@ export const BoardCard: React.FC<BoardCardProps> = ({ board, displayMode, onOpen
             className="text-blue-600" />
             </div>
             <div className="flex-1">
-              <h3 className="text-base font-medium theme-text-primary mb-2">
-                {board.title}
-              </h3>
+              {isEditing ? (
+                <input
+                  type="text"
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  onBlur={handleBlur}
+                  className="w-full text-base font-medium theme-text-primary mb-2 bg-transparent border-none outline-none focus:ring-0"
+                  autoFocus
+                />
+              ) : (
+                <h3
+                  className="text-base font-medium theme-text-primary mb-2 cursor-text"
+                  onDoubleClick={handleTitleDoubleClick}
+                >
+                  {board.title}
+                </h3>
+              )}
               <div className="flex items-center gap-3 text-xs theme-text-secondary">
                 <span>{nodeCount} 节点</span>
                 <span>·</span>
@@ -68,17 +109,6 @@ export const BoardCard: React.FC<BoardCardProps> = ({ board, displayMode, onOpen
               </div>
             </div>
           </div>
-
-          <button onClick={handleToggleFavorite}
-            className="p-2 rounded-lg theme-bg-secondary/50 hover:theme-bg-secondary/70 backdrop-blur-sm theme-border transition-colors duration-200"
-          title={board.isFavorite ? '取消收藏' : '添加收藏'}
-          >
-          {board.isFavorite ? (
-            <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-          ) : (
-            <StarOff className="w-4 h-4 theme-text-tertiary" />
-          )}
-        </button>
       </div>
       </div>
     );
@@ -89,18 +119,6 @@ return (
             className="rounded-xl bg-transparent theme-border backdrop-blur-sm hover:backdrop-blur-md hover:theme-bg-secondary/50 transition-all cursor-pointer overflow-hidden"
     >
       <div className="aspect-video relative bg-transparent border-b theme-border">
-        <div className="absolute top-2 right-2">
-          <button onClick={handleToggleFavorite}
-            className="p-1.5 rounded-lg theme-bg-primary/20 hover:theme-bg-primary/30 backdrop-blur-sm border theme-border-primary transition-colors duration-200"
-            title={board.isFavorite ? '取消收藏' : '添加收藏'}
-          >
-            {board.isFavorite ? (
-              <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-            ) : (
-              <StarOff className="w-4 h-4 theme-text-tertiary" />
-            )}
-          </button>
-        </div>
       <div className="h-full flex items-center justify-center">
           <div className="text-center">
             <div className="w-16 h-16 theme-bg-secondary/30 backdrop-blur-sm rounded-xl flex items-center justify-center theme-border mb-3 mx-auto">
@@ -115,9 +133,24 @@ return (
       </div>
       
       <div className="relative p-4 bg-transparent border-t theme-border">
-        <h3 className="font-semibold theme-text-primary truncate mb-3 text-lg">
-          {board.title}
-        </h3>
+        {isEditing ? (
+          <input
+            type="text"
+            value={editTitle}
+            onChange={(e) => setEditTitle(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onBlur={handleBlur}
+            className="w-full font-semibold theme-text-primary mb-3 text-lg bg-transparent border-none outline-none focus:ring-0"
+            autoFocus
+          />
+        ) : (
+          <h3
+            className="font-semibold theme-text-primary truncate mb-3 text-lg cursor-text"
+            onDoubleClick={handleTitleDoubleClick}
+          >
+            {board.title}
+          </h3>
+        )}
         <div className="inline-flex items-center gap-2 px-3 py-1.5 theme-bg-secondary/50 backdrop-blur-sm rounded-full text-xs theme-text-secondary theme-border">
           <Clock className="w-3 h-3" />
           <span>{formatDate(board.updatedAt)}</span>

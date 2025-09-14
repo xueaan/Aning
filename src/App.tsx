@@ -13,16 +13,46 @@ import { Toast } from '@/components/common/Toast';
 function App() {
   const {
     initializeApp,
-    sidebarOpen} = useAppStore();
+    sidebarOpen,
+    fontFamily,
+    editorFontFamily} = useAppStore();
 
   useResponsive(); // Hook 会自动处理响应式逻辑
   const { currentGradient, noiseLevel } = useTheme();
+
+  // 应用字体类
+  useEffect(() => {
+    const fontClasses: Record<string, string> = {
+      'system': 'font-system',
+      'lxgw-neo-zhisong': 'font-lxgw-neo-zhisong',
+      'lxgw-neo-xihei': 'font-lxgw-neo-xihei'
+    };
+
+    const editorFontClasses: Record<string, string> = {
+      'default': 'editor-font-default'
+    };
+
+    // 移除所有字体类
+    Object.values(fontClasses).forEach(cls => {
+      document.documentElement.classList.remove(cls);
+    });
+    Object.values(editorFontClasses).forEach(cls => {
+      document.documentElement.classList.remove(cls);
+    });
+
+    // 添加当前字体类
+    if (fontClasses[fontFamily]) {
+      document.documentElement.classList.add(fontClasses[fontFamily]);
+    }
+    if (editorFontClasses[editorFontFamily]) {
+      document.documentElement.classList.add(editorFontClasses[editorFontFamily]);
+    }
+  }, [fontFamily, editorFontFamily]);
 
   // 初始化应用
   useEffect(() => {
     const startupProcess = async () => {
       try {
-        console.log('🚀 应用启动流程开始');
 
         // 添加网络稳定性检查和重试机制
         const retryWithDelay = async (fn: () => Promise<any>, retries = 3, delay = 500) => {
@@ -31,7 +61,6 @@ function App() {
               return await fn();
             } catch (error: any) {
               if (error?.message?.includes('ERR_NETWORK_CHANGED') && i < retries - 1) {
-                console.warn(`⚠️ 网络错误，${delay} ms 后重试 (${i + 1}/${retries})`);
                 await new Promise(resolve => setTimeout(resolve, delay));
                 delay *= 1.5; // 递增延迟
               } else {
@@ -48,20 +77,25 @@ function App() {
         if (appInitResult.status === 'rejected') {
           console.error('应用初始化失败:', appInitResult.reason);
         } else {
-          console.log('✅ 应用数据初始化完成');
         }
 
-        // 确保窗口显示（虽然现在配置为默认显示，但仍然确保设置焦点）
-        try {
-          const { getCurrentWebviewWindow } = await import('@tauri-apps/api/webviewWindow');
-          const mainWindow = getCurrentWebviewWindow();
+        // 显示环境信息
+        const { isTauriEnvironment, showEnvironmentBanner } = await import('@/utils/environmentUtils');
+        showEnvironmentBanner();
 
-          // 确保窗口可见和获得焦点
-          await mainWindow.show();
-          await mainWindow.setFocus();
-          console.log('👁️ 主窗口已显示并获得焦点');
-        } catch (windowError) {
-          console.error('窗口操作失败:', windowError);
+        // 确保窗口显示（仅在Tauri环境中）
+        try {
+          if (isTauriEnvironment()) {
+            const { getCurrentWebviewWindow } = await import('@tauri-apps/api/webviewWindow');
+            const mainWindow = getCurrentWebviewWindow();
+            if (mainWindow) {
+              // 确保窗口可见和获得焦点
+              await mainWindow.show();
+              await mainWindow.setFocus();
+            }
+          }
+        } catch (windowError: unknown) {
+          console.warn('窗口操作跳过:', (windowError as Error).message);
         }
 
       } catch (error) {
@@ -70,8 +104,8 @@ function App() {
     };
 
     // 监听网络状态变化
-    const handleOnline = () => console.log('✅ 网络已连接');
-    const handleOffline = () => console.warn('⚠️ 网络已断开');
+    const handleOnline = () => {};
+    const handleOffline = () => {};
     
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);

@@ -20,6 +20,15 @@ import { TextStyle } from '@tiptap/extension-text-style';
 import { Highlight } from '@tiptap/extension-highlight';
 import { Color } from '@tiptap/extension-color';
 
+// 暂时回到 Tiptap 表格扩展，但使用自定义配置
+import { Table } from '@tiptap/extension-table';
+import { TableRow } from '@tiptap/extension-table-row';
+import { TableHeader } from '@tiptap/extension-table-header';
+import { TableCell } from '@tiptap/extension-table-cell';
+
+// 导入 ProseMirror 的选择类型
+import { NodeSelection } from '@tiptap/pm/state';
+
 import { cx } from "class-variance-authority";
 import { MarkdownPasteExtension } from "./markdown-paste-extension";
 import { CalloutExtension } from "./callout-extension";
@@ -29,7 +38,6 @@ import { EnhancedBlockExtension } from "./enhanced-code-block-extension";
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BlockActionMenu } from './BlockActionMenu';
-import { Plus } from 'lucide-react';
 
 // Placeholder configuration
 const placeholder = Placeholder.configure({
@@ -116,7 +124,7 @@ const starterKit = StarterKit.configure({
     color: "#DBEAFE",
     width: 4
   },
-  gapcursor: false
+  gapcursor: false  // 修复类型分配错误
 });
 
 // TextStyle configuration
@@ -130,31 +138,34 @@ const highlight = Highlight.configure({
   multicolor: true
 });
 
-// 图片上传处理函数（保留备用）
-// const imageUpload = createImageUpload({
-//   validateFn: (file: File) => {
-//     const error = validateImageFile(file, 5); // 5MB 限制
-//     if (error) {
-//       throw new Error(error);
-//     }
-//   },
-//   onUpload: async (file: File) => {
-//     try {
-//       // 处理图片：压缩并转换为 base64
-//       const base64 = await processImageUpload(file, {
-//         quality: 0.8,
-//         maxWidth: 1920,
-//         maxHeight: 1080,
-//         maxSize: 5,
-//       });
-//       
-//       return base64; // 返回 base64 数据 URL
-//     } catch (error) {
-//       console.error('图片上传处理失败:', error);
-//       throw error;
-//     }
-//   },
-// });
+// Tiptap 表格扩展配置 - 使用 anning-table 类名
+const table = Table.configure({
+  HTMLAttributes: {
+    class: "anning-table prosemirror-table",
+  },
+  resizable: true,
+  allowTableNodeSelection: true,
+});
+
+const tableRow = TableRow.configure({
+  HTMLAttributes: {
+    class: "anning-table-row",
+  }
+});
+
+const tableHeader = TableHeader.configure({
+  HTMLAttributes: {
+    class: "anning-table-header",
+  }
+});
+
+const tableCell = TableCell.configure({
+  HTMLAttributes: {
+    class: "anning-table-cell",
+  },
+  // content: 'paragraph block*',  // 移除不兼容的content配置
+});
+
 
 // 配置 ResizableImage 扩展，支持拖拽调整大小
 const resizableImage = ResizableImage.configure({
@@ -182,6 +193,11 @@ export const defaultExtensions = [
   textStyle,
   color,
   highlight,
+  // 表格扩展 - 使用 Tiptap 扩展但配置 anning-table 类名
+  table,
+  tableRow,
+  tableHeader,
+  tableCell,
   MarkdownPasteExtension,
   CalloutExtension,
   EnhancedBlockExtension.configure({
@@ -193,38 +209,37 @@ export const defaultExtensions = [
     render: () => {
       const handle = document.createElement('div');
       handle.classList.add('drag-handle-official');
-      
-      // 创建 + 号按钮（使用Plus图标）
+
+      // 创建 + 号按钮（使用SVG图标而不是React组件）
       const addButton = document.createElement('div');
       addButton.classList.add('drag-handle-add');
       addButton.title = '在下方添加新段落';
-      
-      // 使用React渲染Plus图标
-      const addButtonRoot = createRoot(addButton);
-      addButtonRoot.render(React.createElement(Plus, { size: 16 }));
-      
+
+      // 使用SVG而不是React组件，避免渲染警告
+      addButton.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>';
+
       handle.appendChild(addButton);
-      
+
       // 创建六个小点的容器
       const dotsContainer = document.createElement('div');
       dotsContainer.classList.add('drag-handle-dots');
-      
+
       // 创建六个小点的HTML结构
       for (let i = 0; i < 6; i++) {
         const dot = document.createElement('div');
         dot.classList.add('drag-handle-dot');
         dotsContainer.appendChild(dot);
       }
-      
+
       handle.appendChild(dotsContainer);
-      
+
       // 菜单状态管理
       let menuContainer: HTMLElement | null = null;
       let menuRoot: any = null;
       let clickTimer: NodeJS.Timeout | null = null;
       let currentEditor: any = null;
       let currentNodePos: number = -1;
-      
+
       // 关闭菜单函数
       const closeMenu = () => {
         if (menuContainer && menuRoot) {
@@ -234,18 +249,98 @@ export const defaultExtensions = [
           menuRoot = null;
         }
       };
-      
+
       // 显示菜单函数
       const showMenu = (editor: any, nodePos: number, rect: DOMRect) => {
         closeMenu(); // 先关闭已有菜单
-        
+
+        // 在显示菜单前自动选中对应的块
+        try {
+          const { state } = editor;
+          const { doc } = state;
+
+          // 验证 nodePos 是否有效
+          if (nodePos < 0 || nodePos > doc.content.size) {
+            console.warn('Invalid nodePos:', nodePos);
+            editor.chain().focus().run();
+            menuContainer = document.createElement('div');
+            menuContainer.style.position = 'fixed';
+            menuContainer.style.left = `${rect.right + 8}px`;
+            menuContainer.style.top = `${rect.top}px`;
+            menuContainer.style.zIndex = '9999';
+            document.body.appendChild(menuContainer);
+
+            menuRoot = createRoot(menuContainer);
+            menuRoot.render(
+              React.createElement(BlockActionMenu, {
+                editor,
+                nodePos,
+                onClose: closeMenu,
+              })
+            );
+            return;
+          }
+
+          // 尝试找到nodePos位置的节点
+          let targetNode: any = null;
+          let targetPos = -1;
+          let found = false;
+
+          // 遍历文档找到包含nodePos的最顶层块节点
+          doc.descendants((node: any, pos: number) => {
+            if (!found && pos <= nodePos && pos + node.nodeSize > nodePos) {
+              if (node.type.isBlock && node.type.name !== 'doc') {
+                targetNode = node;
+                targetPos = pos;
+                // 对于表格，找到表格本身就停止
+                if (node.type.name === 'table') {
+                  found = true;
+                  return false;
+                }
+              }
+            }
+          });
+
+          if (targetNode && targetPos >= 0) {
+            // 特殊处理表格
+            if (targetNode.type.name === 'table') {
+              // 使用 NodeSelection 来选中整个表格
+              try {
+                const selection = NodeSelection.create(state.doc, targetPos);
+                editor.view.dispatch(state.tr.setSelection(selection));
+              } catch (e) {
+                // 如果 NodeSelection 失败，尝试将光标放在表格开始位置
+                editor.chain().focus().setTextSelection(targetPos).run();
+              }
+            }
+            // 处理其他块节点
+            else {
+              // 使用 setNodeSelection 命令选中块
+              try {
+                editor.commands.setNodeSelection(targetPos);
+              } catch (e) {
+                // 如果失败，至少将光标放在节点位置
+                editor.chain().focus().setTextSelection(targetPos).run();
+              }
+            }
+          } else {
+            // 如果没找到合适的节点，使用当前选区
+            editor.chain().focus().run();
+          }
+
+        } catch (error) {
+          console.error('❌ Error in showMenu auto-selection:', error);
+          // 发生错误时，至少确保编辑器获得焦点
+          editor.chain().focus().run();
+        }
+
         menuContainer = document.createElement('div');
         menuContainer.style.position = 'fixed';
         menuContainer.style.left = `${rect.right + 8}px`;
         menuContainer.style.top = `${rect.top}px`;
         menuContainer.style.zIndex = '9999';
         document.body.appendChild(menuContainer);
-        
+
         menuRoot = createRoot(menuContainer);
         menuRoot.render(
           React.createElement(BlockActionMenu, {
@@ -255,8 +350,8 @@ export const defaultExtensions = [
           })
         );
       };
-      
-      // 存储编辑器信息
+
+      // 存储编辑器信息 - 初始化时节点位置未知
       (handle as any).setEditorInfo = (editor: any, nodePos: number) => {
         currentEditor = editor;
         currentNodePos = nodePos;
@@ -296,10 +391,12 @@ export const defaultExtensions = [
           clearTimeout(clickTimer);
           e.preventDefault();
           e.stopPropagation();
-          
-          if (currentEditor && currentNodePos >= 0) {
+
+          if (currentEditor) {
+            // 如果nodePos无效，使用当前光标位置
+            let effectiveNodePos = currentNodePos >= 0 ? currentNodePos : 0;
             const rect = dotsContainer.getBoundingClientRect();
-            showMenu(currentEditor, currentNodePos, rect);
+            showMenu(currentEditor, effectiveNodePos, rect);
           }
         }
       });
@@ -322,31 +419,59 @@ export const defaultExtensions = [
       return handle;
     },
     onNodeChange: ({ node, editor }) => {
-      // 获取当前节点位置
-      const nodePos = 0;
-      
       // 更新所有拖拽手柄的编辑器信息
       const handles = document.querySelectorAll('.drag-handle-official');
+
+      // 使用当前选区位置作为默认位置
+      let actualNodePos = editor.state.selection.from;
+
+      // 如果pos未提供，尝试计算当前节点的实际位置
+      if (typeof actualNodePos !== 'number' && node) {
+        try {
+          // 尝试通过遍历文档找到该节点的位置
+          editor.state.doc.descendants((foundNode, foundNodePos) => {
+            if (foundNode === node) {
+              actualNodePos = foundNodePos;
+              return false; // 停止遍历
+            }
+            return true;
+          });
+        } catch (error) {
+          actualNodePos = editor.state.selection.from;
+        }
+      }
+
+      // 如果仍然没有有效位置，使用当前选区位置
+      if (typeof actualNodePos !== 'number') {
+        actualNodePos = editor.state.selection.from;
+      }
+
       handles.forEach(handle => {
         if ((handle as any).setEditorInfo) {
-          (handle as any).setEditorInfo(editor, nodePos);
+          (handle as any).setEditorInfo(editor, actualNodePos);
         }
       });
-      
+
       // 只在有内容的节点上显示拖拽手柄
-      if (!node) return;
-      
-      // 空段落或仅包含占位符的节点不显示拖拽手柄
-      if (node.type.name === 'paragraph' && node.textContent.trim() === '') {
-        handles.forEach(handle => {
-          (handle as HTMLElement).style.display = 'none';
-        });
+      if (!node || !node.type) {
         return;
       }
-      
-      // 其他情况恢复显示
+
+      // 检查是否为空段落
+      const isEmpty = node.type.name === 'paragraph' && (!node.textContent || node.textContent.trim() === '');
+
       handles.forEach(handle => {
-        (handle as HTMLElement).style.display = 'grid';
+        const handleElement = handle as HTMLElement;
+
+        if (isEmpty) {
+          // 空段落：隐藏手柄并添加标记
+          handleElement.style.display = 'none';
+          handleElement.setAttribute('data-empty', 'true');
+        } else {
+          // 非空段落：显示手柄并移除标记
+          handleElement.style.display = 'grid';
+          handleElement.removeAttribute('data-empty');
+        }
       });
     },
   }), // 使用官方DragHandle扩展

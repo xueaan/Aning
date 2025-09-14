@@ -13,6 +13,13 @@ const priorityLabels = {
   low: '低'
 };
 
+const priorityColors = {
+  urgent: 'priority-urgent',
+  high: 'priority-high',
+  medium: 'priority-medium',
+  low: 'priority-low'
+};
+
 export const TodoWidget: React.FC = () => {
   const { getTodayTasks, loadTasks, completeTask, projects, loadProjects } = useTaskBoxStore();
 
@@ -66,7 +73,7 @@ export const TodoWidget: React.FC = () => {
   const todoCount = todayTasks.length;
 
   return (
-    <div className="h-full flex flex-col p-2">
+    <div className="h-full flex flex-col p-4">
       {/* 头部 */}
       <div className="flex items-center justify-between mb-3 flex-shrink-0">
         <div className="flex items-center gap-2">
@@ -111,19 +118,20 @@ export const TodoWidget: React.FC = () => {
         </div>
       ) : (
         <div className="h-full overflow-y-auto scrollbar-hidden">
-          <motion.div className="space-y-1.5"
+          <motion.div className="space-y-0"
             variants={listContainerVariants}
             initial="hidden"
             animate="visible"
           >
-            <AnimatePresence mode="wait">
+            <AnimatePresence>
               {todayTasks.map((task, index) => {
                 const project = projects.find(p => p.id === task.project_id);
+                const isLast = index === todayTasks.length - 1;
 
                 return (
                   <motion.div
                     key={task.id}
-                    className="group flex items-start gap-3 p-3 rounded-lg cursor-pointer feather-glass-deco"
+                    className={`group flex items-start gap-3 p-3 rounded-lg cursor-pointer feather-glass-bottom-border ${isLast ? 'border-b-0' : ''}`}
                     variants={listItemVariants}
                     custom={index}
                     initial="hidden"
@@ -159,7 +167,7 @@ export const TodoWidget: React.FC = () => {
                         <div className="flex items-center gap-1.5">
                           {project && (
                             <motion.span
-                              className="text-xs px-2 py-1 rounded-full bg-white/10 theme-text-secondary font-medium"
+                              className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-600 dark:text-blue-400 font-medium"
                               whileHover={{ scale: 1.05 }}
                               transition={{ duration: 0.15 }}
                             >
@@ -169,7 +177,7 @@ export const TodoWidget: React.FC = () => {
                         </div>
 
                         <motion.span
-                          className="text-xs px-1.5 py-0.5 rounded theme-text-tertiary font-medium"
+                          className={`text-[10px] px-1 py-0.5 rounded font-medium ${priorityColors[task.priority as TaskPriority] || 'priority-medium'}`}
                           whileHover={{ scale: 1.05 }}
                           transition={{ duration: 0.15 }}
                         >

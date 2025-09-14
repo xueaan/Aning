@@ -36,16 +36,13 @@ export function parseMarkdownToHTML(markdown: string): string {
   try {
     // 使用 markdown-it 解析
     const html = md.render(markdown);
-    console.log('🔧 原始 HTML,输出:', html);
-    
+
     // 不要过度清理，保留段落和标题结构
     const cleanHtml = html
       .trim()
       .replace(/\n+/g, ' ') // 将换行替换为空格
       .replace(/\s+/g, ' ') // 合并多个空格
       .trim();
-    
-    console.log('🧹 清理后的 HTML:', cleanHtml);
     return cleanHtml;
   } catch (error) {
     console.error('Markdown 解析失败:', error);
@@ -62,12 +59,8 @@ export function handleMarkdownPaste(
   editor: any
 ): boolean {
   const text = event.clipboardData?.getData('text/plain');
-  
-  console.log('🔍,粘贴内容:', text);
-  console.log('📝 是否为 Markdown:', isMarkdown(text || ''));
-  
+
   if (!text || !isMarkdown(text)) {
-    console.log('❌ 不是 Markdown，使用默认处理');
     return false; // 不是 Markdown，使用默认处理
   }
 
@@ -77,15 +70,13 @@ export function handleMarkdownPaste(
     
     // 解析 Markdown 为 HTML,
     const html = parseMarkdownToHTML(text);
-    console.log('🔄 转换后的 HTML:', html);
-    
+
     // 插入解析后的内容
     editor.commands.insertContent(html);
-    console.log('✅ Markdown 粘贴处理完成');
     
     return true; // 已处理
   } catch (error) {
-    console.error('❌ 处理 Markdown 粘贴失败:', error);
+    console.error('Failed to process Markdown paste:', error);
     return false; // 处理失败，使用默认行为
   }
 }

@@ -7,7 +7,7 @@ import { PagesCatalog } from './PagesCatalog';
 import { CreateKnowledgeBaseModal } from '@/components/modals/CreateKnowledgeBaseModal';
 import { FloatingOutline } from './FloatingOutline';
 import type { OutlineItem } from './HeadingExtractor';
-import { Plus, ChevronRight, ChevronDown, FileText } from 'lucide-react';
+import { ChevronRight, ChevronDown, FileText, FolderSync } from 'lucide-react';
 
 interface KnowledgeLayoutProps {
   searchQuery?: string;
@@ -57,33 +57,19 @@ export const KnowledgeLayout: React.FC<KnowledgeLayoutProps> = ({
     setShowCreateKnowledgeBaseModal(true);
   };
 
-  // 临时清理功能 - 测试用
-  const handleCleanupData = async () => {
-    try {
-      const { DatabaseAPI } = await import('@/services/api/database');
-      const updatedCount = await DatabaseAPI.cleanupUnnamedPages();
-      console.log(`清理完成，更新了 ${updatedCount} 个页面`);
-      // 刷新页面数据
-      if (knowledgeOps.currentKnowledgeBase) {
-        await knowledgeOps.loadPages?.(knowledgeOps.currentKnowledgeBase.id);
-      }
-    } catch (error) {
-      console.error('清理失败:', error);
-    }
-  };
 
-  // 初始化数据
+  // 初始化数据 - 使用新的智能默认选择逻辑
   useEffect(() => {
     const initData = async () => {
       try {
-        await knowledgeOps.loadKnowledgeBases?.();
+        await knowledgeOps.initializeKnowledge?.();
       } catch (error) {
-        console.error('加载知识库失败:', error);
+        console.error('初始化知识库失败:', error);
       }
     };
 
     initData();
-  }, [knowledgeOps.loadKnowledgeBases]);
+  }, [knowledgeOps.initializeKnowledge]);
 
   // 当选择知识库时加载页面并重置页面选择
   useEffect(() => {
@@ -127,12 +113,11 @@ export const KnowledgeLayout: React.FC<KnowledgeLayoutProps> = ({
   };
 
   // 处理块数据变更
-  const handleBlocksChange = async (newBlocks: any[]) => {
+  const handleBlocksChange = async (_newBlocks: any[]) => {
     if (!selectedId) return;
 
     try {
       // Note: Block updates are handled by individual components
-      console.log('Blocks changed:', newBlocks);
     } catch (error) {
       console.error('保存页面内容失败:', error);
     }
@@ -202,13 +187,13 @@ export const KnowledgeLayout: React.FC<KnowledgeLayoutProps> = ({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <h2 className="text-sm font-medium text-white/70">
+              <h2 className="text-sm font-medium theme-text-secondary">
                 知识目录
               </h2>
             </div>
             <div className="flex items-center gap-1">
               <button onClick={handleToggleExpandAll}
-            className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-white/8 text-white/50 hover:text-white/80 transition-colors"
+            className="w-7 h-7 flex items-center justify-center rounded-md hover:theme-bg-tertiary theme-text-tertiary hover:theme-text-secondary transition-colors"
               title={knowledgeOps.expandedIds?.size === 0 ? "展开全部" : "折叠全部"}
               >
               {knowledgeOps.expandedIds?.size === 0 ? (
@@ -217,27 +202,15 @@ export const KnowledgeLayout: React.FC<KnowledgeLayoutProps> = ({
                 <ChevronDown className="w-3.5 h-3.5" />
               )}
             </button>
-            <button onClick={handleCreate}
-            className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-blue-500/15 text-white/50 hover:text-blue-300 transition-colors"
-            title="创建新页面"
-              >
-            <Plus className="w-3.5 h-3.5" />
-          </button>
-          <button onClick={handleCleanupData}
-            className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-green-500/15 text-white/50 hover:text-green-300 transition-colors text-xs"
-            title="清理历史数据"
-              >
-            🧹
-          </button>
-          <button onClick={async () => {
+            <button onClick={async () => {
             if (knowledgeOps.currentKnowledgeBase) {
               await knowledgeOps.loadPages?.(knowledgeOps.currentKnowledgeBase.id);
             }
           }}
-            className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-blue-500/15 text-white/50 hover:text-blue-300 transition-colors text-xs"
+            className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-blue-500/15 theme-text-tertiary hover:text-blue-300 transition-colors"
             title="刷新页面数据"
               >
-            🔄
+            <FolderSync className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
@@ -300,7 +273,7 @@ export const KnowledgeLayout: React.FC<KnowledgeLayoutProps> = ({
       title="新建页面"
     >
       <FileText size={24} 
-            className="text-white transition-transform group-hover:rotate-12 duration-200" />
+            className="theme-text-on-accent transition-transform group-hover:rotate-12 duration-200" />
     </button>
   )
 }

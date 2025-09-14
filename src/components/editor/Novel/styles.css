@@ -18,7 +18,7 @@
 
 /* ProseMirror 编辑器样式 - 完全融入背景 */
 .ProseMirror {
-  @apply p-8 px-6 sm:px-8;
+  @apply pt-4 pb-8 pl-11 pr-6 sm:pl-12 sm:pr-8;
   color: rgba(var(--text-primary), 1);
   background: transparent !important;
   outline: none !important;
@@ -26,9 +26,26 @@
   box-shadow: none !important;
   min-height: 100vh;
   font-size: 15px;
-  line-height: 1.7;
+  line-height: 1.4;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   letter-spacing: 0.01em;
+  /* 确保文本可以被选择 */
+  user-select: text !important;
+}
+
+/* 确保所有文本内容都可以被选择 */
+.ProseMirror p,
+.ProseMirror h1,
+.ProseMirror h2,
+.ProseMirror h3,
+.ProseMirror h4,
+.ProseMirror h5,
+.ProseMirror h6,
+.ProseMirror li,
+.ProseMirror blockquote,
+.ProseMirror pre,
+.ProseMirror code {
+  user-select: text !important;
 }
 
 .ProseMirror .is-editor-empty:first-child::before {
@@ -322,7 +339,7 @@
 /* 响应式调整 - 优化移动端体验 */
 @media (max-width: 768px) {
   .ProseMirror {
-    padding: 1rem;
+    padding: 0.5rem 1rem 1rem 1rem;
     font-size: 16px;
     line-height: 1.6;
   }
@@ -1181,19 +1198,30 @@ div[data-tippy-root]:has(.editor-bubble)>.tippy-content {
   position: relative;
 }
 
+/* 基础DragHandle样式 - 确保所有拖拽手柄都有正确间距 */
+.drag-handle {
+  margin-right: 16px !important;
+}
+
+/* 强制覆盖DragHandle的内联样式定位 - 解决间距问题 */
+.drag-handle-official[style*="left"] {
+  left: -8px !important; /* 强制覆盖内联样式从-14px到-16px，增加2px间距，避免超出边界 */
+}
+
 /* 官方DragHandle扩展样式 - 防止超出边界 */
 .drag-handle-official {
   display: flex !important;
   align-items: center !important;
-  gap: 3px !important;
+  gap: 1px !important;
   padding: 2px 2px 2px 2px !important;
-  margin-top: 1px !important;
+  margin-top: 0 !important;
+  transform: translateY(-4px) !important;
   margin-left: 6px !important;
-  margin-right: 1px !important;
-  min-width: 44px !important;
+  margin-right: 4px !important;
+  min-width: 40px !important;
   width: auto !important;
   overflow: visible !important;
-  opacity: 0.5;
+  opacity: 0.8;
   transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 50 !important;
   background: transparent !important;
@@ -1215,8 +1243,9 @@ div[data-tippy-root]:has(.editor-bubble)>.tippy-content {
 
 /* + 号按钮样式 - 使用Plus图标 */
 .drag-handle-add {
-  width: 20px !important;
-  height: 20px !important;
+  width: 28px !important;
+  height: 28px !important;
+  
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -1244,11 +1273,12 @@ div[data-tippy-root]:has(.editor-bubble)>.tippy-content {
 /* 六个小点容器样式 - 与Plus图标平衡 */
 .drag-handle-dots {
   display: grid !important;
+
   grid-template-columns: repeat(2, 1fr) !important;
   grid-template-rows: repeat(3, 1fr) !important;
   gap: 2px !important;
   width: 14px !important;
-  height: 18px !important;
+  height: 20px !important;
   cursor: grab !important;
   padding: 2px !important;
   border-radius: 2px !important;
@@ -1286,6 +1316,23 @@ div[data-tippy-root]:has(.editor-bubble)>.tippy-content {
   background: rgba(var(--text-primary), 0.05) !important;
 }
 
+/* 空段落不显示拖拽手柄 - 通过data属性控制 */
+.drag-handle-official[data-empty="true"] {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+/* 额外确保空段落拖拽手柄隐藏 */
+.ProseMirror p:empty:not([data-placeholder]):hover ~ .drag-handle-official,
+.ProseMirror p.is-empty:hover ~ .drag-handle-official,
+.ProseMirror p.is-editor-empty:hover ~ .drag-handle-official {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
 /* 移动端隐藏拖拽手柄 */
 @media screen and (max-width: 600px) {
   .drag-handle-official {
@@ -1306,17 +1353,17 @@ div[data-tippy-root]:has(.editor-bubble)>.tippy-content {
 .block-action-menu {
   position: fixed;
   z-index: 9999;
-  min-width: 200px;
+  min-width: 120px;  /* 缩短宽度，因为现在文字都是两个字 */
   padding: 8px;
   border-radius: 16px;
-  
+
   /* 毛玻璃效果 - 与项目主题一致 */
   background: rgba(255, 255, 255, 0.02) !important;
   backdrop-filter: blur(20px) saturate(180%) !important;
   -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
-  
+
   animation: menuFadeIn 0.2s ease;
 }
 
@@ -1329,17 +1376,17 @@ div[data-tippy-root]:has(.editor-bubble)>.tippy-content {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
 }
 
-/* 菜单项样式 */
+/* 菜单项样式 - 简洁透明效果 */
 .block-action-item {
   display: flex;
   align-items: center;
   gap: 12px;
   width: 100%;
-  padding: 12px 16px;
+  padding: 10px 12px;  /* 缩小内边距，因为文字变短 */
   border: none;
-  background: transparent;
-  border-radius: 12px;
-  color: rgba(var(--text-primary), 0.9);
+  background: transparent;  /* 恢复透明背景 */
+  border-radius: 10px;  /* 与格式项保持一致的圆角 */
+  color: rgba(var(--text-primary), 0.85);  /* 与格式项保持一致的透明度 */
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -1348,14 +1395,14 @@ div[data-tippy-root]:has(.editor-bubble)>.tippy-content {
 }
 
 .block-action-item:hover {
-  background: rgba(var(--color-accent), 0.1);
+  background: rgba(var(--color-accent), 0.08);  /* 与格式项保持一致的透明度 */
   color: rgba(var(--text-primary), 1);
-  transform: translateY(-1px);
+  transform: translateX(2px);  /* 与格式项保持一致的动画方向 */
 }
 
 .block-action-item:active {
-  transform: translateY(0);
-  background: rgba(var(--color-accent), 0.15);
+  transform: translateX(0);
+  background: rgba(var(--color-accent), 0.12);  /* 与格式项保持一致的激活状态 */
 }
 
 /* 删除项特殊样式 */
@@ -1364,8 +1411,9 @@ div[data-tippy-root]:has(.editor-bubble)>.tippy-content {
 }
 
 .block-action-item.delete-item:hover {
-  background: rgba(239, 68, 68, 0.1);
+  background: rgba(239, 68, 68, 0.08);  /* 保持一致的透明度 */
   color: #dc2626;
+  transform: translateX(2px);  /* 与其他项保持一致的动画 */
 }
 
 .dark .block-action-item.delete-item {
@@ -1373,8 +1421,140 @@ div[data-tippy-root]:has(.editor-bubble)>.tippy-content {
 }
 
 .dark .block-action-item.delete-item:hover {
-  background: rgba(248, 113, 113, 0.1);
+  background: rgba(248, 113, 113, 0.08);  /* 保持一致的透明度 */
   color: #fca5a5;
+  transform: translateX(2px);  /* 与其他项保持一致的动画 */
+}
+
+/* 格式转换组件样式 */
+.block-action-item-group {
+  position: relative;
+}
+
+.block-action-item.format-trigger {
+  /* 移除space-between，保持与其他按钮一致的左对齐 */
+}
+
+.block-action-item.format-trigger .chevron {
+  margin-left: auto;  /* 箭头自动推到右侧 */
+}
+
+.chevron {
+  transition: transform 0.2s ease;
+}
+
+.chevron.expanded {
+  transform: rotate(90deg);
+}
+
+/* 格式子菜单 */
+.format-submenu {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  margin-left: 8px;
+  min-width: 180px;
+  padding: 8px;
+  border-radius: 16px;
+  z-index: 10000;
+
+  /* 毛玻璃效果 - 与主菜单保持一致 */
+  background: rgba(255, 255, 255, 0.02) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+
+  animation: submenuSlideIn 0.2s ease;
+}
+
+.dark .format-submenu {
+  background: rgba(20, 20, 20, 0.05) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+/* 格式项样式 */
+.format-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  color: rgba(var(--text-primary), 0.85);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.format-item:hover {
+  background: rgba(var(--color-accent), 0.08);
+  color: rgba(var(--text-primary), 1);
+  transform: translateX(2px);
+}
+
+.format-item.active {
+  background: rgba(var(--color-accent), 0.12);
+  color: rgba(var(--color-accent), 1);
+}
+
+.format-item.active:hover {
+  background: rgba(var(--color-accent), 0.15);
+}
+
+/* 格式图标容器 */
+.format-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 1px solid rgba(var(--text-primary), 0.15);
+  background: rgba(var(--text-primary), 0.03);
+  transition: all 0.2s ease;
+}
+
+.format-item:hover .format-icon {
+  border-color: rgba(var(--color-accent), 0.3);
+  background: rgba(var(--color-accent), 0.08);
+}
+
+.format-item.active .format-icon {
+  border-color: rgba(var(--color-accent), 0.5);
+  background: rgba(var(--color-accent), 0.15);
+}
+
+/* 菜单分隔线 */
+.menu-separator {
+  height: 1px;
+  margin: 8px 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(var(--text-primary), 0.1) 20%,
+    rgba(var(--text-primary), 0.1) 80%,
+    transparent
+  );
+}
+
+/* 子菜单动画 */
+@keyframes submenuSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
 }
 
 /* 菜单动画 */
@@ -1387,4 +1567,162 @@ div[data-tippy-root]:has(.editor-bubble)>.tippy-content {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
+}
+
+/* 🔧 表格调试样式 - 强制显示检查DOM结构 */
+
+/* 🔧 表格样式 - 使用CSS变量，支持主题切换 */
+.ProseMirror .anning-table,
+.ProseMirror table {
+  display: table !important;
+  table-layout: fixed !important;  /* 固定表格布局，确保列宽均匀分配 */
+  border-collapse: collapse !important;
+  border-spacing: 0 !important;
+  margin: 1rem auto !important;  /* 居中显示 */
+  border: 2px solid rgba(var(--border-secondary), 1) !important;
+  background: transparent !important;  /* 透明背景，让单元格定义自己的背景 */
+  color: rgba(var(--text-primary), 1) !important;
+  width: auto !important;  /* 自动宽度，不强制占满 */
+  min-width: 500px !important;  /* 最小宽度确保表格不会太窄 */
+  max-width: 100% !important;
+}
+
+.ProseMirror colgroup {
+  display: table-column-group !important;
+}
+
+.ProseMirror col {
+  display: table-column !important;
+  width: 33.333% !important;  /* 强制每列占1/3 */
+}
+
+.ProseMirror tbody {
+  display: table-row-group !important;
+}
+
+.ProseMirror .anning-table-row,
+.ProseMirror tr {
+  display: table-row !important;
+}
+
+.ProseMirror .anning-table-cell,
+.ProseMirror td {
+  display: table-cell !important;
+  background: rgba(var(--bg-primary), 1) !important;
+  color: rgba(var(--text-primary), 1) !important;
+  border: 1px solid rgba(var(--border-secondary), 0.8) !important;
+  padding: 12px 16px !important;
+  width: auto !important;  /* 自动宽度 */
+  min-width: 150px !important;  /* 最小单元格宽度 */
+  max-width: unset !important;
+  min-height: 48px !important;  /* 确保空单元格有最小高度 */
+  vertical-align: top !important;
+  position: relative !important;
+}
+
+.ProseMirror .anning-table-header,
+.ProseMirror th {
+  display: table-cell !important;
+  background: rgba(var(--bg-tertiary), 0.6) !important;
+  color: rgba(var(--text-primary), 1) !important;
+  border: 1px solid rgba(var(--border-secondary), 0.8) !important;
+  padding: 12px 16px !important;
+  font-weight: 600 !important;
+  width: auto !important;  /* 自动宽度 */
+  min-width: 150px !important;  /* 最小单元格宽度 */
+  max-width: unset !important;
+  min-height: 48px !important;  /* 确保空单元格有最小高度 */
+  vertical-align: top !important;
+  position: relative !important;
+}
+
+/* 移除隐藏第4列的规则 - 通过自动填充内容解决问题 */
+
+/* 空单元格占位 */
+.ProseMirror td:empty::after,
+.ProseMirror .anning-table-cell:empty::after {
+  content: '\00a0';  /* 不间断空格 */
+  display: block;
+  min-height: 48px;
+  line-height: 48px;
+}
+
+/* 表格交互效果 */
+.ProseMirror td:hover,
+.ProseMirror .anning-table-cell:hover {
+  background: rgba(var(--bg-secondary), 0.5) !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.ProseMirror th:hover,
+.ProseMirror .anning-table-header:hover {
+  background: rgba(var(--bg-tertiary), 0.8) !important;
+  transition: background-color 0.2s ease !important;
+}
+
+/* 选中状态 */
+.ProseMirror .selectedCell {
+  background: rgba(var(--color-accent), 0.15) !important;
+}
+
+/* 主题变量会自动处理深色模式，无需额外CSS */
+
+/* 表格内容样式优化 */
+.ProseMirror table p,
+.ProseMirror .anning-table p {
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1.5 !important;
+  word-break: break-word !important;
+}
+
+.ProseMirror table p:empty::before,
+.ProseMirror .anning-table p:empty::before,
+.ProseMirror td p:empty::before,
+.ProseMirror .anning-table-cell p:empty::before {
+  content: '\200B';  /* 零宽空格，保持可编辑性 */
+  display: inline-block;
+  min-height: 1.5rem;
+  line-height: 1.5;
+}
+
+/* 表格选中状态 - NodeSelection */
+.ProseMirror .ProseMirror-selectednode.anning-table,
+.ProseMirror .ProseMirror-selectednode {
+  outline: 2px solid rgba(var(--color-accent), 0.5) !important;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* 响应式表格 */
+@media (max-width: 768px) {
+  .ProseMirror table {
+    font-size: 0.875rem !important;
+    margin: 1rem auto !important;
+  }
+
+  .ProseMirror table th,
+  .ProseMirror table td {
+    padding: 0.5rem !important;
+    min-width: 80px !important;
+  }
+}
+
+/* 表格工具栏弹出样式 */
+.table-toolbar {
+  background: rgba(255, 255, 255, 0.02) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+  padding: 8px !important;
+}
+
+.dark .table-toolbar {
+  background: rgba(20, 20, 20, 0.05) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
 }

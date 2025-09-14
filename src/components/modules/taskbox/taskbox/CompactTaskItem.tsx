@@ -36,6 +36,7 @@ export const CompactTaskItem: React.FC<CompactTaskItemProps> = ({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
+
   // 查找任务关联的项目
   const project = projects.find(p => p.id === task.project_id);
 
@@ -93,47 +94,47 @@ export const CompactTaskItem: React.FC<CompactTaskItemProps> = ({
     setEditValue(currentValue);
   };
 
-    // 保存编辑
-    const handleSaveEdit = async () => {
-      if (!editField) {
-        handleCancelEdit();
-        return;
+  // 保存编辑
+  const handleSaveEdit = async () => {
+    if (!editField) {
+      handleCancelEdit();
+      return;
+    }
+
+    // 对于非标题字段，允许空值（比如清除日期）
+    if (editField === 'title' && !editValue.trim()) {
+      handleCancelEdit();
+      return;
+    }
+
+    try {
+      const updates: Partial<Task> = {};
+
+      switch (editField) {
+        case 'title':
+          updates.title = editValue.trim();
+          break;
+        case 'due_date':
+          updates.due_date = editValue && editValue.trim() ? editValue.trim() : undefined;
+          break;
+        case 'priority':
+          updates.priority = editValue as TaskPriority;
+          break;
+        case 'status':
+          updates.status = editValue as TaskStatus;
+          break;
+        case 'project':
+          updates.project_id = editValue ? parseInt(editValue) : null;
+          break;
       }
 
-      // 对于非标题字段，允许空值（比如清除日期）
-      if (editField === 'title' && !editValue.trim()) {
-        handleCancelEdit();
-        return;
-      }
-
-      try {
-        const updates: Partial<Task> = {};
-
-        switch (editField) {
-          case 'title':
-            updates.title = editValue.trim();
-            break;
-          case 'due_date':
-            updates.due_date = editValue && editValue.trim() ? editValue.trim() : undefined;
-            break;
-          case 'priority':
-            updates.priority = editValue as TaskPriority;
-            break;
-          case 'status':
-            updates.status = editValue as TaskStatus;
-            break;
-          case 'project':
-            updates.project_id = editValue ? parseInt(editValue) : null;
-            break;
-        }
-
-        await onUpdate(updates);
-        setEditField(null);
-        setEditValue('');
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
+      await onUpdate(updates);
+      setEditField(null);
+      setEditValue('');
+    } catch (error) {
+      console.error('Failed to save task edit:', error);
+    }
+  };
 
     // 取消编辑
     const handleCancelEdit = () => {
@@ -235,7 +236,7 @@ export const CompactTaskItem: React.FC<CompactTaskItemProps> = ({
           type="checkbox"
           checked={task.status === 'completed'} 
           onChange={handleToggleComplete}
-          className={`w-4 h-4 rounded focus:ring-2 focus:ring-offset-0 ${
+          className={`w-4 h-4 bg-transparent border-2 theme-border rounded focus:ring-2 focus:ring-offset-0 ${
             isOverdue
               ? 'theme-text-error focus:theme-ring-error'
               : 'theme-text-accent focus:theme-ring-accent'
@@ -310,10 +311,19 @@ export const CompactTaskItem: React.FC<CompactTaskItemProps> = ({
               </button>
                 {showProjectPicker && (
                   <div className="absolute bottom-full left-0 mb-1 w-full max-h-32 overflow-y-auto rounded-lg shadow-xl z-50 feather-glass-deco">
-                    <button 
+                    <button
                       onClick={() => {
+                        const completeUpdates = {
+                          title: task.title,
+                          description: task.description,
+                          priority: task.priority,
+                          status: task.status,
+                          due_date: task.due_date,
+                          project_id: null,
+                          completed_at: task.completed_at
+                        };
                         setEditValue('');
-                        onUpdate({ project_id: null });
+                        onUpdate(completeUpdates);
                         setEditField(null);
                         setShowProjectPicker(false);
                       }}
@@ -322,11 +332,20 @@ export const CompactTaskItem: React.FC<CompactTaskItemProps> = ({
                     <span className="theme-text-tertiary">无项目</span>
                   </button>
                   {projects.map(proj => (
-                    <button 
-                      key={proj.id} 
+                    <button
+                      key={proj.id}
                       onClick={() => {
+                        const completeUpdates = {
+                          title: task.title,
+                          description: task.description,
+                          priority: task.priority,
+                          status: task.status,
+                          due_date: task.due_date,
+                          project_id: proj.id,
+                          completed_at: task.completed_at
+                        };
                         setEditValue(proj.id?.toString() || '');
-                        onUpdate({ project_id: proj.id });
+                        onUpdate(completeUpdates);
                         setEditField(null);
                         setShowProjectPicker(false);
                       }}
@@ -390,12 +409,21 @@ export const CompactTaskItem: React.FC<CompactTaskItemProps> = ({
         {editField === 'priority' ? (
           <div className="flex gap-0.5">
             {priorityOptions.map(option => (
-              <button 
-                key={option.value} 
+              <button
+                key={option.value}
                 type="button"
                 onClick={() => {
+                  const completeUpdates = {
+                    title: task.title,
+                    description: task.description,
+                    priority: option.value,
+                    status: task.status,
+                    due_date: task.due_date,
+                    project_id: task.project_id,
+                    completed_at: task.completed_at
+                  };
                   setEditValue(option.value);
-                  onUpdate({ priority: option.value });
+                  onUpdate(completeUpdates);
                   setEditField(null);
                 }}
                 className={`px-2 py-1 text-xs rounded-full transition-all duration-200 font-medium ${
@@ -430,10 +458,16 @@ export const CompactTaskItem: React.FC<CompactTaskItemProps> = ({
                 setEditValue(newValue);
                 // 立即保存，不需要等关闭
                 setTimeout(() => {
-                  const updates: Partial<Task> = {
-                    due_date: newValue && newValue.trim() ? newValue.trim() : undefined
+                  const completeUpdates = {
+                    title: task.title,
+                    description: task.description,
+                    priority: task.priority,
+                    status: task.status,
+                    due_date: newValue && newValue.trim() ? newValue.trim() : undefined,
+                    project_id: task.project_id,
+                    completed_at: task.completed_at
                   };
-                  onUpdate(updates);
+                  onUpdate(completeUpdates);
                   setEditField(null);
                   setEditValue('');
                 }, 100);

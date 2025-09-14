@@ -54,7 +54,6 @@ export const MessageInput: React.FC<MessageInputProps> = ({
             }
           }
         } catch (err) {
-          console.log('剪贴板读取失败或无图片内容:', err);
         }
       }
     };
@@ -98,11 +97,11 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   };
 
   return (
-    <div className="border-t theme-border-primary bg-transparent">
+    <div className="feather-glass-bottom-border">
       <div className="max-w-3xl mx-auto p-6">
         {/* 上下文标签 */}
         {activeContexts.size > 0 && (
-          <div className="mb-4 p-3 theme-bg-secondary rounded-lg">
+          <div className="mb-4 p-3 feather-glass-deco rounded-lg">
             <div className="text-sm theme-text-secondary mb-2">
               引用上下文 ({activeContexts.size}个)
             </div>
@@ -110,13 +109,13 @@ export const MessageInput: React.FC<MessageInputProps> = ({
               {Array.from(activeContexts.values()).slice(0, 3).map((context: any) => (
                 <span
                   key={context.id}
-                  className="px-2 py-1 theme-bg-tertiary rounded text-xs theme-text-primary"
+                  className="px-2 py-1 theme-bg-primary/20 rounded text-xs theme-text-primary backdrop-blur-sm"
                 >
                   {context.type}: {context.content.slice(0, 30)}...
                 </span>
               ))}
               {activeContexts.size > 3 && (
-                <span className="px-2 py-1 theme-bg-tertiary rounded text-xs theme-text-secondary">
+                <span className="px-2 py-1 theme-bg-primary/20 rounded text-xs theme-text-secondary backdrop-blur-sm">
                   还有 {activeContexts.size - 3} 个...
                 </span>
               )}

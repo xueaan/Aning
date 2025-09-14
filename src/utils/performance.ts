@@ -30,7 +30,6 @@ export class PerformanceMonitor {
       this.metrics.get(label)!.push(duration);
       this.timers.delete(label);
       
-      console.log(`⚡ ${label}: ${duration.toFixed(2)}ms`);
       return duration;
     }
     return 0;

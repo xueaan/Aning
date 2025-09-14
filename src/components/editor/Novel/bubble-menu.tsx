@@ -1,8 +1,8 @@
 ﻿import { useState } from 'react';
 import { TextButtons } from './selectors/text-buttons';
-import { NodeSelector } from './selectors/node-selector';
 import { LinkSelector } from './selectors/link-selector';
 import { ColorSelector } from './selectors/color-selector';
+import { TableSelector } from './selectors/table-selector';
 import { Separator } from './ui/separator';
 import GenerativeMenuSwitch from './generative/generative-menu-switch';
 
@@ -11,17 +11,17 @@ interface BubbleMenuProps {
 }
 
 export function BubbleMenu({}: BubbleMenuProps) {
-  const [isNodeSelectorOpen, setIsNodeSelectorOpen] = useState(false);
   const [isColorSelectorOpen, setIsColorSelectorOpen] = useState(false);
   const [isLinkSelectorOpen, setIsLinkSelectorOpen] = useState(false);
+  const [isTableSelectorOpen, setIsTableSelectorOpen] = useState(false);
   const [isAIOpen, setIsAIOpen] = useState(false);
 
   return (
     <GenerativeMenuSwitch open={isAIOpen} onOpenChange={setIsAIOpen}>
       <Separator orientation="vertical" />
-      <NodeSelector open={isNodeSelectorOpen} onOpenChange={setIsNodeSelectorOpen} />
-      <Separator orientation="vertical" />
       <LinkSelector open={isLinkSelectorOpen} onOpenChange={setIsLinkSelectorOpen} />
+      <Separator orientation="vertical" />
+      <TableSelector open={isTableSelectorOpen} onOpenChange={setIsTableSelectorOpen} />
       <Separator orientation="vertical" />
       <TextButtons />
       <Separator orientation="vertical" />

@@ -50,39 +50,39 @@ const TEXT_COLORS: BubbleColorMenuItem[] = [
 const HIGHLIGHT_COLORS: BubbleColorMenuItem[] = [
   {
     name: "默认",
-    color: "var(--novel-highlight-default)"
+    color: "transparent"
   },
   {
     name: "紫色",
-    color: "var(--novel-highlight-purple)"
+    color: "#E9D5FF"
   },
   {
     name: "红色",
-    color: "var(--novel-highlight-red)"
+    color: "#FECACA"
   },
   {
     name: "黄色",
-    color: "var(--novel-highlight-yellow)"
+    color: "#FEF3C7"
   },
   {
     name: "蓝色",
-    color: "var(--novel-highlight-blue)"
+    color: "#DBEAFE"
   },
   {
     name: "绿色",
-    color: "var(--novel-highlight-green)"
+    color: "#D1FAE5"
   },
   {
     name: "橙色",
-    color: "var(--novel-highlight-orange)"
+    color: "#FED7AA"
   },
   {
     name: "粉色",
-    color: "var(--novel-highlight-pink)"
+    color: "#FBCFE8"
   },
   {
     name: "灰色",
-    color: "var(--novel-highlight-gray)"
+    color: "#F3F4F6"
   }
 ];
 
@@ -102,9 +102,9 @@ export const ColorSelector = ({ open, onOpenChange }: ColorSelectorProps) => {
   return (
     <Popover modal={true} open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger asChild>
-        <Button 
-          size="sm" 
-          className="gap-2 rounded-none" 
+        <Button
+          size="sm"
+          className="h-8 w-8 p-0 bg-transparent border-none hover:bg-transparent"
           variant="ghost"
         >
           <span 
@@ -159,7 +159,7 @@ export const ColorSelector = ({ open, onOpenChange }: ColorSelectorProps) => {
                 if (name === "默认") {
                   editor.chain().focus().unsetHighlight().run();
                 } else {
-                  editor.chain().focus().toggleHighlight({ color }).run();
+                  editor.chain().focus().setHighlight({ color }).run();
                 }
                 onOpenChange(false);
               }}

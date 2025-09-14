@@ -140,7 +140,16 @@ pub async fn send_ai_chat(request: AiChatRequest) -> Result<AiChatResponse, Stri
 #[tauri::command]
 pub async fn send_ai_chat_stream(app_handle: AppHandle, request: AiStreamRequest) -> Result<(), String> {
     let request_id = request.request_id.clone();
-    
+
+    println!("🚀 [Tauri命令] send_ai_chat_stream 开始执行");
+    println!("   request_id: {}", request_id);
+    println!("   provider: {}", request.provider);
+    println!("   model: {}", request.model);
+    println!("   base_url: {}", request.base_url);
+    println!("   messages_count: {}", request.messages.len());
+    println!("   temperature: {}", request.temperature);
+    println!("   max_tokens: {}", request.max_tokens);
+
     match request.provider.as_str() {
         "deepseek" => {
             if let Err(e) = send_deepseek_chat_stream(app_handle.clone(), request).await {
@@ -305,18 +314,38 @@ async fn send_claude_chat(request: AiChatRequest, start_time: std::time::Instant
 }
 
 async fn send_claude_chat_stream(app_handle: AppHandle, request: AiStreamRequest) -> Result<(), String> {
+    println!("🔵 [Claude] send_claude_chat_stream 开始执行");
+    println!("   request_id: {}", request.request_id);
+    println!("   base_url: {}", request.base_url);
+    println!("   model: {}", request.model);
+    println!("   messages_count: {}", request.messages.len());
+    println!("   max_tokens: {}", request.max_tokens);
+    println!("   temperature: {}", request.temperature);
+
     let client = reqwest::Client::builder()
         .timeout(std::time::Duration::from_secs(90))
         .build()
-        .map_err(|e| format!("创建HTTP客户端失败: {}", e))?;
-        
+        .map_err(|e| {
+            let error = format!("创建HTTP客户端失败: {}", e);
+            println!("❌ [Claude] {}", error);
+            error
+        })?;
+
     let url = format!("{}/v1/messages", request.base_url);
+    println!("🌐 [Claude] 请求URL: {}", url);
     let request_id = request.request_id.clone();
     
-    // 构建 Claude API 请求
-    let claude_messages: Vec<serde_json::Value> = request.messages
-        .iter()
-        .map(|msg| {
+    // 构建 Claude API 请求 - 分离 system 消息
+    let mut system_message: Option<String> = None;
+    let mut claude_messages: Vec<serde_json::Value> = Vec::new();
+
+    for msg in &request.messages {
+        if msg.role == "system" {
+            // 提取 system 消息作为顶级参数
+            system_message = Some(msg.content.clone());
+            println!("🔧 [Claude] 提取system消息: {}", msg.content);
+        } else {
+            // 处理非 system 消息
             if let Some(images) = &msg.images {
                 if !images.is_empty() {
                     // 构建多模态内容
@@ -331,7 +360,7 @@ async fn send_claude_chat_stream(app_handle: AppHandle, request: AiStreamRequest
                             }
                         }))
                         .collect();
-                    
+
                     // 如果有文字内容，添加到数组中
                     if !msg.content.trim().is_empty() {
                         content_array.push(serde_json::json!({
@@ -339,34 +368,46 @@ async fn send_claude_chat_stream(app_handle: AppHandle, request: AiStreamRequest
                             "text": msg.content
                         }));
                     }
-                    
-                    serde_json::json!({
+
+                    claude_messages.push(serde_json::json!({
                         "role": msg.role,
                         "content": content_array
-                    })
+                    }));
                 } else {
-                    serde_json::json!({
+                    claude_messages.push(serde_json::json!({
                         "role": msg.role,
                         "content": msg.content
-                    })
+                    }));
                 }
             } else {
-                serde_json::json!({
+                claude_messages.push(serde_json::json!({
                     "role": msg.role,
                     "content": msg.content
-                })
+                }));
             }
-        })
-        .collect();
-    
-    let claude_request = serde_json::json!({
+        }
+    }
+
+    // 构建请求体，system 消息作为顶级参数
+    let mut claude_request = serde_json::json!({
         "model": request.model,
         "max_tokens": request.max_tokens,
         "messages": claude_messages,
         "temperature": request.temperature,
         "stream": true
     });
-    
+
+    // 如果有 system 消息，添加为顶级参数
+    if let Some(system_content) = system_message {
+        claude_request["system"] = serde_json::Value::String(system_content);
+        println!("✅ [Claude] 已将system消息设置为顶级参数");
+    }
+
+    println!("📝 [Claude] 构建请求体完成");
+    println!("   请求体大小: {} bytes", serde_json::to_string(&claude_request).unwrap_or_default().len());
+    println!("   API密钥前缀: {}...", &request.api_key.chars().take(8).collect::<String>());
+
+    println!("🚀 [Claude] 开始发送HTTP请求");
     let response = client
         .post(&url)
         .json(&claude_request)
@@ -375,32 +416,71 @@ async fn send_claude_chat_stream(app_handle: AppHandle, request: AiStreamRequest
         .header("anthropic-version", "2023-06-01")
         .send()
         .await
-        .map_err(|e| format!("请求发送失败: {}", e))?;
-        
+        .map_err(|e| {
+            let error = format!("请求发送失败: {}", e);
+            println!("❌ [Claude] {}", error);
+            error
+        })?;
+
+    println!("📡 [Claude] 收到HTTP响应");
+    println!("   状态码: {}", response.status());
+    println!("   响应头: {:?}", response.headers());
+
     if !response.status().is_success() {
         let status = response.status();
         let error_text = response.text().await.unwrap_or_else(|_| "Unknown error".to_string());
-        return Err(format!("HTTP {}: {}", status, error_text));
+        let error = format!("HTTP {}: {}", status, error_text);
+        println!("❌ [Claude] 请求失败: {}", error);
+        return Err(error);
     }
-    
+
     // 处理流式响应
+    println!("📡 [Claude] 开始处理流式响应");
     let mut stream = response.bytes_stream();
     let mut buffer = String::new();
-    
+    let mut chunk_count = 0;
+    let mut total_content = String::new();
+
     while let Some(chunk) = stream.next().await {
+        chunk_count += 1;
         match chunk {
             Ok(bytes) => {
                 let text = String::from_utf8_lossy(&bytes);
+                println!("📦 [Claude] 收到第{}个数据块, 大小: {} bytes", chunk_count, bytes.len());
+                println!("📦 [Claude] 原始数据内容: {:?}", text);
                 buffer.push_str(&text);
-                
+
                 // 处理完整的行
                 while let Some(line_end) = buffer.find('\n') {
                     let line = buffer[..line_end].trim().to_string();
                     buffer.drain(0..=line_end);
-                    
-                    if line.starts_with("data: ") {
+
+                    println!("🔍 [Claude] 处理行: {:?}", line);
+
+                    if line.starts_with("event: error") {
+                        println!("❌ [Claude] 检测到错误事件");
+                        continue;
+                    } else if line.starts_with("data: ") {
                         let data = &line[6..]; // 移除"data: "前缀
-                        
+
+                        // 检查是否是错误数据
+                        if data.contains("\"error\":") {
+                            println!("❌ [Claude] 检测到错误数据: {}", data);
+                            // 解析错误信息并发送给前端
+                            if let Ok(error_data) = serde_json::from_str::<serde_json::Value>(data) {
+                                let error_msg = error_data.get("error")
+                                    .and_then(|e| e.as_str())
+                                    .unwrap_or("Claude API错误");
+                                let _ = app_handle.emit("ai-stream-chunk", AiStreamChunk {
+                                    request_id: request_id.clone(),
+                                    content: String::new(),
+                                    finished: true,
+                                    error: Some(error_msg.to_string()),
+                                });
+                                return Ok(());
+                            }
+                        }
+
                         if data == "[DONE]" {
                             // 发送完成事件
                             let _ = app_handle.emit("ai-stream-chunk", AiStreamChunk {
@@ -414,9 +494,12 @@ async fn send_claude_chat_stream(app_handle: AppHandle, request: AiStreamRequest
                         
                         // 解析JSON数据并发送chunk
                         if let Ok(chunk_response) = serde_json::from_str::<ClaudeStreamResponse>(data) {
+                            println!("🔄 [Claude] 解析JSON成功, 类型: {}", chunk_response.type_);
                             if chunk_response.type_ == "content_block_delta" {
                                 if let Some(delta) = chunk_response.delta {
                                     if let Some(text) = delta.text {
+                                        println!("💬 [Claude] 发送内容块: {:?}", text);
+                                        total_content.push_str(&text);
                                         // 发送内容chunk
                                         let _ = app_handle.emit("ai-stream-chunk", AiStreamChunk {
                                             request_id: request_id.clone(),
@@ -449,13 +532,18 @@ async fn send_claude_chat_stream(app_handle: AppHandle, request: AiStreamRequest
 }
 
 async fn send_deepseek_chat_stream(app_handle: AppHandle, request: AiStreamRequest) -> Result<(), String> {
+    println!("🤖 [DeepSeek] send_deepseek_chat_stream 开始执行");
+    println!("   request_id: {}", request.request_id);
+
     let client = reqwest::Client::builder()
         .timeout(std::time::Duration::from_secs(90))
         .build()
         .map_err(|e| format!("创建HTTP客户端失败: {}", e))?;
-        
+
     let url = format!("{}/chat/completions", request.base_url);
     let request_id = request.request_id.clone();
+
+    println!("🌐 [DeepSeek] API URL: {}", url);
     
     // 检查是否有图片 - DeepSeek不支持图片
     for msg in &request.messages {

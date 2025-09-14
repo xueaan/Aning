@@ -240,7 +240,8 @@ onError?: (error: string) => void
   const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   let fullResponse = '';
   let unlisten: UnlistenFn | null = null;
-  
+
+
   try {
     // 监听流式响应事件
     unlisten = await listen<{
@@ -250,17 +251,18 @@ onError?: (error: string) => void
       error?: string;
     }>('ai-stream-chunk', (event) => {
       const chunk = event.payload;
-      
+
+
       // 只处理本次请求的响应
       if (chunk.request_id !== requestId) {
         return;
       }
-      
+
       if (chunk.error) {
         onError?.(chunk.error);
         return;
       }
-      
+
       if (chunk.finished) {
         onComplete?.(fullResponse);
         unlisten?.(); // 清理事件监听
@@ -290,20 +292,22 @@ onError?: (error: string) => void
     ];
 
     // 发起流式请求
-    await invoke('send_ai_chat_stream', {
-      request: {
-        request_id: requestId,
-        provider,
-        base_url: config.baseURL || AI_PROVIDERS[provider].baseURL,
-        api_key: config.apiKey,
-        model: config.model,
-        messages,
-        temperature: config.temperature,
-        max_tokens: config.maxTokens
-      }
-    });
+    const request = {
+      request_id: requestId,
+      provider,
+      base_url: config.baseURL || AI_PROVIDERS[provider].baseURL,
+      api_key: config.apiKey,
+      model: config.model,
+      messages,
+      temperature: config.temperature,
+      max_tokens: config.maxTokens
+    };
+
+
+    await invoke('send_ai_chat_stream', { request });
 
   } catch (error) {
+    console.error('AI streaming error:', error);
     unlisten?.();
     onError?.(parseAiError(provider, error));
   }

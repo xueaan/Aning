@@ -8,11 +8,13 @@ import ReactFlow, {
   applyEdgeChanges,
   addEdge,
   Connection,
+  ConnectionLineType,
   NodeChange,
   EdgeChange,
   ReactFlowProvider,
   useReactFlow,
-  Panel
+  Panel,
+  Controls
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { ArrowLeft, Plus, Trash2, Image, StickyNote as StickyNoteIcon, Download, Users, Search, Brain } from 'lucide-react';
@@ -51,6 +53,9 @@ const BoardCanvasInner: React.FC = () => {
   const [isExporting, setIsExporting] = useState(false);
   const [selectedCount, setSelectedCount] = useState(0);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editTitle, setEditTitle] = useState('');
+
   const { project, fitBounds: _fitBounds } = useReactFlow();
 
 
@@ -61,6 +66,36 @@ const BoardCanvasInner: React.FC = () => {
     deleteBoard
   } = useMindBoardStore();
 
+  const handleTitleDoubleClick = () => {
+    if (currentBoard) {
+      setEditTitle(currentBoard.title);
+      setIsEditingTitle(true);
+    }
+  };
+
+  const handleSaveTitle = () => {
+    const trimmedTitle = editTitle.trim();
+    if (currentBoard && trimmedTitle && trimmedTitle !== currentBoard.title) {
+      updateBoard(currentBoard.id, { title: trimmedTitle });
+    } else if (!trimmedTitle && currentBoard) {
+      setEditTitle(currentBoard.title);
+    }
+    setIsEditingTitle(false);
+  };
+
+  const handleTitleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSaveTitle();
+    } else if (e.key === 'Escape') {
+      setEditTitle(currentBoard?.title || '');
+      setIsEditingTitle(false);
+    }
+  };
+
+  const handleTitleBlur = () => {
+    handleSaveTitle();
+  };
+
   // Store references removed - themeMode cleanup
   if (!currentBoard) {
     return null;
@@ -68,9 +103,7 @@ const BoardCanvasInner: React.FC = () => {
 
   const onNodesChange = useCallback(
     (changes: NodeChange[]) => {
-      console.log('onNodesChange called with:', changes);
       const newNodes = applyNodeChanges(changes, currentBoard.nodes);
-      console.log('Applying node changes, result:', newNodes.length, 'nodes');
       updateBoard(currentBoard.id, { nodes: newNodes });
       // 更新选中节点数量
       const selected = newNodes.filter(n => n.selected && n.type !== 'groupNode');
@@ -95,6 +128,8 @@ const BoardCanvasInner: React.FC = () => {
     [currentBoard, updateBoard]
   );
 
+
+
   const onDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
@@ -116,13 +151,31 @@ const BoardCanvasInner: React.FC = () => {
         y: event.clientY - reactFlowBounds.top
       });
 
+      // 根据不同类型创建对应的数据结构
+      let nodeData;
+      switch (type) {
+        case 'textCard':
+          nodeData = { text: '', colorIndex: 0, width: 280, height: 180 };
+          break;
+        case 'imageCard':
+          nodeData = { imageUrl: '', colorIndex: 0, width: 280, height: 180 };
+          break;
+        case 'stickyNote':
+          nodeData = { text: '', colorIndex: Math.floor(Math.random() * 6), width: 280, height: 180 };
+          break;
+        case 'noteCard':
+          nodeData = { content: '# 新笔记卡片\n\n在这里输入内容...', colorIndex: 0, width: 280, height: 180 };
+          break;
+        default:
+          nodeData = { text: '', colorIndex: 0 };
+      }
+
       const newNode: Node = {
-        id: `${Date.now()}`,
+        id: `${type}-${Date.now()}`,
         type,
         position,
-        data: type === 'textCard'
-          ? { text: '新文字卡片' }
-          : { content: '# 新笔记卡片\n\n在这里输入内容...' }
+        data: nodeData,
+        selected: true // 创建后自动选中
       };
 
       const newNodes = [...currentBoard.nodes, newNode];
@@ -130,6 +183,7 @@ const BoardCanvasInner: React.FC = () => {
     },
     [currentBoard, updateBoard, project]
   );
+
 
   const handleAddTextCard = () => {
     const newNode: Node = {
@@ -139,11 +193,7 @@ const BoardCanvasInner: React.FC = () => {
       data: { text: '新文字卡片' }
     };
 
-    console.log('Adding new text card:', newNode);
-    console.log('Current board nodes before:', currentBoard.nodes.length);
-
     const newNodes = [...currentBoard.nodes, newNode];
-    console.log('New nodes array:', newNodes.length);
 
     updateBoard(currentBoard.id, { nodes: newNodes });
   };
@@ -159,7 +209,6 @@ const BoardCanvasInner: React.FC = () => {
 
     const { nodes: mindMapNodes, edges: mindMapEdges } = createMindMap(centerPosition);
 
-    console.log('Creating mindmap:', { mindMapNodes, mindMapEdges });
 
     const newNodes = [...currentBoard.nodes, ...mindMapNodes];
     const newEdges = [...currentBoard.edges, ...mindMapEdges];
@@ -185,7 +234,6 @@ const BoardCanvasInner: React.FC = () => {
       }
     };
 
-    console.log('Adding card from search:', newNode);
 
     const newNodes = [...currentBoard.nodes, newNode];
     updateBoard(currentBoard.id, { nodes: newNodes });
@@ -199,7 +247,6 @@ const BoardCanvasInner: React.FC = () => {
       data
     };
 
-    console.log('Adding new node:', type, newNode);
 
     const newNodes = [...currentBoard.nodes, newNode];
     updateBoard(currentBoard.id, { nodes: newNodes });
@@ -296,23 +343,30 @@ const BoardCanvasInner: React.FC = () => {
 
   return (
     <div className="h-full w-full" ref={reactFlowWrapper}>
-      <ReactFlow 
-        key={`${currentBoard.id}-${currentBoard.nodes.length}`} 
-        nodes={currentBoard.nodes} 
+      <ReactFlow
+        key={`${currentBoard.id}-${currentBoard.nodes.length}`}
+        nodes={currentBoard.nodes}
         edges={currentBoard.edges}
-        onNodesChange={onNodesChange} 
+        onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        onConnect={onConnect} 
+        onConnect={onConnect}
         onDragOver={onDragOver}
-        onDrop={onDrop} 
+        onDrop={onDrop}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         fitView
-        selectionMode={SelectionMode.Partial} 
+        selectionMode={SelectionMode.Partial}
         selectionOnDrag={true}
-        panOnDrag={[1, 2]} 
+        panOnDrag={[1, 2]}
         selectNodesOnDrag={true}
         multiSelectionKeyCode={null}
+        deleteKeyCode="Delete"
+        connectionLineStyle={{ stroke: '#3b82f6', strokeWidth: 2 }}
+        connectionLineType={ConnectionLineType.SmoothStep}
+        connectionMode={'loose' as any}
+        elevateEdgesOnSelect={false}
+        snapToGrid={false}
+        snapGrid={[15, 15]}
       >
         <Panel position="top-left" className="flex gap-2">
           <button 
@@ -324,39 +378,106 @@ const BoardCanvasInner: React.FC = () => {
           </button>
           
           <div className="flex items-center px-3 py-2 rounded-lg backdrop-blur-md bg-white/10 dark:bg-white/10 border border-black/20 dark:border-white/20 text-black dark:text-white shadow-lg">
-            <span className="font-medium">
-              {currentBoard.title}
-            </span>
+            {isEditingTitle ? (
+              <input
+                type="text"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                onKeyDown={handleTitleKeyDown}
+                onBlur={handleTitleBlur}
+                className="font-medium bg-transparent border-none outline-none focus:ring-0 text-black dark:text-white placeholder-black/50 dark:placeholder-white/50"
+                placeholder="输入思维板名称"
+                autoFocus
+              />
+            ) : (
+              <span
+                className="font-medium cursor-text hover:opacity-80 transition-opacity"
+                onDoubleClick={handleTitleDoubleClick}
+                title="双击编辑标题"
+              >
+                {currentBoard.title}
+              </span>
+            )}
           </div>
         </Panel>
 
-        <Background variant={BackgroundVariant.Dots} gap={12} size={16} />
+        {/* 操作提示面板 */}
+        <Panel position="bottom-right" className="mb-24">
+          <div className="backdrop-blur-md bg-white/10 dark:bg-white/10 border border-black/20 dark:border-white/20 rounded-xl shadow-lg p-4 text-sm text-black dark:text-white max-w-64">
+            <div className="space-y-2">
+              <div className="text-center font-medium text-xs opacity-80 mb-3">💡 操作提示</div>
+              <div className="flex items-center gap-2">
+                <span className="text-green-400 text-xs">拖拽工具栏按钮</span>
+                <span className="opacity-60 text-xs">到画布创建卡片</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-purple-400 text-xs">Ctrl + 滚轮</span>
+                <span className="opacity-60 text-xs">缩放画布</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-orange-400 text-xs">空格 + 拖拽</span>
+                <span className="opacity-60 text-xs">移动画布</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-red-400 text-xs">Delete</span>
+                <span className="opacity-60 text-xs">删除选中项</span>
+              </div>
+            </div>
+          </div>
+        </Panel>
+
+        <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
+
+        {/* 官方 Controls 组件 */}
+        <Controls
+          position="bottom-left"
+          className="!bg-white/10 !backdrop-blur-md !border !border-white/20 !rounded-xl !shadow-lg"
+          showZoom={true}
+          showFitView={true}
+          showInteractive={true}
+          fitViewOptions={{ padding: 0.1, duration: 800 }}
+        />
       </ReactFlow>
 
       {/* 底部横向工具栏 */}
       <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
         <div className="flex items-center gap-3 p-3 backdrop-blur-lg bg-white/10 dark:bg-white/10 border border-black/20 dark:border-white/20 rounded-2xl shadow-xl">
           {/* 节点创建按钮组 */}
-          <button 
+          <button
+            draggable
             onClick={handleAddTextCard}
-            className="p-3 backdrop-blur-sm bg-white/10 dark:bg-white/10 border border-black/20 dark:border-white/20 hover:bg-white/20 dark:hover:bg-white/20 hover:scale-105 transition-all rounded-xl text-black dark:text-white shadow-lg"
-            title="文字卡片"
+            onDragStart={(e) => {
+              e.dataTransfer.setData('application/reactflow', 'textCard');
+              e.dataTransfer.effectAllowed = 'move';
+            }}
+            className="p-3 backdrop-blur-sm bg-white/10 dark:bg-white/10 border border-black/20 dark:border-white/20 hover:bg-white/20 dark:hover:bg-white/20 hover:scale-105 transition-all rounded-xl text-black dark:text-white shadow-lg cursor-grab active:cursor-grabbing"
+            title="文字卡片 (拖拽到画布创建)"
           >
             <Plus className="w-5 h-5" />
           </button>
-          
-          <button 
+
+          <button
+            draggable
             onClick={() => handleAddNode('imageCard', { imageUrl: '' })}
-            className="p-3 backdrop-blur-sm bg-white/10 dark:bg-white/10 border border-black/20 dark:border-white/20 hover:bg-white/20 dark:hover:bg-white/20 hover:scale-105 transition-all rounded-xl text-black dark:text-white shadow-lg"
-            title="图片卡片"
+            onDragStart={(e) => {
+              e.dataTransfer.setData('application/reactflow', 'imageCard');
+              e.dataTransfer.effectAllowed = 'move';
+            }}
+            className="p-3 backdrop-blur-sm bg-white/10 dark:bg-white/10 border border-black/20 dark:border-white/20 hover:bg-white/20 dark:hover:bg-white/20 hover:scale-105 transition-all rounded-xl text-black dark:text-white shadow-lg cursor-grab active:cursor-grabbing"
+            title="图片卡片 (拖拽到画布创建)"
           >
             <Image className="w-5 h-5" />
           </button>
 
-          <button 
+          <button
+            draggable
             onClick={() => handleAddNode('stickyNote', { text: '', colorIndex: Math.floor(Math.random() * 6) })}
-            className="p-3 backdrop-blur-sm bg-white/10 dark:bg-white/10 border border-black/20 dark:border-white/20 hover:bg-white/20 dark:hover:bg-white/20 hover:scale-105 transition-all rounded-xl text-black dark:text-white shadow-lg"
-            title="便签"
+            onDragStart={(e) => {
+              e.dataTransfer.setData('application/reactflow', 'stickyNote');
+              e.dataTransfer.effectAllowed = 'move';
+            }}
+            className="p-3 backdrop-blur-sm bg-white/10 dark:bg-white/10 border border-black/20 dark:border-white/20 hover:bg-white/20 dark:hover:bg-white/20 hover:scale-105 transition-all rounded-xl text-black dark:text-white shadow-lg cursor-grab active:cursor-grabbing"
+            title="便签 (拖拽到画布创建)"
           >
             <StickyNoteIcon className="w-5 h-5" />
           </button>
@@ -423,11 +544,12 @@ const BoardCanvasInner: React.FC = () => {
       </div>
 
       {/* 搜索笔记对话框 */}
-      <CardSearchModal 
+      <CardSearchModal
         isOpen={searchModalOpen}
         onClose={() => setSearchModalOpen(false)}
         onSelectCard={handleAddCardFromSearch}
       />
+
     </div>
   );
 };

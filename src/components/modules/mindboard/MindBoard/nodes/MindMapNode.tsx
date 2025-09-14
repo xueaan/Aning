@@ -3,6 +3,7 @@ import { Handle, Position, NodeProps, useReactFlow } from 'reactflow';
 import { Plus, Target, Edit, Trash2 } from 'lucide-react';
 import { Paintbrush2 } from 'lucide-react';
 import { useMindBoardStore } from '@/stores/mindBoardStore';
+import { ConfirmDeleteModal } from '@/components/common/ConfirmDeleteModal';
 
 const colors = [
   {
@@ -43,6 +44,8 @@ export const MindMapNode: React.FC<NodeProps> = ({ data, id, selected, xPos, yPo
   const [label, setLabel] = useState(data.label || '新节点');
   const [colorIndex, setColorIndex] = useState(data.colorIndex || 0);
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const { currentBoard, updateBoard, deleteNode } = useMindBoardStore();
   const { fitBounds } = useReactFlow();
@@ -85,8 +88,20 @@ export const MindMapNode: React.FC<NodeProps> = ({ data, id, selected, xPos, yPo
   };
 
   const handleDelete = () => {
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = async () => {
     if (deleteNode) {
-      deleteNode(id);
+      setIsDeleting(true);
+      try {
+        deleteNode(id);
+        setShowDeleteConfirm(false);
+      } catch (error) {
+        console.error('Failed to delete mind map node:', error);
+      } finally {
+        setIsDeleting(false);
+      }
     }
   };
 
@@ -243,9 +258,19 @@ export const MindMapNode: React.FC<NodeProps> = ({ data, id, selected, xPos, yPo
         )}
       </div>
 
-      <Handle type="source" 
+      <Handle type="source"
         position={Position.Right}
         className="w-3 h-3 !bg-blue-500 border-2 border-white shadow-md"
+      />
+
+      {/* 删除确认弹窗 */}
+      <ConfirmDeleteModal
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleConfirmDelete}
+        title="删除思维导图节点"
+        itemName={label || '新节点'}
+        isLoading={isDeleting}
       />
     </div>
   );

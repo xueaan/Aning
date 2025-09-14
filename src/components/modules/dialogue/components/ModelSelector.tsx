@@ -40,7 +40,7 @@ export const ModelSelector: React.FC = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setShowDropdown(!showDropdown)}
-        className="flex items-center gap-2 px-3 py-2 theme-bg-secondary hover:theme-bg-tertiary rounded-lg transition-colors"
+        className="flex items-center gap-2 px-3 py-2 feather-glass-button rounded-lg transition-colors"
       >
         <div className="text-sm">
           <div className="theme-text-primary font-medium">
@@ -54,7 +54,7 @@ export const ModelSelector: React.FC = () => {
       </button>
 
       {showDropdown && (
-        <div className="absolute top-full left-0 mt-2 w-80 theme-bg-primary theme-border-primary border rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
+        <div className="absolute top-full left-0 mt-2 w-80 feather-glass-dropdown rounded-lg z-50 max-h-80 overflow-y-auto">
           {/* 设置按钮 */}
           <div className="p-2 border-b theme-border-primary">
             <button

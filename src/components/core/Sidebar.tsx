@@ -7,14 +7,14 @@ import {
   SquareLibrary,
   Map,
   Edit2,
-  CheckCircle2,
+  ListTodo,
   Sun,
   Moon,
-  LockKeyhole,
+  Key,
   Package,
   X,
   CircleFadingPlus,
-  MessageSquare,
+  BotMessageSquare,
   Compass,
   Settings,
 } from "lucide-react";
@@ -31,10 +31,10 @@ const modules = [
   { id: "knowledge", name: "知识库", icon: SquareLibrary },
   { id: "cardbox", name: "笔记盒", icon: Package },
   { id: "mindboard", name: "思维板", icon: Map },
-  { id: "taskbox", name: "待办箱", icon: CheckCircle2 },
+  { id: "taskbox", name: "待办箱", icon: ListTodo },
   { id: "habit", name: "习惯圈", icon: CircleFadingPlus },
-  { id: "password", name: "密钥本", icon: LockKeyhole },
-  { id: "dialogue", name: "对话屋", icon: MessageSquare },
+  { id: "password", name: "密钥本", icon: Key },
+  { id: "dialogue", name: "对话屋", icon: BotMessageSquare },
 ];
 
 export const Sidebar: React.FC = () => {

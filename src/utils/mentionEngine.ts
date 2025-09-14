@@ -62,7 +62,7 @@ export class MentionEngine {
       const end = start + match[0].length;
       
       // 如果有光标位置，只关心光标位置附近的匹配
-      if (cursorPosition !== undefined && (start > cursorPosition || end < cursorPosition - match[1].length)) {
+      if (cursorPosition !== undefined && (start > cursorPosition || end < cursorPosition - (match[1]?.length || 0))) {
         continue;
       }
 

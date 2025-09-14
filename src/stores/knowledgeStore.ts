@@ -122,20 +122,37 @@ export const useKnowledgeStore = create<KnowledgeStore>((set, get) => ({
   // 集成操作
   initializeKnowledge: async (knowledgeBaseId?: string) => {
     const kbStore = useKnowledgeBaseStore.getState();
-    
+
     try {
       // 加载知识库列表
       await kbStore.loadKnowledgeBases();
-      
-      // 如果指定了知识库ID或有默认知识库，则加载其内容
+
+      // 智能默认选择逻辑
       if (knowledgeBaseId) {
+        // 1. 优先使用指定的知识库ID
         const kb = kbStore.knowledgeBases.find(kb => kb.id === knowledgeBaseId);
         if (kb) {
           await get().switchKnowledgeBase(knowledgeBaseId);
         }
       } else if (kbStore.knowledgeBases.length > 0) {
-        // 自动选择第一个知识库
-        await get().switchKnowledgeBase(kbStore.knowledgeBases[0].id);
+        // 2. 尝试使用上次使用的知识库
+        const { useAppStore } = await import('@/stores');
+        const appStore = useAppStore.getState();
+        const lastUsedId = appStore.lastUsedKnowledgeBaseId;
+
+        let targetKb = null;
+        if (lastUsedId) {
+          targetKb = kbStore.knowledgeBases.find(kb => kb.id === lastUsedId);
+        }
+
+        // 3. 如果上次使用的知识库不存在，选择第一个可用的
+        if (!targetKb) {
+          targetKb = kbStore.knowledgeBases[0];
+        }
+
+        if (targetKb) {
+          await get().switchKnowledgeBase(targetKb.id);
+        }
       }
     } catch (error) {
       console.error('初始化知识库失败:', error);
@@ -145,22 +162,27 @@ export const useKnowledgeStore = create<KnowledgeStore>((set, get) => ({
   switchKnowledgeBase: async (knowledgeBaseId: string) => {
     const kbStore = useKnowledgeBaseStore.getState();
     const pageStore = usePageStore.getState();
-    
+
     try {
       // 设置当前知识库
       const kb = kbStore.knowledgeBases.find(kb => kb.id === knowledgeBaseId);
       if (kb) {
         kbStore.setCurrentKnowledgeBase(kb);
-        
+
+        // 记录用户选择行为 - 更新最后使用的知识库
+        const { useAppStore } = await import('@/stores');
+        const appStore = useAppStore.getState();
+        appStore.setLastUsedKnowledgeBaseId(knowledgeBaseId);
+
         // 加载页面
         await pageStore.loadPages(knowledgeBaseId);
-        
+
         // 清除之前的编辑状态
         const editorStore = useEditorStore.getState();
         if (editorStore.isEditing) {
           editorStore.cancelEditing();
         }
-        
+
         // 清除搜索状态
         const searchStore = useSearchStore.getState();
         searchStore.clearSearch();
