@@ -79,8 +79,10 @@ fn generate_preview_from_html(html: &str) -> String {
         .replace("&nbsp;", " ");
     
     // 移除其他HTML标签
-    let re = regex::Regex::new(r"<[^>]*>").unwrap();
-    let clean_text = re.replace_all(&text, "");
+    let clean_text = match regex::Regex::new(r"<[^>]*>") {
+        Ok(re) => re.replace_all(&text, "").to_string(),
+        Err(_) => text,
+    };
     
     // 清理多余空白和换行
     let lines: Vec<&str> = clean_text
@@ -418,3 +420,4 @@ pub async fn search_cards(database: State<'_, Arc<Database>>, query: String) -> 
         cards
     }).map_err(|e| format!("Search failed: {}", e))
 }
+

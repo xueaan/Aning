@@ -4,7 +4,7 @@ import { Inbox, Calendar, Clock, AlertTriangle, Check } from 'lucide-react';
 type TaskView = 'inbox' | 'today' | 'upcoming' | 'overdue' | 'completed';
 
 interface TaskViewTabsProps {
-  current: TaskView;
+  current: string;
   onChange: (view: TaskView) => void;
   counts: {
     inbox: number;
@@ -137,4 +137,3 @@ export const TaskViewTabs: React.FC<TaskViewTabsProps> = React.memo(({ current, 
 });
 
 TaskViewTabs.displayName = 'TaskViewTabs';
-

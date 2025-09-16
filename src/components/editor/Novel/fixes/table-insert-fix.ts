@@ -4,12 +4,18 @@ import { Fragment } from '@tiptap/pm/model';
 // Overrides/ensures insertTable respects rows/cols/withHeaderRow
 export const TableInsertFix = Extension.create({
   name: 'table-insert-fix',
+  priority: 1000,
 
   addCommands() {
     return {
       insertTable:
         ({ rows = 3, cols = 3, withHeaderRow = false } = {}) =>
         ({ state, tr, dispatch }) => {
+          // debug log to confirm override is active
+          try {
+            // eslint-disable-next-line no-console
+            console.log('[TableInsertFix] insertTable called with', { rows, cols, withHeaderRow });
+          } catch {}
           const { schema, selection } = state;
           const tableType = schema.nodes.table;
           const rowType = schema.nodes.tableRow;
@@ -39,7 +45,12 @@ export const TableInsertFix = Extension.create({
 
             const tableNode = tableType.createChecked({}, Fragment.from(rowNodes));
             if (dispatch) {
-              dispatch(tr.replaceRangeWith(selection.from, selection.to, tableNode).scrollIntoView());
+              const trNew = tr.replaceRangeWith(selection.from, selection.to, tableNode).scrollIntoView();
+              dispatch(trNew);
+              try {
+                // eslint-disable-next-line no-console
+                console.log('[TableInsertFix] table inserted');
+              } catch {}
             }
             return true;
           } catch (e) {
@@ -52,4 +63,3 @@ export const TableInsertFix = Extension.create({
 });
 
 export default TableInsertFix;
-

@@ -208,6 +208,11 @@ const EditorInner = forwardRef<NovelEditorRef, NovelEditorProps>(
 
     const handleCreate = ({ editor }: any) => {
       setEditorInstance(editor);
+      try {
+        const names = editor.extensionManager.extensions.map((e: any) => e.name);
+        // eslint-disable-next-line no-console
+        console.log('[NovelEditor] extensions loaded:', names);
+      } catch {}
     };
 
     const extensions = [

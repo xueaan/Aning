@@ -157,6 +157,9 @@ export const suggestionItems: SuggestionItem[] = createSuggestionItems([
         document.body.removeChild(selectorContainer);
 
         // 插入指定大小的表格
+        // Debug: log intended table size
+        try { console.log('[Slash] inserting table', { rows, cols }); } catch {}
+
         (editor as any)
           .chain()
           .focus()
@@ -196,6 +199,13 @@ export const suggestionItems: SuggestionItem[] = createSuggestionItems([
           if (tr.docChanged) {
             view.dispatch(tr);
           }
+          // Debug: check DOM structure after insert
+          try {
+            const colgroup = document.querySelectorAll('.ProseMirror table colgroup col').length;
+            const perRow = Array.from(document.querySelectorAll('.ProseMirror table tbody tr')).map((tr) => (tr as HTMLTableRowElement).querySelectorAll('td,th').length);
+            console.log('[Slash] DOM table stats', { colgroup, perRow });
+          } catch {}
+
 
           // 将光标移动到第一个单元格
           editor.commands.focus();
@@ -280,6 +290,7 @@ export const slashCommand = Command.configure({
     },
   },
 });
+
 
 
 
