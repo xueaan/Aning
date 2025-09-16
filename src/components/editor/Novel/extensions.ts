@@ -144,7 +144,7 @@ const table = Table.configure({
   HTMLAttributes: {
     class: 'anning-table prosemirror-table',
   },
-  resizable: true,
+  resizable: false,
   allowTableNodeSelection: true,
 });
 

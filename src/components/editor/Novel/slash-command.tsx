@@ -199,11 +199,50 @@ export const suggestionItems: SuggestionItem[] = createSuggestionItems([
           if (tr.docChanged) {
             view.dispatch(tr);
           }
-          // Debug: check DOM structure after insert
+          // Debug: check DOM + doc structure after insert
           try {
             const colgroup = document.querySelectorAll('.ProseMirror table colgroup col').length;
             const perRow = Array.from(document.querySelectorAll('.ProseMirror table tbody tr')).map((tr) => (tr as HTMLTableRowElement).querySelectorAll('td,th').length);
-            console.log('[Slash] DOM table stats', { colgroup, perRow });
+            const rowCounts: number[] = [];
+            const { state: s } = editor as any;
+            s.doc.descendants((n: any) => {
+              if (n?.type?.name === 'table') {
+                n.descendants((r: any) => {
+                  if (r?.type?.name === 'tableRow') {
+                    const count = (r.content?.content || []).filter((c: any) => c?.type?.name === 'tableCell' || c?.type?.name === 'tableHeader').length;
+                    rowCounts.push(count);
+                  }
+                });
+                return false;
+              }
+              return true;
+            });
+            console.log(`[Slash] DOM table stats colgroup=${colgroup} perRow=${JSON.stringify(perRow)} rowCounts=${JSON.stringify(rowCounts)}`);
+
+            // If any row shows unexpected column count, normalize by replacing the table
+            const expectedCols = cols;
+            const mismatch = rowCounts.some((c) => c !== expectedCols);
+            if (mismatch) {
+              let lastTablePos = -1;
+              let lastTableNode: any = null;
+              s.doc.descendants((n: any, p: number) => {
+                if (n?.type?.name === 'table') {
+                  lastTablePos = p;
+                  lastTableNode = n;
+                }
+                return true;
+              });
+              if (lastTablePos >= 0 && lastTableNode) {
+                const rowsCount = rowCounts.length || 2;
+                // eslint-disable-next-line no-console
+                console.log('[Slash] normalizing table to', { rows: rowsCount, cols: expectedCols });
+                (editor as any)
+                  .chain()
+                  .focus()
+                  .insertContentAt({ from: lastTablePos, to: lastTablePos + lastTableNode.nodeSize }, buildTableJSON(rowsCount, expectedCols, false))
+                  .run();
+              }
+            }
           } catch {}
 
 

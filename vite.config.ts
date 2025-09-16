@@ -105,8 +105,11 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            if (id.includes('react') || id.includes('react-dom')) return 'vendor-react';
-            if (id.includes('@tiptap') || id.includes('prosemirror') || id.includes('novel')) return 'vendor-editor';
+            if (id.includes('react-dom')) return 'vendor-react-dom';
+            if (id.includes('/react/')) return 'vendor-react';
+            if (id.includes('@tiptap')) return 'vendor-tiptap';
+            if (id.includes('prosemirror')) return 'vendor-prosemirror';
+            if (id.includes('novel')) return 'vendor-novel';
             if (id.includes('reactflow')) return 'vendor-reactflow';
             if (id.includes('framer-motion')) return 'vendor-motion';
           }
