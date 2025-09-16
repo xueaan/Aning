@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useCallback, useMemo } from 'react';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import {
   useAppStore,
@@ -113,16 +113,18 @@ export const MainContent: React.FC = () => {
 
   // Get task counts for badges
   const taskStats = getTaskStats();
-  const inboxCount = taskStats.inbox;
-  const todayCount = taskStats.today;
-  const upcomingCount = taskStats.upcoming;
-  const overdueCount = taskStats.overdue;
-  const completedCount = taskStats.completed;
+  const { inboxCount, todayCount, upcomingCount, overdueCount, completedCount } = useMemo(() => ({
+    inboxCount: taskStats.inbox,
+    todayCount: taskStats.today,
+    upcomingCount: taskStats.upcoming,
+    overdueCount: taskStats.overdue,
+    completedCount: taskStats.completed,
+  }), [taskStats.inbox, taskStats.today, taskStats.upcoming, taskStats.overdue, taskStats.completed]);
 
   // Handle task view change
-  const handleTaskViewChange = (view: 'inbox' | 'today' | 'upcoming' | 'overdue' | 'completed') => {
+  const handleTaskViewChange = useCallback((view: 'inbox' | 'today' | 'upcoming' | 'overdue' | 'completed') => {
     setCurrentTaskView(view);
-  };
+  }, [setCurrentTaskView]);
 
   const { currentDate, changeDate, setCurrentDate, toggleViewMode } = useTimelineStore();
 
@@ -256,11 +258,12 @@ export const MainContent: React.FC = () => {
   };
 
   // 导航按钮状态计算（增强边界检查）
-  const canGoBack = navigationHistory && navigationHistory.length > 0 && navigationIndex > 0;
-  const canGoForward =
-    navigationHistory &&
-    navigationHistory.length > 0 &&
-    navigationIndex < navigationHistory.length - 1;
+  const canGoBack = useMemo(() => (
+    navigationHistory && navigationHistory.length > 0 && navigationIndex > 0
+  ), [navigationHistory, navigationIndex]);
+  const canGoForward = useMemo(() => (
+    navigationHistory && navigationHistory.length > 0 && navigationIndex < navigationHistory.length - 1
+  ), [navigationHistory, navigationIndex]);
 
   // 调试信息
   useEffect(() => {
@@ -946,7 +949,7 @@ export const MainContent: React.FC = () => {
   );
 };
 
-const DefaultModuleContent: React.FC<{ module: string }> = ({ module }) => {
+const DefaultModuleContent: React.FC<{ module: string }> = React.memo(({ module }) => {
   return (
     <div className="flex items-center justify-center h-full">
       <div className="text-center">
@@ -956,4 +959,8 @@ const DefaultModuleContent: React.FC<{ module: string }> = ({ module }) => {
       </div>
     </div>
   );
-};
+});
+
+DefaultModuleContent.displayName = 'DefaultModuleContent';
+
+

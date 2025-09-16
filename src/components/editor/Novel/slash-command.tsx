@@ -135,6 +135,22 @@ export const suggestionItems: SuggestionItem[] = createSuggestionItems([
       // 创建React根并渲染选择器
       const root = ReactDOM.createRoot(selectorContainer);
 
+            const buildTableJSON = (rows: number, cols: number, withHeaderRow: boolean) => {
+        const table: any = { type: 'table', content: [] };
+        for (let i = 0; i < rows; i++) {
+          const row: any = { type: 'tableRow', content: [] };
+          for (let j = 0; j < cols; j++) {
+            const isHeader = withHeaderRow && i === 0;
+            row.content.push({
+              type: isHeader ? 'tableHeader' : 'tableCell',
+              content: [{ type: 'paragraph' }],
+            });
+          }
+          table.content.push(row);
+        }
+        return table;
+      };
+
       const handleSelect = (rows: number, cols: number) => {
         // 关闭选择器
         root.unmount();
@@ -144,11 +160,7 @@ export const suggestionItems: SuggestionItem[] = createSuggestionItems([
         (editor as any)
           .chain()
           .focus()
-          .insertTable({
-            rows: rows,
-            cols: cols,
-            withHeaderRow: false,
-          })
+          .insertContent(buildTableJSON(rows, cols, false))
           .run();
 
         // 最简单的方案：为所有空单元格填充零宽空格
@@ -268,3 +280,6 @@ export const slashCommand = Command.configure({
     },
   },
 });
+
+
+
