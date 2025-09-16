@@ -44,7 +44,7 @@ export default [
       // 以 TS 版本为准，避免重复报错
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_', caughtErrors: 'none' }],
-      'no-empty': 'warn',
+      'no-empty': ['warn', { allowEmptyCatch: true }],
       'no-case-declarations': 'off',
       'no-useless-escape': 'warn',
       'no-empty-pattern': 'off',

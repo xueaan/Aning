@@ -199,52 +199,7 @@ export const suggestionItems: SuggestionItem[] = createSuggestionItems([
           if (tr.docChanged) {
             view.dispatch(tr);
           }
-          // Debug: check DOM + doc structure after insert
-          try {
-            const colgroup = document.querySelectorAll('.ProseMirror table colgroup col').length;
-            const perRow = Array.from(document.querySelectorAll('.ProseMirror table tbody tr')).map((tr) => (tr as HTMLTableRowElement).querySelectorAll('td,th').length);
-            const rowCounts: number[] = [];
-            const { state: s } = editor as any;
-            s.doc.descendants((n: any) => {
-              if (n?.type?.name === 'table') {
-                n.descendants((r: any) => {
-                  if (r?.type?.name === 'tableRow') {
-                    const count = (r.content?.content || []).filter((c: any) => c?.type?.name === 'tableCell' || c?.type?.name === 'tableHeader').length;
-                    rowCounts.push(count);
-                  }
-                });
-                return false;
-              }
-              return true;
-            });
-            console.log(`[Slash] DOM table stats colgroup=${colgroup} perRow=${JSON.stringify(perRow)} rowCounts=${JSON.stringify(rowCounts)}`);
-
-            // If any row shows unexpected column count, normalize by replacing the table
-            const expectedCols = cols;
-            const mismatch = rowCounts.some((c) => c !== expectedCols);
-            if (mismatch) {
-              let lastTablePos = -1;
-              let lastTableNode: any = null;
-              s.doc.descendants((n: any, p: number) => {
-                if (n?.type?.name === 'table') {
-                  lastTablePos = p;
-                  lastTableNode = n;
-                }
-                return true;
-              });
-              if (lastTablePos >= 0 && lastTableNode) {
-                const rowsCount = rowCounts.length || 2;
-                // eslint-disable-next-line no-console
-                console.log('[Slash] normalizing table to', { rows: rowsCount, cols: expectedCols });
-                (editor as any)
-                  .chain()
-                  .focus()
-                  .insertContentAt({ from: lastTablePos, to: lastTablePos + lastTableNode.nodeSize }, buildTableJSON(rowsCount, expectedCols, false))
-                  .run();
-              }
-            }
-          } catch {}
-
+          // Debug: check DOM + doc structure after insert\n          try {\n            const colgroup = document.querySelectorAll('.ProseMirror table colgroup col').length;\n            const perRow = Array.from(document.querySelectorAll('.ProseMirror table tbody tr')).map((tr) => (tr as HTMLTableRowElement).querySelectorAll('td,th').length);\n            const { state: s } = editor as any;\n            const selPos = s.selection.from;\n            let target = null as any;\n            s.doc.descendants((n: any, p: number) => {\n              if (n?.type?.name === 'table') {\n                if (p <= selPos && selPos < p + n.nodeSize) { target = { pos: p, node: n }; return false; }\n              }\n              return true;\n            });\n            const rowCounts: number[] = [];\n            if (target) {\n              target.node.descendants((r: any) => {\n                if (r?.type?.name === 'tableRow') {\n                  const count = (r.content?.content || []).filter((c: any) => c?.type?.name === 'tableCell' || c?.type?.name === 'tableHeader').length;\n                  rowCounts.push(count);\n                }\n              });\n            }\n            console.log([Slash] DOM table stats colgroup= perRow= rowCounts=);\n            const expectedCols = cols;\n            const mismatch = rowCounts.some((c) => c !== expectedCols);\n            if (mismatch && target) {\n              const rowsCount = rowCounts.length || 2;\n              console.log('[Slash] normalizing table to', { rows: rowsCount, cols: expectedCols });\n              (editor as any).chain().focus().insertContentAt({ from: target.pos, to: target.pos + target.node.nodeSize }, buildTableJSON(rowsCount, expectedCols, false)).run();\n            }\n          } catch {}\n
 
           // 将光标移动到第一个单元格
           editor.commands.focus();
@@ -329,6 +284,7 @@ export const slashCommand = Command.configure({
     },
   },
 });
+
 
 
 
