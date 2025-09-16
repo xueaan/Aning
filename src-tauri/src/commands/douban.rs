@@ -77,16 +77,18 @@ fn extract_book_info(html_content: &str) -> DoubanBookInfo {
     let document = Html::parse_document(html_content);
 
     // 创建选择器
-    let title_selector = Selector::parse("h1 span").unwrap();
-    let info_selector = Selector::parse("#info").unwrap();
-    let rating_selector = Selector::parse("strong.rating_num").unwrap();
-    let rating_count_selector = Selector::parse("a.rating_people span").unwrap();
-    let description_selector = Selector::parse("#link-report .intro").unwrap();
-    let cover_selector1 = Selector::parse("#mainpic a img").unwrap();
-    let cover_selector2 = Selector::parse("a.nbg img").unwrap();
-    let tag_selector = Selector::parse(".tag-list a.tag").unwrap();
-    let author_link_selector = Selector::parse("#info a[href*='/author/']").unwrap();
-    let author_search_selector = Selector::parse("#info a[href*='/search/']").unwrap();
+    // 选择器（含回退，避免 panic）
+    fn sel(s: &str) -> Selector { Selector::parse(s).unwrap_or_else(|_| Selector::parse("body").unwrap()) }
+    let title_selector = sel("h1 span");
+    let info_selector = sel("#info");
+    let rating_selector = sel("strong.rating_num");
+    let rating_count_selector = sel("a.rating_people span");
+    let description_selector = sel("#link-report .intro");
+    let cover_selector1 = sel("#mainpic a img");
+    let cover_selector2 = sel("a.nbg img");
+    let tag_selector = sel(".tag-list a.tag");
+    let author_link_selector = sel("#info a[href*='/author/']");
+    let author_search_selector = sel("#info a[href*='/search/']");
 
     // 提取书名
     let title = document
