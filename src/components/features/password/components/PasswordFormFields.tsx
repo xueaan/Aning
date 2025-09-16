@@ -13,7 +13,7 @@ export const PasswordFormFields: React.FC<PasswordFormFieldsProps> = ({
   formData,
   onFieldChange,
   onPasswordGenerate,
-  errors
+  errors,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -21,9 +21,7 @@ export const PasswordFormFields: React.FC<PasswordFormFieldsProps> = ({
     <div className="space-y-4">
       {/* 标题字段 */}
       <div>
-        <label className="block text-sm font-medium theme-text-primary mb-2">
-          标题 *
-        </label>
+        <label className="block text-sm font-medium theme-text-primary mb-2">标题 *</label>
         <input
           type="text"
           value={formData.title || ''}
@@ -34,16 +32,12 @@ export const PasswordFormFields: React.FC<PasswordFormFieldsProps> = ({
             errors.title && 'border-red-400'
           )}
         />
-        {errors.title && (
-          <p className="text-red-400 text-sm mt-1">{errors.title}</p>
-        )}
+        {errors.title && <p className="text-red-400 text-sm mt-1">{errors.title}</p>}
       </div>
 
       {/* 用户名字段 */}
       <div>
-        <label className="block text-sm font-medium theme-text-primary mb-2">
-          用户名/邮箱
-        </label>
+        <label className="block text-sm font-medium theme-text-primary mb-2">用户名/邮箱</label>
         <input
           type="text"
           value={formData.username || ''}
@@ -55,11 +49,12 @@ export const PasswordFormFields: React.FC<PasswordFormFieldsProps> = ({
 
       {/* 密码字段 */}
       <div>
-        <label className="block text-sm font-medium theme-text-primary mb-2">
-          密码 *
-        </label>
+        <label className="block text-sm font-medium theme-text-primary mb-2">密码 *</label>
         <div className="relative">
-          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-muted" size={18} />
+          <Lock
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-muted"
+            size={18}
+          />
           <input
             type={showPassword ? 'text' : 'password'}
             value={formData.password || ''}
@@ -92,16 +87,12 @@ export const PasswordFormFields: React.FC<PasswordFormFieldsProps> = ({
             </button>
           </div>
         </div>
-        {errors.password && (
-          <p className="text-red-400 text-sm mt-1">{errors.password}</p>
-        )}
+        {errors.password && <p className="text-red-400 text-sm mt-1">{errors.password}</p>}
       </div>
 
       {/* URL字段 */}
       <div>
-        <label className="block text-sm font-medium theme-text-primary mb-2">
-          网站地址
-        </label>
+        <label className="block text-sm font-medium theme-text-primary mb-2">网站地址</label>
         <input
           type="url"
           value={formData.url || ''}
@@ -113,9 +104,7 @@ export const PasswordFormFields: React.FC<PasswordFormFieldsProps> = ({
 
       {/* 备注字段 */}
       <div>
-        <label className="block text-sm font-medium theme-text-primary mb-2">
-          备注
-        </label>
+        <label className="block text-sm font-medium theme-text-primary mb-2">备注</label>
         <textarea
           value={formData.notes || ''}
           onChange={(e) => onFieldChange('notes', e.target.value)}

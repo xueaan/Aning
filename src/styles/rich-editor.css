@@ -39,7 +39,9 @@
   background: rgba(255, 255, 255, 0.1);
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  transition: width 0.3s ease, height 0.3s ease;
+  transition:
+    width 0.3s ease,
+    height 0.3s ease;
 }
 
 .rich-editor-toolbar button:hover::before {
@@ -142,6 +144,5 @@
 .rich-editor-content .ProseMirror ::selection {
   background: rgb(var(--accent) / 0.3);
 }
-
 
 /* 主题兼容性 - 文本样式通过CSS变量自动适配，响应式由Tailwind处理 */

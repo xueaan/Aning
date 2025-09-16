@@ -10,9 +10,7 @@ interface CardBoxLayoutProps {
   className?: string;
 }
 
-export const CardBoxLayout: React.FC<CardBoxLayoutProps> = ({
-  className = ''
-}) => {
+export const CardBoxLayout: React.FC<CardBoxLayoutProps> = ({ className = '' }) => {
   const {
     boxes,
     activeBoxId,
@@ -26,7 +24,7 @@ export const CardBoxLayout: React.FC<CardBoxLayoutProps> = ({
     deleteCard,
     openFullEditor,
     closeFullEditor,
-    saveFullCard
+    saveFullCard,
   } = useCardBoxStore();
 
   const [showCreateBoxModal, setShowCreateBoxModal] = useState(false);
@@ -109,9 +107,11 @@ export const CardBoxLayout: React.FC<CardBoxLayoutProps> = ({
         className="fixed bottom-6 right-6 w-14 h-14 theme-button-primary rounded-full shadow-lg hover:shadow-xl transition-all duration-200 z-50 flex items-center justify-center group hover:scale-105"
         title="新建笔记"
       >
-        <PenTool size={24} className="text-white transition-transform group-hover:rotate-12 duration-200" />
+        <PenTool
+          size={24}
+          className="text-white transition-transform group-hover:rotate-12 duration-200"
+        />
       </button>
-
 
       {/* 创建笔记盒模态框 */}
       <CreateCardBoxModal

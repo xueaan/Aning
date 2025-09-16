@@ -32,10 +32,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
   // 点击外部关闭
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        isOpen && modalRef.current &&
-        !modalRef.current.contains(event.target as Node)
-      ) {
+      if (isOpen && modalRef.current && !modalRef.current.contains(event.target as Node)) {
         onClose();
       }
     };
@@ -77,7 +74,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
           <div className="flex items-center justify-center h-full theme-text-secondary">
             <div className="text-center">
               <Settings size={48} className="mx-auto mb-4 theme-text-secondary" />
-              <p>{settingsNavigation.find(item => item.id === currentPage)?.name} 设置</p>
+              <p>{settingsNavigation.find((item) => item.id === currentPage)?.name} 设置</p>
               <p className="text-sm mt-2">此功能正在开发中...</p>
             </div>
           </div>
@@ -86,20 +83,24 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
   };
 
   return ReactDOM.createPortal(
-    <div className="feather-glass-modal-backdrop" onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div
+      className="feather-glass-modal-backdrop"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
       {/* 设置弹窗 - 使用轻羽毛玻璃，确保内容可读性*/}
-      <div ref={modalRef}
-            className="feather-glass-modal w-[900px] h-[600px] max-w-[90vw] max-h-[90vh] overflow-hidden rounded-2xl"
+      <div
+        ref={modalRef}
+        className="feather-glass-modal w-[900px] h-[600px] max-w-[90vw] max-h-[90vh] overflow-hidden rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* 标题栏 - 紧凑设计 */}
         <div className="h-12 flex items-center justify-between px-4 border-b border-border-primary/10">
           <div className="flex items-center gap-2">
-            <Settings size={16} 
-            className="theme-text-accent" />
+            <Settings size={16} className="theme-text-accent" />
             <h2 className="text-base font-medium theme-text-primary">应用设置</h2>
           </div>
-          <button onClick={onClose}
+          <button
+            onClick={onClose}
             className="p-1.5 rounded-lg theme-text-secondary hover:theme-text-primary transition-colors feather-glass-nav"
             title="关闭设置"
           >
@@ -117,12 +118,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                   const isActive = currentPage === item.id;
 
                   return (
-                    <button 
-                      key={item.id} 
+                    <button
+                      key={item.id}
                       onClick={() => setCurrentPage(item.id as SettingsPage)}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 mb-1.5 rounded-lg text-sm font-medium transition-colors ${
-                        isActive 
-                          ? 'feather-glass-deco theme-text-accent' 
+                        isActive
+                          ? 'feather-glass-deco theme-text-accent'
                           : 'theme-text-secondary hover:theme-text-primary hover:feather-glass-deco'
                       }`}
                     >
@@ -133,11 +134,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                 })}
               </div>
               <div className="pt-3 mt-3 border-t border-border-primary/10">
-                <button 
+                <button
                   onClick={() => setCurrentPage('about')}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                     currentPage === 'about'
-                      ? 'feather-glass-deco theme-text-accent' 
+                      ? 'feather-glass-deco theme-text-accent'
                       : 'theme-text-secondary hover:theme-text-primary hover:feather-glass-deco'
                   }`}
                 >
@@ -148,9 +149,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             </div>
           </div>
           <div className="flex-1 overflow-y-auto">
-            <div className="min-h-full p-4">
-              {renderContent()}
-            </div>
+            <div className="min-h-full p-4">{renderContent()}</div>
           </div>
         </div>
       </div>
@@ -171,15 +170,14 @@ const AppearanceSettings: React.FC = () => {
     setNoiseLevel,
     setGradientAngle,
     setBlendMode,
-    setFontFamily
+    setFontFamily,
   } = useAppStore();
 
   const themes = [
     { key: 'auto', name: '通用', icon: '🔄' },
     { key: 'light', name: '亮色', icon: '☀️' },
-    { key: 'dark', name: '暗色', icon: '🌙' }
+    { key: 'dark', name: '暗色', icon: '🌙' },
   ];
-
 
   const handleAngleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setGradientAngle(Number(e.target.value));
@@ -201,15 +199,14 @@ const AppearanceSettings: React.FC = () => {
         {/* 主题模式选择 - 紧凑timekeeper风格 */}
         <div className="p-4 rounded-xl feather-glass-content">
           <div className="flex items-center gap-2 mb-3">
-            <Palette size={16} 
-            className="theme-text-accent" />
+            <Palette size={16} className="theme-text-accent" />
             <h4 className="text-base font-medium theme-text-primary">主题模式</h4>
           </div>
 
           <div className="grid grid-cols-3 gap-2">
             {themes.map((themeOption) => (
-              <button 
-                key={themeOption.key} 
+              <button
+                key={themeOption.key}
                 onClick={() => setTheme(themeOption.key as any)}
                 className={`relative p-3 rounded-lg text-xs transition-colors ${
                   theme === themeOption.key
@@ -288,7 +285,6 @@ const AppearanceSettings: React.FC = () => {
           </div>
         </div>
 
-
         {/* 字体设置 */}
         <div className="p-4 rounded-xl feather-glass-content">
           <div className="flex items-center gap-2 mb-3">
@@ -339,10 +335,3 @@ const AppearanceSettings: React.FC = () => {
     </div>
   );
 };
-
-
-
-
-
-
-

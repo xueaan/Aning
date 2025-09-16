@@ -17,7 +17,7 @@ export const MentionDropdown: React.FC<MentionDropdownProps> = ({
   onSelect,
   onClose: _onClose,
   className = '',
-  maxHeight = 320
+  maxHeight = 320,
 }) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const selectedItemRef = useRef<HTMLButtonElement>(null);
@@ -27,7 +27,7 @@ export const MentionDropdown: React.FC<MentionDropdownProps> = ({
     if (selectedItemRef.current) {
       selectedItemRef.current.scrollIntoView({
         behavior: 'smooth',
-        block: 'nearest'
+        block: 'nearest',
       });
     }
   }, [selectedIndex]);
@@ -44,26 +44,28 @@ export const MentionDropdown: React.FC<MentionDropdownProps> = ({
     isSelected: boolean
   ) => {
     return (
-      <button 
-        key={`${suggestion.groupType}-${suggestion.value}-${index}`} 
-        ref={isSelected ? selectedItemRef : undefined} 
+      <button
+        key={`${suggestion.groupType}-${suggestion.value}-${index}`}
+        ref={isSelected ? selectedItemRef : undefined}
         onClick={() => handleItemClick(suggestion)}
         className={`w-full px-3 py-2 text-left hover:theme-bg-secondary/50 transition-colors flex items-center ${
-          isSelected ? 'theme-bg-accent/20 theme-text-accent border-l-2 theme-border-accent' : 'theme-text-primary'
+          isSelected
+            ? 'theme-bg-accent/20 theme-text-accent border-l-2 theme-border-accent'
+            : 'theme-text-primary'
         }`}
       >
-
         {/* 内容 */}
         <div className="flex-1 min-w-0">
           {/* 标题 */}
-          <div className={`font-medium text-sm truncate ${isSelected ? 'theme-text-accent' : 'theme-text-primary'
-            }`}>
+          <div
+            className={`font-medium text-sm truncate ${
+              isSelected ? 'theme-text-accent' : 'theme-text-primary'
+            }`}
+          >
             {suggestion.label}
           </div>
           {suggestion.preview && (
-            <div className="text-xs theme-text-secondary truncate mt-0.5">
-              {suggestion.preview}
-            </div>
+            <div className="text-xs theme-text-secondary truncate mt-0.5">{suggestion.preview}</div>
           )}
 
           {/* 元数据标签 */}
@@ -78,22 +80,28 @@ export const MentionDropdown: React.FC<MentionDropdownProps> = ({
 
               {/* 任务状态 */}
               {suggestion.metadata.status && (
-                <span className={`text-xs px-1.5 py-0.5 rounded ${suggestion.metadata.status === 'completed'
-                    ? 'theme-bg-success/20 theme-success'
-                    : suggestion.metadata.status === 'in_progress'
-                      ? 'theme-bg-warning/20 theme-warning'
-                      : 'theme-bg-secondary theme-text-secondary'
-                  }`}>
+                <span
+                  className={`text-xs px-1.5 py-0.5 rounded ${
+                    suggestion.metadata.status === 'completed'
+                      ? 'theme-bg-success/20 theme-success'
+                      : suggestion.metadata.status === 'in_progress'
+                        ? 'theme-bg-warning/20 theme-warning'
+                        : 'theme-bg-secondary theme-text-secondary'
+                  }`}
+                >
                   {suggestion.metadata.status}
                 </span>
               )}
 
               {/* 优先级 */}
               {suggestion.metadata.priority && suggestion.metadata.priority !== 'low' && (
-                <span className={`text-xs px-1.5 py-0.5 rounded ${suggestion.metadata.priority === 'urgent'
-                    ? 'theme-bg-error/20 theme-error'
-                    : 'theme-bg-warning/20 theme-warning'
-                  }`}>
+                <span
+                  className={`text-xs px-1.5 py-0.5 rounded ${
+                    suggestion.metadata.priority === 'urgent'
+                      ? 'theme-bg-error/20 theme-error'
+                      : 'theme-bg-warning/20 theme-warning'
+                  }`}
+                >
                   {suggestion.metadata.priority}
                 </span>
               )}
@@ -108,17 +116,12 @@ export const MentionDropdown: React.FC<MentionDropdownProps> = ({
 
               {/* Token数量 */}
               {suggestion.metadata.tokens && suggestion.metadata.tokens > 100 && (
-                <span className="text-xs theme-text-secondary">
-                  ~{suggestion.metadata.tokens}t
-                </span>
+                <span className="text-xs theme-text-secondary">~{suggestion.metadata.tokens}t</span>
               )}
             </div>
           )}
         </div>
-        {isSelected && (
-          <ChevronRight size={14} 
-            className="theme-text-accent flex-shrink-0" />
-        )}
+        {isSelected && <ChevronRight size={14} className="theme-text-accent flex-shrink-0" />}
       </button>
     );
   };
@@ -128,15 +131,16 @@ export const MentionDropdown: React.FC<MentionDropdownProps> = ({
     if (group.items.length === 0) return null;
 
     return (
-      <div className={`px-3 py-2 theme-bg-secondary/30 border-b theme-border ${!isFirst ? 'border-t theme-border' : ''
-        }`}>
+      <div
+        className={`px-3 py-2 theme-bg-secondary/30 border-b theme-border ${
+          !isFirst ? 'border-t theme-border' : ''
+        }`}
+      >
         <div className="flex items-center gap-2">
           <span className="text-xs font-medium theme-text-primary uppercase tracking-wide">
             {group.title}
           </span>
-          <span className="text-xs theme-text-secondary">
-            ({group.items.length})
-          </span>
+          <span className="text-xs theme-text-secondary">({group.items.length})</span>
         </div>
       </div>
     );
@@ -145,10 +149,8 @@ export const MentionDropdown: React.FC<MentionDropdownProps> = ({
   if (suggestions.total === 0) {
     return (
       <div className={`theme-border rounded-xl shadow-lg ${className}`}>
-
         <div className="p-4 text-center theme-text-secondary">
-          <Search size={24} 
-            className="mx-auto mb-2 opacity-50" />
+          <Search size={24} className="mx-auto mb-2 opacity-50" />
           <div className="text-sm">未找到匹配的内容</div>
           <div className="text-xs mt-1">尝试输入不同的关键词</div>
         </div>
@@ -157,7 +159,7 @@ export const MentionDropdown: React.FC<MentionDropdownProps> = ({
   }
 
   return (
-    <div 
+    <div
       ref={dropdownRef}
       className={`theme-border rounded-xl shadow-lg overflow-hidden ${className}`}
     >
@@ -188,7 +190,7 @@ export const MentionDropdown: React.FC<MentionDropdownProps> = ({
             <div key={group.type}>
               {/* 组标题 */}
               {renderGroupHeader(group, groupIndex === 0)}
-              
+
               {/* 组项目 */}
               <div>
                 {group.items.map((item, itemIndex) => {
@@ -197,7 +199,7 @@ export const MentionDropdown: React.FC<MentionDropdownProps> = ({
                   const suggestionWithGroup = {
                     ...item,
                     groupType: group.type,
-                    groupTitle: group.title
+                    groupTitle: group.title,
                   };
 
                   return renderSuggestionItem(suggestionWithGroup, globalIndex, isSelected);
@@ -209,20 +211,9 @@ export const MentionDropdown: React.FC<MentionDropdownProps> = ({
       </div>
       {suggestions.hasMore && (
         <div className="px-3 py-2 theme-bg-secondary/30 border-t theme-border text-center">
-          <span className="text-xs theme-text-secondary">
-            还有更多结果...
-          </span>
+          <span className="text-xs theme-text-secondary">还有更多结果...</span>
         </div>
       )}
     </div>
   );
 };
-
-
-
-
-
-
-
-
-

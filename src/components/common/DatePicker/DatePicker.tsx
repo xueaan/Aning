@@ -19,7 +19,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   minDate,
   maxDate,
   disabled = false,
-  size = 'md'
+  size = 'md',
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentDate, setCurrentDate] = useState(() => {
@@ -152,7 +152,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   };
 
   const handleMonthChange = (delta: number) => {
-    setCurrentDate(prev => {
+    setCurrentDate((prev) => {
       const newDate = new Date(prev);
       newDate.setMonth(newDate.getMonth() + delta);
       return newDate;
@@ -160,7 +160,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   };
 
   const handleYearChange = (year: number) => {
-    setCurrentDate(prev => {
+    setCurrentDate((prev) => {
       const newDate = new Date(prev);
       newDate.setFullYear(year);
       return newDate;
@@ -177,7 +177,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     const sizeClasses = {
       sm: 'px-2 py-0.5 text-xs',
       md: 'px-3 py-1 text-sm',
-      lg: 'px-4 py-1.5 text-base'
+      lg: 'px-4 py-1.5 text-base',
     };
 
     let baseClass = `flex items-center gap-2 rounded-lg transition-all duration-200 theme-text-primary min-w-32 ${sizeClasses[size]}`;
@@ -197,69 +197,65 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   return (
     <div className={`relative ${className}`} ref={containerRef}>
       {/* 触发按钮 */}
-      <button 
+      <button
         ref={triggerRef}
         type="button"
         onClick={handleOpen}
         disabled={disabled}
         className={getTriggerClassName()}
       >
-        <Calendar 
+        <Calendar
           size={size === 'sm' ? 10 : size === 'lg' ? 14 : 12}
-          className="theme-text-secondary" 
+          className="theme-text-secondary"
         />
-        <span className={value ? 'theme-text-primary' : 'theme-text-tertiary'}>
-          {displayText}
-        </span>
-        <ChevronDown 
+        <span className={value ? 'theme-text-primary' : 'theme-text-tertiary'}>{displayText}</span>
+        <ChevronDown
           size={size === 'sm' ? 10 : 12}
-          className={`theme-text-secondary ml-auto transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} 
+          className={`theme-text-secondary ml-auto transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
         />
       </button>
 
-      {typeof document !== 'undefined' && createPortal(
-        <AnimatePresence>
-          {isOpen && (
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95, y: -10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: -10 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="fixed z-[99999] rounded-lg shadow-2xl backdrop-blur-sm border border-white/10 overflow-hidden w-56"
-              data-datepicker-popup="true"
-              style={{
-                top: `${position.top}px`,
-                left: `${position.left}px`
-              }}
-            >
-              {/* 导航头部 */}
-              <DateNavigation 
-                currentDate={currentDate}
-                onMonthChange={handleMonthChange}
-                onYearChange={handleYearChange}
-              />
-
-              {/* 日历网格 */}
-              <CalendarGrid 
-                currentDate={currentDate}
-                selectedDate={value}
-                onDateSelect={handleDateSelect}
-                minDate={minDate}
-                maxDate={maxDate}
-              />
-
-              {/* 快捷按钮 */}
-              {showShortcuts && (
-                <DateShortcuts 
-                  shortcuts={shortcuts}
-                  onSelect={handleShortcutSelect}
+      {typeof document !== 'undefined' &&
+        createPortal(
+          <AnimatePresence>
+            {isOpen && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+                className="fixed z-[99999] rounded-lg shadow-2xl backdrop-blur-sm border border-white/10 overflow-hidden w-56"
+                data-datepicker-popup="true"
+                style={{
+                  top: `${position.top}px`,
+                  left: `${position.left}px`,
+                }}
+              >
+                {/* 导航头部 */}
+                <DateNavigation
+                  currentDate={currentDate}
+                  onMonthChange={handleMonthChange}
+                  onYearChange={handleYearChange}
                 />
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>,
-        document.body
-      )}
+
+                {/* 日历网格 */}
+                <CalendarGrid
+                  currentDate={currentDate}
+                  selectedDate={value}
+                  onDateSelect={handleDateSelect}
+                  minDate={minDate}
+                  maxDate={maxDate}
+                />
+
+                {/* 快捷按钮 */}
+                {showShortcuts && (
+                  <DateShortcuts shortcuts={shortcuts} onSelect={handleShortcutSelect} />
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body
+        )}
     </div>
   );
 };

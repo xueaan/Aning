@@ -2,7 +2,7 @@
   MentionDetection,
   MENTION_PATTERNS,
   SHORTCUT_MENTIONS,
-  type ShortcutMention
+  type ShortcutMention,
 } from '@/types/dialogue';
 
 // 提及类型
@@ -30,7 +30,6 @@ export interface MentionReplacement {
  * 提及检测和处理引擎
  */
 export class MentionEngine {
-  
   /**
    * 检测文本中的@提及
    * @param text 输入文本
@@ -41,7 +40,7 @@ export class MentionEngine {
     // 如果提供了光标位置，只检查光标附近的内容
     let searchText = text;
     let offset = 0;
-    
+
     if (cursorPosition !== undefined) {
       // 从光标位置向前查找，最多查找100个字符
       const startPos = Math.max(0, cursorPosition - 100);
@@ -52,7 +51,7 @@ export class MentionEngine {
     // 使用正则表达式查找@提及模式
     const regex = MENTION_PATTERNS.MENTION_REGEX;
     regex.lastIndex = 0; // 重置正则表达式状态
-    
+
     let match;
     let bestMatch = null;
 
@@ -60,9 +59,12 @@ export class MentionEngine {
     while ((match = regex.exec(searchText)) !== null) {
       const start = match.index + offset;
       const end = start + match[0].length;
-      
+
       // 如果有光标位置，只关心光标位置附近的匹配
-      if (cursorPosition !== undefined && (start > cursorPosition || end < cursorPosition - (match[1]?.length || 0))) {
+      if (
+        cursorPosition !== undefined &&
+        (start > cursorPosition || end < cursorPosition - (match[1]?.length || 0))
+      ) {
         continue;
       }
 
@@ -70,7 +72,7 @@ export class MentionEngine {
         start,
         end,
         query: match[1] || '',
-        fullMatch: match[0]
+        fullMatch: match[0],
       };
 
       // 如果找到当前光标位置的匹配，直接返回
@@ -90,25 +92,25 @@ export class MentionEngine {
   static parseMention(mention: string): ParsedMention {
     // 移除@符号
     const content = mention.startsWith('@') ? mention.slice(1) : mention;
-    
+
     if (!content) {
       return {
         type: 'unknown',
         value: '',
         isValid: false,
-        error: '提及内容为空'
+        error: '提及内容为空',
       };
     }
 
     // 检查是否是快捷方式
-    const shortcut = SHORTCUT_MENTIONS.find(s => 
-      s.trigger === content || s.aliases?.includes(content)
+    const shortcut = SHORTCUT_MENTIONS.find(
+      (s) => s.trigger === content || s.aliases?.includes(content)
     );
     if (shortcut) {
       return {
         type: 'shortcut',
         value: shortcut.value,
-        isValid: true
+        isValid: true,
       };
     }
 
@@ -119,7 +121,7 @@ export class MentionEngine {
         type: 'page',
         value: pageRef,
         isValid: pageRef.length > 0,
-        error: pageRef.length === 0 ? '页面引用为空' : undefined
+        error: pageRef.length === 0 ? '页面引用为空' : undefined,
       };
     }
 
@@ -130,7 +132,7 @@ export class MentionEngine {
         type: 'task',
         value: taskRef,
         isValid: taskRef.length > 0,
-        error: taskRef.length === 0 ? '任务引用为空' : undefined
+        error: taskRef.length === 0 ? '任务引用为空' : undefined,
       };
     }
 
@@ -139,7 +141,7 @@ export class MentionEngine {
       return {
         type: 'tasks',
         value: 'today',
-        isValid: true
+        isValid: true,
       };
     }
 
@@ -147,7 +149,7 @@ export class MentionEngine {
       return {
         type: 'pages',
         value: 'all',
-        isValid: true
+        isValid: true,
       };
     }
 
@@ -158,7 +160,7 @@ export class MentionEngine {
         type: 'kb',
         value: kbRef,
         isValid: kbRef.length > 0,
-        error: kbRef.length === 0 ? '知识库引用为空' : undefined
+        error: kbRef.length === 0 ? '知识库引用为空' : undefined,
       };
     }
 
@@ -167,7 +169,7 @@ export class MentionEngine {
       type: 'unknown',
       value: content,
       isValid: content.length > 0,
-      error: content.length === 0 ? '查询内容为空' : undefined
+      error: content.length === 0 ? '查询内容为空' : undefined,
     };
   }
 
@@ -177,7 +179,10 @@ export class MentionEngine {
    * @param replacements 替换映射
    * @returns 替换后的文本和替换详情
    */
-  static replaceMentions(text: string, replacements: Record<string, string>): {
+  static replaceMentions(
+    text: string,
+    replacements: Record<string, string>
+  ): {
     text: string;
     replacements: MentionReplacement[];
   } {
@@ -187,24 +192,24 @@ export class MentionEngine {
 
     const regex = MENTION_PATTERNS.MENTION_REGEX;
     regex.lastIndex = 0;
-    
+
     let match;
     while ((match = regex.exec(text)) !== null) {
       const original = match[0];
       const key = match[1] || '';
-      
+
       if (replacements[key]) {
         const replacement = replacements[key];
         const start = match.index + offset;
         const end = start + original.length;
-        
+
         // 记录替换信息
         resultReplacements.push({
           original,
           replacement,
           displayText: replacement,
           start,
-          end: start + replacement.length
+          end: start + replacement.length,
         });
 
         // 执行替换
@@ -215,7 +220,7 @@ export class MentionEngine {
 
     return {
       text: resultText,
-      replacements: resultReplacements
+      replacements: resultReplacements,
     };
   }
 
@@ -236,10 +241,10 @@ export class MentionEngine {
    */
   static getDisplayText(mention: string): string {
     const parsed = this.parseMention(mention);
-    
+
     switch (parsed.type) {
       case 'shortcut':
-        const shortcut = SHORTCUT_MENTIONS.find(s => s.value === parsed.value);
+        const shortcut = SHORTCUT_MENTIONS.find((s) => s.value === parsed.value);
         return shortcut?.label || mention;
       case 'page':
         return `页面: ${parsed.value}`;
@@ -265,7 +270,7 @@ export class MentionEngine {
     const mentions: string[] = [];
     const regex = MENTION_PATTERNS.MENTION_REGEX;
     regex.lastIndex = 0;
-    
+
     let match;
     while ((match = regex.exec(text)) !== null) {
       mentions.push(match[0]);
@@ -290,18 +295,16 @@ export class MentionEngine {
    */
   static getShortcutSuggestions(query: string = ''): ShortcutMention[] {
     const lowerQuery = query.toLowerCase();
-    
+
     if (!lowerQuery) {
       return SHORTCUT_MENTIONS;
     }
 
-    return SHORTCUT_MENTIONS.filter(shortcut => 
-      shortcut.trigger.toLowerCase().includes(lowerQuery) ||
-      shortcut.label.toLowerCase().includes(lowerQuery) ||
-      shortcut.aliases?.some(alias => alias.toLowerCase().includes(lowerQuery))
+    return SHORTCUT_MENTIONS.filter(
+      (shortcut) =>
+        shortcut.trigger.toLowerCase().includes(lowerQuery) ||
+        shortcut.label.toLowerCase().includes(lowerQuery) ||
+        shortcut.aliases?.some((alias) => alias.toLowerCase().includes(lowerQuery))
     );
   }
 }
-
-
-

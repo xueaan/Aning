@@ -52,8 +52,8 @@ export default defineConfig({
         './src/stores/appStore.ts',
         './src/hooks/useTheme.ts',
         './src/hooks/useResponsive.ts',
-        './src/components/core/Sidebar/index.tsx',
-        './src/components/core/MainContent/index.tsx'
+        './src/components/core/Sidebar.tsx',
+        './src/components/core/MainContent.tsx'
       ]
     },
     // 排除特定目录和文件
@@ -63,7 +63,7 @@ export default defineConfig({
   },
 
   // Environment variables with the `VITE_` prefix will be exposed to your frontend code
-  envPrefix: ['VITE_', 'TAURI_ENV_*'],
+  envPrefix: ['VITE_', 'TAURI_ENV_'],
   
   // 🚀 优化的依赖预构建配置
   optimizeDeps: {
@@ -95,17 +95,24 @@ export default defineConfig({
     // 支持 BlockSuite 的环境变量
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
   },
-  
   build: {
-    // Tauri uses Chromium on Windows and WebKit on macOS and Linux
     target: process.env.TAURI_ENV_PLATFORM === 'windows' ? 'chrome105' : 'safari13',
     minify: !process.env.TAURI_ENV_DEBUG ? 'esbuild' : false,
     sourcemap: !!process.env.TAURI_ENV_DEBUG,
+    chunkSizeWarningLimit: 1200,
     rollupOptions: {
-      external: [
-        // 排除blocksuite文件夹
-        /^.*\/blocksuite\//
-      ]
-    }
+      external: [/^.*\/blocksuite\//],
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom')) return 'vendor-react';
+            if (id.includes('@tiptap') || id.includes('prosemirror') || id.includes('novel')) return 'vendor-editor';
+            if (id.includes('reactflow')) return 'vendor-reactflow';
+            if (id.includes('framer-motion')) return 'vendor-motion';
+          }
+        },
+      },
+    },
   },
 });
+

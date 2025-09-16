@@ -27,7 +27,7 @@ export const MarkdownPasteExtension = Extension.create({
             try {
               // 阻止默认粘贴
               event.preventDefault();
-              
+
               // 解析 Markdown
               const html = parseMarkdownToHTML(text);
 
@@ -49,20 +49,16 @@ export const MarkdownPasteExtension = Extension.create({
               const newTr = tr.replaceSelection(slice);
 
               view.dispatch(newTr);
-              
+
               return true;
             } catch (error) {
               console.error('Markdown paste processing failed:', error);
               // 如果处理失败，允许默认粘贴
               return false;
             }
-          }
-        }
+          },
+        },
       }),
     ];
-  }
+  },
 });
-
-
-
-

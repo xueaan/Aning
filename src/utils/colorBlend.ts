@@ -16,7 +16,7 @@
  */
 export function blendColor(r: number, g: number, b: number, blendMode: number): string {
   let blendedR: number, blendedG: number, blendedB: number;
-  
+
   if (blendMode < 50) {
     // 0-50: 从黑色混合到原色
     const factor = blendMode / 50;
@@ -30,7 +30,7 @@ export function blendColor(r: number, g: number, b: number, blendMode: number): 
     blendedG = Math.round(g + (255 - g) * factor);
     blendedB = Math.round(b + (255 - b) * factor);
   }
-  
+
   return `${blendedR}, ${blendedG}, ${blendedB}`;
 }
 
@@ -44,12 +44,12 @@ export function blendColor(r: number, g: number, b: number, blendMode: number): 
 export function processGradient(gradient: string, blendMode: number, angle: number): string {
   // 替换角度
   let processedGradient = gradient.replace(/\d+deg/, `${angle}deg`);
-  
+
   // 如果是原色模式，直接返回
   if (blendMode === 50) {
     return processedGradient;
   }
-  
+
   // 处理每个颜色
   processedGradient = processedGradient.replace(
     /rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)/g,
@@ -58,7 +58,7 @@ export function processGradient(gradient: string, blendMode: number, angle: numb
       return `rgba(${blended}, ${a})`;
     }
   );
-  
+
   return processedGradient;
 }
 
@@ -74,8 +74,3 @@ export function getBlendModeLabel(blendMode: number): string {
   if (blendMode < 80) return '亮色';
   return '纯白';
 }
-
-
-
-
-

@@ -1,6 +1,6 @@
 ﻿import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { invoke } from '@tauri-apps/api/core';
+import { invokeTauri } from '@/utils/tauriWrapper';
 
 // 数据类型定义
 export interface CardBox {
@@ -60,18 +60,23 @@ interface CardBoxStore {
   searchQuery: string;
   isLoading: boolean;
   error: string | null;
-  
+
   // 全屏编辑器相关状态
   fullEditorOpen: boolean;
   fullEditingCard: Card | null;
-  
+
   // 笔记盒操作
   loadBoxes: () => Promise<void>;
-  createBox: (name: string, description?: string, color?: string, icon?: string) => Promise<CardBox>;
+  createBox: (
+    name: string,
+    description?: string,
+    color?: string,
+    icon?: string
+  ) => Promise<CardBox>;
   updateBox: (id: string, updates: CardBoxUpdate) => Promise<void>;
   deleteBox: (id: string) => Promise<void>;
   selectBox: (id: string | null) => Promise<void>;
-  
+
   // 笔记操作
   loadCards: (boxId?: string) => Promise<void>;
   getCard: (cardId: string) => Promise<Card | null>;
@@ -79,16 +84,16 @@ interface CardBoxStore {
   updateCard: (id: string, updates: CardUpdate) => Promise<void>;
   deleteCard: (id: string) => Promise<void>;
   moveCard: (cardId: string, targetBoxId: string) => Promise<void>;
-  
+
   // 全屏编辑器操作
   openFullEditor: (card?: Card, boxId?: string) => void;
   closeFullEditor: () => void;
   saveFullCard: (title: string, content: string, shouldClose?: boolean) => Promise<void>;
-  
+
   // 搜索和视图
   searchCards: (query: string) => Promise<void>;
   setSelectedCard: (card: Card | null) => void;
-  
+
   // 工具方法
   clearError: () => void;
   refreshData: () => Promise<void>;
@@ -113,13 +118,13 @@ export const useCardBoxStore = create<CardBoxStore>()(
       loadBoxes: async () => {
         try {
           set({ isLoading: true, error: null });
-          const boxes = await invoke<CardBox[]>('get_card_boxes');
+          const boxes = await invokeTauri<CardBox[]>('get_card_boxes');
           set({ boxes, isLoading: false });
         } catch (error) {
           console.error('Failed to load boxes:', error);
-          set({ 
+          set({
             error: error instanceof Error ? error.message : '加载笔记盒失败',
-            isLoading: false 
+            isLoading: false,
           });
         }
       },
@@ -127,24 +132,24 @@ export const useCardBoxStore = create<CardBoxStore>()(
       createBox: async (name: string, description?: string, color?: string, icon?: string) => {
         try {
           set({ isLoading: true, error: null });
-          const newBox = await invoke<CardBox>('create_card_box', {
+          const newBox = await invokeTauri<CardBox>('create_card_box', {
             name,
             description,
             color,
-            icon
+            icon,
           });
-          
+
           set((state) => ({
             boxes: [...state.boxes, newBox],
-            isLoading: false
+            isLoading: false,
           }));
-          
+
           return newBox;
         } catch (error) {
           console.error('Failed to create box:', error);
-          set({ 
+          set({
             error: error instanceof Error ? error.message : '创建笔记盒失败',
-            isLoading: false 
+            isLoading: false,
           });
           throw error;
         }
@@ -153,18 +158,18 @@ export const useCardBoxStore = create<CardBoxStore>()(
       updateBox: async (id: string, updates: CardBoxUpdate) => {
         try {
           set({ error: null });
-          await invoke('update_card_box', { id, updates });
-          
+          await invokeTauri('update_card_box', { id, updates });
+
           set((state) => ({
             boxes: state.boxes.map((box) =>
               box.id === id
-                ? { 
-                    ...box, 
+                ? {
+                    ...box,
                     ...updates,
-                    updated_at: Date.now()
+                    updated_at: Date.now(),
                   }
                 : box
-            )
+            ),
           }));
         } catch (error) {
           console.error('Failed to update box:', error);
@@ -176,12 +181,12 @@ export const useCardBoxStore = create<CardBoxStore>()(
       deleteBox: async (id: string) => {
         try {
           set({ error: null });
-          await invoke('delete_card_box', { id });
-          
+          await invokeTauri('delete_card_box', { id });
+
           set((state) => ({
             boxes: state.boxes.filter((box) => box.id !== id),
             activeBoxId: state.activeBoxId === id ? null : state.activeBoxId,
-            cards: state.activeBoxId === id ? [] : state.cards
+            cards: state.activeBoxId === id ? [] : state.cards,
           }));
         } catch (error) {
           console.error('Failed to delete box:', error);
@@ -193,20 +198,20 @@ export const useCardBoxStore = create<CardBoxStore>()(
       selectBox: async (id: string | null) => {
         try {
           set({ activeBoxId: id, isLoading: true, error: null });
-          
+
           if (id) {
-            const cards = await invoke<Card[]>('get_cards', { boxId: id });
+            const cards = await invokeTauri<Card[]>('get_cards', { boxId: id });
             set({ cards, isLoading: false });
           } else {
             // 显示所有卡片
-            const cards = await invoke<Card[]>('get_cards', { boxId: null });
+            const cards = await invokeTauri<Card[]>('get_cards', { boxId: null });
             set({ cards, isLoading: false });
           }
         } catch (error) {
           console.error('Failed to load cards:', error);
-          set({ 
+          set({
             error: error instanceof Error ? error.message : '加载卡片失败',
-            isLoading: false 
+            isLoading: false,
           });
         }
       },
@@ -215,13 +220,13 @@ export const useCardBoxStore = create<CardBoxStore>()(
       loadCards: async (boxId?: string) => {
         try {
           set({ isLoading: true, error: null });
-          const cards = await invoke<Card[]>('get_cards', { boxId: boxId });
+          const cards = await invokeTauri<Card[]>('get_cards', { boxId: boxId });
           set({ cards, isLoading: false });
         } catch (error) {
           console.error('Failed to load cards:', error);
-          set({ 
+          set({
             error: error instanceof Error ? error.message : '加载卡片失败',
-            isLoading: false 
+            isLoading: false,
           });
         }
       },
@@ -229,12 +234,12 @@ export const useCardBoxStore = create<CardBoxStore>()(
       getCard: async (cardId: string): Promise<Card | null> => {
         try {
           set({ error: null });
-          const card = await invoke<Card | null>('get_card_by_id', { cardId });
+          const card = await invokeTauri<Card | null>('get_card_by_id', { cardId });
           return card;
         } catch (error) {
           console.error('Failed to get card:', error);
           set({
-            error: error instanceof Error ? error.message : '获取卡片失败'
+            error: error instanceof Error ? error.message : '获取卡片失败',
           });
           return null;
         }
@@ -243,21 +248,19 @@ export const useCardBoxStore = create<CardBoxStore>()(
       createCard: async (boxId: string, title: string, content: string) => {
         try {
           set({ error: null });
-          const newCard = await invoke<Card>('create_card', {
+          const newCard = await invokeTauri<Card>('create_card', {
             boxId,
             title,
-            content
+            content,
           });
-          
+
           set((state) => ({
             cards: [newCard, ...state.cards],
             boxes: state.boxes.map((box) =>
-              box.id === boxId
-                ? { ...box, cards_count: box.cards_count + 1 }
-                : box
-            )
+              box.id === boxId ? { ...box, cards_count: box.cards_count + 1 } : box
+            ),
           }));
-          
+
           return newCard;
         } catch (error) {
           console.error('Failed to create card:', error);
@@ -269,18 +272,18 @@ export const useCardBoxStore = create<CardBoxStore>()(
       updateCard: async (id: string, updates: CardUpdate) => {
         try {
           set({ error: null });
-          await invoke('update_card', { id, updates });
-          
+          await invokeTauri('update_card', { id, updates });
+
           set((state) => ({
             cards: state.cards.map((card) =>
               card.id === id
-                ? { 
-                    ...card, 
+                ? {
+                    ...card,
                     ...updates,
-                    updated_at: Date.now()
+                    updated_at: Date.now(),
                   }
                 : card
-            )
+            ),
           }));
         } catch (error) {
           console.error('Failed to update card:', error);
@@ -292,18 +295,20 @@ export const useCardBoxStore = create<CardBoxStore>()(
       deleteCard: async (id: string) => {
         try {
           set({ error: null });
-          const cardToDelete = get().cards.find(c => c.id === id);
-          
-          await invoke('delete_card', { id });
-          
+          const cardToDelete = get().cards.find((c) => c.id === id);
+
+          await invokeTauri('delete_card', { id });
+
           set((state) => ({
             cards: state.cards.filter((card) => card.id !== id),
             selectedCard: state.selectedCard?.id === id ? null : state.selectedCard,
-            boxes: cardToDelete ? state.boxes.map((box) =>
-              box.id === cardToDelete.box_id
-                ? { ...box, cards_count: Math.max(0, box.cards_count - 1) }
-                : box
-            ) : state.boxes
+            boxes: cardToDelete
+              ? state.boxes.map((box) =>
+                  box.id === cardToDelete.box_id
+                    ? { ...box, cards_count: Math.max(0, box.cards_count - 1) }
+                    : box
+                )
+              : state.boxes,
           }));
         } catch (error) {
           console.error('Failed to delete card:', error);
@@ -315,18 +320,16 @@ export const useCardBoxStore = create<CardBoxStore>()(
       moveCard: async (cardId: string, targetBoxId: string) => {
         try {
           set({ error: null });
-          const card = get().cards.find(c => c.id === cardId);
+          const card = get().cards.find((c) => c.id === cardId);
           if (!card) return;
-          
+
           const oldBoxId = card.box_id;
-          
-          await invoke('move_card', { cardId, targetBoxId });
-          
+
+          await invokeTauri('move_card', { cardId, targetBoxId });
+
           set((state) => ({
             cards: state.cards.map((c) =>
-              c.id === cardId
-                ? { ...c, box_id: targetBoxId, updated_at: Date.now() }
-                : c
+              c.id === cardId ? { ...c, box_id: targetBoxId, updated_at: Date.now() } : c
             ),
             boxes: state.boxes.map((box) => {
               if (box.id === oldBoxId) {
@@ -335,7 +338,7 @@ export const useCardBoxStore = create<CardBoxStore>()(
                 return { ...box, cards_count: box.cards_count + 1 };
               }
               return box;
-            })
+            }),
           }));
         } catch (error) {
           console.error('Failed to move card:', error);
@@ -378,24 +381,24 @@ export const useCardBoxStore = create<CardBoxStore>()(
       closeFullEditor: () => {
         set({
           fullEditorOpen: false,
-          fullEditingCard: null
+          fullEditingCard: null,
         });
       },
 
       saveFullCard: async (title: string, content: string, shouldClose = true) => {
         try {
           const { fullEditingCard, activeBoxId, boxes } = get();
-          
+
           if (fullEditingCard) {
             // 更新现有卡片
-            await get().updateCard(fullEditingCard.id, { 
-              title, 
-              content
+            await get().updateCard(fullEditingCard.id, {
+              title,
+              content,
             });
           } else {
             // 创建新卡片时，确定目标盒子ID
             let targetBoxId = activeBoxId;
-            
+
             if (!targetBoxId && boxes.length > 0) {
               // 如果没有活动盒子但有盒子存在，使用第一个盒子
               targetBoxId = boxes[0].id;
@@ -411,7 +414,7 @@ export const useCardBoxStore = create<CardBoxStore>()(
 
             // 创建新卡片
             const newCard = await get().createCard(targetBoxId, title, content);
-            
+
             // 创建成功后，设置为正在编辑的卡片
             if (!shouldClose) {
               set({ fullEditingCard: newCard });
@@ -432,9 +435,9 @@ export const useCardBoxStore = create<CardBoxStore>()(
       searchCards: async (query: string) => {
         try {
           set({ searchQuery: query, isLoading: true, error: null });
-          
+
           if (query.trim()) {
-            const results = await invoke<Card[]>('search_cards', { query });
+            const results = await invokeTauri<Card[]>('search_cards', { query });
             set({ cards: results, isLoading: false });
           } else {
             // 重新加载当前卡片盒的卡片
@@ -442,9 +445,9 @@ export const useCardBoxStore = create<CardBoxStore>()(
           }
         } catch (error) {
           console.error('Failed to search cards:', error);
-          set({ 
+          set({
             error: error instanceof Error ? error.message : '搜索失败',
-            isLoading: false 
+            isLoading: false,
           });
         }
       },
@@ -461,14 +464,10 @@ export const useCardBoxStore = create<CardBoxStore>()(
       refreshData: async () => {
         const { activeBoxId } = get();
         await Promise.all([get().loadBoxes(), get().selectBox(activeBoxId)]);
-      }
+      },
     }),
     {
-      name: 'cardbox-store'
+      name: 'cardbox-store',
     }
   )
 );
-
-
-
-

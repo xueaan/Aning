@@ -14,78 +14,192 @@ export const COMMON_ICONS: IconCategory[] = [
     name: 'basic',
     label: '基础',
     icons: [
-      'Home', 'User', 'Users', 'Settings', 'Crown', 'Star', 'Heart', 'ThumbsUp',
-      'Award', 'Trophy', 'CheckCircle', 'Flame', 'Zap', 'Sparkles', 'Bot', 'Monitor'
-    ]
+      'Home',
+      'User',
+      'Users',
+      'Settings',
+      'Crown',
+      'Star',
+      'Heart',
+      'ThumbsUp',
+      'Award',
+      'Trophy',
+      'CheckCircle',
+      'Flame',
+      'Zap',
+      'Sparkles',
+      'Bot',
+      'Monitor',
+    ],
   },
   {
     name: 'actions',
     label: '操作',
     icons: [
-      'Plus', 'Minus', 'Edit2', 'Trash2', 'Save', 'Copy', 'Share2', 'Send',
-      'RefreshCw', 'RotateCcw', 'Upload', 'Download', 'Move', 'ArrowDown', 'Link2', 'Unlink2'
-    ]
+      'Plus',
+      'Minus',
+      'Edit2',
+      'Trash2',
+      'Save',
+      'Copy',
+      'Share2',
+      'Send',
+      'RefreshCw',
+      'RotateCcw',
+      'Upload',
+      'Download',
+      'Move',
+      'ArrowDown',
+      'Link2',
+      'Unlink2',
+    ],
   },
   {
     name: 'files',
     label: '文件',
     icons: [
-      'Folder', 'FolderOpen', 'FileText', 'File', 'Book', 'BookOpen', 'Library', 'Database',
-      'Image', 'Camera', 'Video', 'Music', 'HardDrive', 'Server', 'Package', 'Archive'
-    ]
+      'Folder',
+      'FolderOpen',
+      'FileText',
+      'File',
+      'Book',
+      'BookOpen',
+      'Library',
+      'Database',
+      'Image',
+      'Camera',
+      'Video',
+      'Music',
+      'HardDrive',
+      'Server',
+      'Package',
+      'Archive',
+    ],
   },
   {
     name: 'communication',
     label: '通信',
     icons: [
-      'Mail', 'MailOpen', 'MessageCircle', 'MessageSquare', 'MessageSquare2', 'Phone', 'PhoneCall', 'Smartphone',
-      'Bell', 'BellRing', 'Inbox', 'Tag', 'Wifi', 'Signal', 'Link', 'Radio'
-    ]
+      'Mail',
+      'MailOpen',
+      'MessageCircle',
+      'MessageSquare',
+      'MessageSquare2',
+      'Phone',
+      'PhoneCall',
+      'Smartphone',
+      'Bell',
+      'BellRing',
+      'Inbox',
+      'Tag',
+      'Wifi',
+      'Signal',
+      'Link',
+      'Radio',
+    ],
   },
   {
     name: 'data',
     label: '数据',
     icons: [
-      'TrendingUp', 'PieChart', 'LineChart', 'BarChart3', 'Table2', 'Database', 'Monitor', 'Layout',
-      'Target', 'Focus', 'Zap', 'Activity', 'Calculator', 'Computer', 'Tv', 'Cpu'
-    ]
+      'TrendingUp',
+      'PieChart',
+      'LineChart',
+      'BarChart3',
+      'Table2',
+      'Database',
+      'Monitor',
+      'Layout',
+      'Target',
+      'Focus',
+      'Zap',
+      'Activity',
+      'Calculator',
+      'Computer',
+      'Tv',
+      'Cpu',
+    ],
   },
   {
     name: 'business',
     label: '商务',
     icons: [
-      'Briefcase', 'Store', 'Handshake', 'Calendar', 'CalendarDays', 'Clock', 'CalendarCheck', 'Timer',
-      'ShoppingCart', 'DollarSign', 'CreditCard', 'PoundSterling', 'Globe', 'Earth', 'MapPin', 'Navigation'
-    ]
+      'Briefcase',
+      'Store',
+      'Handshake',
+      'Calendar',
+      'CalendarDays',
+      'Clock',
+      'CalendarCheck',
+      'Timer',
+      'ShoppingCart',
+      'DollarSign',
+      'CreditCard',
+      'PoundSterling',
+      'Globe',
+      'Earth',
+      'MapPin',
+      'Navigation',
+    ],
   },
   {
     name: 'tools',
     label: '工具',
     icons: [
-      'Wrench', 'Hammer', 'Settings', 'Tool', 'Shield', 'Key', 'Lock', 'Unlock',
-      'Search', 'Filter', 'ArrowUpDown', 'Eye', 'EyeOff', 'Menu', 'AlignJustify', 'MoreHorizontal',
-      'Chrome', 'Grid3X3', 'Grid2X2', 'ShieldCheck'
-    ]
+      'Wrench',
+      'Hammer',
+      'Settings',
+      'Tool',
+      'Shield',
+      'Key',
+      'Lock',
+      'Unlock',
+      'Search',
+      'Filter',
+      'ArrowUpDown',
+      'Eye',
+      'EyeOff',
+      'Menu',
+      'AlignJustify',
+      'MoreHorizontal',
+      'Chrome',
+      'Grid3X3',
+      'Grid2X2',
+      'ShieldCheck',
+    ],
   },
   {
     name: 'creative',
     label: '创意',
     icons: [
-      'Palette', 'Paintbrush', 'Sparkles', 'Image', 'Lightbulb', 'Brain', 'Puzzle', 'PaintBucket',
-      'ColorSwatch', 'Wand2', 'RotateCcw', 'Scissors', 'Layers2', 'Star', 'Layers', 'Shirt'
-    ]
-  }
+      'Palette',
+      'Paintbrush',
+      'Sparkles',
+      'Image',
+      'Lightbulb',
+      'Brain',
+      'Puzzle',
+      'PaintBucket',
+      'ColorSwatch',
+      'Wand2',
+      'RotateCcw',
+      'Scissors',
+      'Layers2',
+      'Star',
+      'Layers',
+      'Shirt',
+    ],
+  },
 ];
 
 // 扁平化的所有图标名称列表
-export const ALL_COMMON_ICON_NAMES = COMMON_ICONS.flatMap(category => category.icons);
+export const ALL_COMMON_ICON_NAMES = COMMON_ICONS.flatMap((category) => category.icons);
 
 // 图标组件映射表 - 使用 lucide-react
 export const ICON_COMPONENTS = Object.fromEntries(
-  ALL_COMMON_ICON_NAMES.map(iconName => [
-    iconName, 
-    (LucideIcons as any)[iconName]
-  ]).filter(([, component]) => component !== undefined)
+  ALL_COMMON_ICON_NAMES.map((iconName) => [iconName, (LucideIcons as any)[iconName]]).filter(
+    ([, component]) => component !== undefined
+  )
 );
 
 // 默认图标
@@ -102,13 +216,13 @@ export const getIconComponent = (iconName: string) => {
   if (ICON_COMPONENTS[iconName]) {
     return ICON_COMPONENTS[iconName];
   }
-  
+
   // 如果是 @icon-park 图标名称，尝试转换为 lucide
   const lucideIconName = getLucideIconName(iconName);
   if (ICON_COMPONENTS[lucideIconName]) {
     return ICON_COMPONENTS[lucideIconName];
   }
-  
+
   // 兜底返回默认图标
   return ICON_COMPONENTS[DEFAULT_ICON];
 };
@@ -155,15 +269,10 @@ export const EMOJI_TO_ICON_MAP: Record<string, string> = {
   '❤️': 'Heart',
   '⭐': 'Star',
   '📅': 'Calendar',
-  '🔗': 'Link2'
+  '🔗': 'Link2',
 };
 
 // 将emoji转换为图标名称
 export const convertEmojiToIcon = (emoji: string): string => {
   return EMOJI_TO_ICON_MAP[emoji] || DEFAULT_ICON;
 };
-
-
-
-
-

@@ -13,7 +13,7 @@ interface KnowledgeState {
   viewMode: ViewMode;
   sidebarWidth: number;
   batchModeActive: boolean;
-  
+
   // 模态框状态
   showCreateModal: boolean;
   showEditModal: boolean;
@@ -24,18 +24,18 @@ interface KnowledgeActions {
   // 视图控制
   setViewMode: (mode: ViewMode) => void;
   setSidebarWidth: (width: number) => void;
-  
+
   // 批量操作
   toggleBatchMode: () => void;
   batchDeletePages: (pageIds: string[]) => Promise<void>;
   batchMovePages: (pageIds: string[], targetParentId?: string) => Promise<void>;
-  
+
   // 模态框控制
   openCreateModal: () => void;
   closeCreateModal: () => void;
   openEditModal: (knowledgeBase: any) => void;
   closeEditModal: () => void;
-  
+
   // 集成操作 - 协调多个子 store
   initializeKnowledge: (knowledgeBaseId?: string) => Promise<void>;
   switchKnowledgeBase: (knowledgeBaseId: string) => Promise<void>;
@@ -62,8 +62,8 @@ export const useKnowledgeStore = create<KnowledgeStore>((set, get) => ({
   },
 
   toggleBatchMode: () => {
-    set(state => ({ batchModeActive: !state.batchModeActive }));
-    
+    set((state) => ({ batchModeActive: !state.batchModeActive }));
+
     // 批量模式关闭时清除选择
     if (!get().batchModeActive) {
       const pageStore = usePageStore.getState();
@@ -73,11 +73,11 @@ export const useKnowledgeStore = create<KnowledgeStore>((set, get) => ({
 
   batchDeletePages: async (pageIds: string[]) => {
     const pageStore = usePageStore.getState();
-    
+
     try {
       // 批量删除页面
-      await Promise.all(pageIds.map(id => pageStore.deletePage(id)));
-      
+      await Promise.all(pageIds.map((id) => pageStore.deletePage(id)));
+
       // 清除选择并关闭批量模式
       pageStore.clearSelection();
       set({ batchModeActive: false });
@@ -89,11 +89,11 @@ export const useKnowledgeStore = create<KnowledgeStore>((set, get) => ({
 
   batchMovePages: async (pageIds: string[], targetParentId?: string) => {
     const pageStore = usePageStore.getState();
-    
+
     try {
       // 批量移动页面
-      await Promise.all(pageIds.map(id => pageStore.movePage(id, targetParentId)));
-      
+      await Promise.all(pageIds.map((id) => pageStore.movePage(id, targetParentId)));
+
       // 清除选择并关闭批量模式
       pageStore.clearSelection();
       set({ batchModeActive: false });
@@ -130,7 +130,7 @@ export const useKnowledgeStore = create<KnowledgeStore>((set, get) => ({
       // 智能默认选择逻辑
       if (knowledgeBaseId) {
         // 1. 优先使用指定的知识库ID
-        const kb = kbStore.knowledgeBases.find(kb => kb.id === knowledgeBaseId);
+        const kb = kbStore.knowledgeBases.find((kb) => kb.id === knowledgeBaseId);
         if (kb) {
           await get().switchKnowledgeBase(knowledgeBaseId);
         }
@@ -142,7 +142,7 @@ export const useKnowledgeStore = create<KnowledgeStore>((set, get) => ({
 
         let targetKb = null;
         if (lastUsedId) {
-          targetKb = kbStore.knowledgeBases.find(kb => kb.id === lastUsedId);
+          targetKb = kbStore.knowledgeBases.find((kb) => kb.id === lastUsedId);
         }
 
         // 3. 如果上次使用的知识库不存在，选择第一个可用的
@@ -165,7 +165,7 @@ export const useKnowledgeStore = create<KnowledgeStore>((set, get) => ({
 
     try {
       // 设置当前知识库
-      const kb = kbStore.knowledgeBases.find(kb => kb.id === knowledgeBaseId);
+      const kb = kbStore.knowledgeBases.find((kb) => kb.id === knowledgeBaseId);
       if (kb) {
         kbStore.setCurrentKnowledgeBase(kb);
 
@@ -192,7 +192,7 @@ export const useKnowledgeStore = create<KnowledgeStore>((set, get) => ({
       console.error('切换知识库失败:', error);
       throw error;
     }
-  }
+  },
 }));
 
 // 导出组合 Hook，提供统一的知识库操作接口
@@ -206,21 +206,17 @@ export const useKnowledgeOperations = () => {
   return {
     // 主 store
     ...mainStore,
-    
+
     // 知识库操作
     ...kbStore,
-    
+
     // 页面操作
     ...pageStore,
-    
+
     // 搜索操作
     ...searchStore,
-    
+
     // 编辑操作
-    ...editorStore
+    ...editorStore,
   };
 };
-
-
-
-

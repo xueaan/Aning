@@ -15,7 +15,7 @@ export const ContextTags: React.FC<ContextTagsProps> = ({
   onRemove,
   stats,
   maxVisible = 8,
-  className = ''
+  className = '',
 }) => {
   const visibleContexts = contexts.slice(0, maxVisible);
   const hiddenCount = contexts.length - maxVisible;
@@ -63,7 +63,7 @@ export const ContextTags: React.FC<ContextTagsProps> = ({
   const getTooltipContent = (context: ContextItem) => {
     const lines = [
       `标题: ${context.title}`,
-      `类型: ${context.type === 'knowledge_page' ? '知识库页面' : context.type === 'task' ? '任务' : '任务列表'}`
+      `类型: ${context.type === 'knowledge_page' ? '知识库页面' : context.type === 'task' ? '任务' : '任务列表'}`,
     ];
 
     if (context.metadata.kb_name) {
@@ -102,25 +102,22 @@ export const ContextTags: React.FC<ContextTagsProps> = ({
       {/* 上下文标签列表 */}
       <div className="flex flex-wrap gap-2">
         {visibleContexts.map((context) => (
-          <div key={context.id}
+          <div
+            key={context.id}
             className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium border transition-all duration-200 hover:shadow-sm ${getContextStyle(context)}`}
             title={getTooltipContent(context)}
           >
             {/* 图标 */}
-            <span className="flex-shrink-0">
-              {getContextIcon(context)}
-            </span>
-            <span className="truncate max-w-32">
-              {getDisplayTitle(context)}
-            </span>
-        {context.tokenCount && context.tokenCount > 100 && (
-          <span className="text-xs px-1.5 py-0.5 theme-bg-tertiary rounded ml-1">
-            {context.tokenCount}t
-          </span>
-        )}
+            <span className="flex-shrink-0">{getContextIcon(context)}</span>
+            <span className="truncate max-w-32">{getDisplayTitle(context)}</span>
+            {context.tokenCount && context.tokenCount > 100 && (
+              <span className="text-xs px-1.5 py-0.5 theme-bg-tertiary rounded ml-1">
+                {context.tokenCount}t
+              </span>
+            )}
 
             {/* 移除按钮 */}
-            <button 
+            <button
               onClick={() => onRemove(context.id)}
               className="flex-shrink-0 p-0.5 hover:theme-bg-tertiary/50 rounded-full transition-colors"
               title="移除此上下文"
@@ -137,68 +134,59 @@ export const ContextTags: React.FC<ContextTagsProps> = ({
           </div>
         )}
       </div>
-      
+
       {/* 统计信息栏 */}
       <div className="flex items-center justify-between p-2 theme-bg-secondary/30 rounded-lg border theme-border">
-    <div className="flex items-center gap-4 text-xs theme-text-secondary">
-        {/* 项目统计 */}
-        <div className="flex items-center gap-1">
-          <BarChart3 size={16} />
-          <span>{stats.totalItems} 项</span>
+        <div className="flex items-center gap-4 text-xs theme-text-secondary">
+          {/* 项目统计 */}
+          <div className="flex items-center gap-1">
+            <BarChart3 size={16} />
+            <span>{stats.totalItems} 项</span>
+          </div>
+          {stats.knowledges > 0 && (
+            <div className="flex items-center gap-1">
+              <FileText size={16} />
+              <span>{stats.knowledges} 页面</span>
+            </div>
+          )}
+
+          {stats.tasks > 0 && (
+            <div className="flex items-center gap-1">
+              <CheckSquare size={16} />
+              <span>{stats.tasks} 任务</span>
+            </div>
+          )}
+
+          {/* Token统计 */}
+          {stats.totalTokens > 0 && (
+            <div className="flex items-center gap-1">
+              <span>约 {stats.totalTokens.toLocaleString()} tokens</span>
+            </div>
+          )}
         </div>
-        {stats.knowledges > 0 && (
-          <div className="flex items-center gap-1">
-            <FileText size={16} />
-            <span>{stats.knowledges} 页面</span>
-          </div>
-        )}
 
-        {stats.tasks > 0 && (
-          <div className="flex items-center gap-1">
-            <CheckSquare size={16} />
-            <span>{stats.tasks} 任务</span>
-          </div>
-        )}
-
-        {/* Token统计 */}
-        {stats.totalTokens > 0 && (
-          <div className="flex items-center gap-1">
-            <span>约 {stats.totalTokens.toLocaleString()} tokens</span>
-          </div>
+        {/* 清除所有按钮 */}
+        {contexts.length > 1 && (
+          <button
+            onClick={() => contexts.forEach((ctx) => onRemove(ctx.id))}
+            className="text-xs theme-text-secondary hover:theme-text-error transition-colors px-2 py-1 rounded hover:theme-bg-error/10"
+            title="清除所有上下文"
+          >
+            清除所有
+          </button>
         )}
       </div>
-      
-      {/* 清除所有按钮 */}
-      {contexts.length > 1 && (
-        <button 
-          onClick={() => contexts.forEach(ctx => onRemove(ctx.id))}
-          className="text-xs theme-text-secondary hover:theme-text-error transition-colors px-2 py-1 rounded hover:theme-bg-error/10"
-          title="清除所有上下文"
-        >
-          清除所有
-        </button>
-      )}
-      </div>
-      
+
       {/* Token警告 */}
       {stats.totalTokens > 3000 && (
         <div className="flex items-center gap-2 p-2 theme-bg-warning/10 border theme-border-primary rounded-lg theme-warning text-xs">
           <span className="theme-warning">⚠️</span>
           <span>
-            上下文内容较多 ({stats.totalTokens.toLocaleString()} tokens)，可能影响AI响应速度和准确性。
-            建议精简上下文内容。
+            上下文内容较多 ({stats.totalTokens.toLocaleString()}{' '}
+            tokens)，可能影响AI响应速度和准确性。 建议精简上下文内容。
           </span>
         </div>
       )}
     </div>
   );
 };
-
-
-
-
-
-
-
-
-

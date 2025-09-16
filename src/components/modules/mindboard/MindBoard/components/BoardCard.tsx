@@ -69,14 +69,14 @@ export const BoardCard: React.FC<BoardCardProps> = ({ board, displayMode, onOpen
 
   if (displayMode === 'list') {
     return (
-      <div onClick={onOpen}
-            className="group rounded-xl bg-transparent theme-border backdrop-blur-sm hover:backdrop-blur-md hover:theme-bg-secondary/50 transition-all hover:translate-x-1 hover:shadow-lg cursor-pointer will-change-transform"
+      <div
+        onClick={onOpen}
+        className="group rounded-xl bg-transparent theme-border backdrop-blur-sm hover:backdrop-blur-md hover:theme-bg-secondary/50 transition-all hover:translate-x-1 hover:shadow-lg cursor-pointer will-change-transform"
       >
         <div className="flex items-center justify-between p-6">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 theme-bg-secondary/30 backdrop-blur-sm rounded-lg flex items-center justify-center theme-border">
-              <Brain size={24} 
-            className="text-blue-600" />
+              <Brain size={24} className="text-blue-600" />
             </div>
             <div className="flex-1">
               {isEditing ? (
@@ -109,21 +109,21 @@ export const BoardCard: React.FC<BoardCardProps> = ({ board, displayMode, onOpen
               </div>
             </div>
           </div>
-      </div>
+        </div>
       </div>
     );
   }
 
-return (
-    <div onClick={onOpen}
-            className="rounded-xl bg-transparent theme-border backdrop-blur-sm hover:backdrop-blur-md hover:theme-bg-secondary/50 transition-all cursor-pointer overflow-hidden"
+  return (
+    <div
+      onClick={onOpen}
+      className="rounded-xl bg-transparent theme-border backdrop-blur-sm hover:backdrop-blur-md hover:theme-bg-secondary/50 transition-all cursor-pointer overflow-hidden"
     >
       <div className="aspect-video relative bg-transparent border-b theme-border">
-      <div className="h-full flex items-center justify-center">
+        <div className="h-full flex items-center justify-center">
           <div className="text-center">
             <div className="w-16 h-16 theme-bg-secondary/30 backdrop-blur-sm rounded-xl flex items-center justify-center theme-border mb-3 mx-auto">
-              <Brain size={48} 
-            className="text-blue-600" />
+              <Brain size={48} className="text-blue-600" />
             </div>
             <div className="text-xs theme-text-secondary">
               {nodeCount} 节点 · {edgeCount} 连接
@@ -131,7 +131,7 @@ return (
           </div>
         </div>
       </div>
-      
+
       <div className="relative p-4 bg-transparent border-t theme-border">
         {isEditing ? (
           <input
@@ -159,13 +159,3 @@ return (
     </div>
   );
 };
-
-
-
-
-
-
-
-
-
-

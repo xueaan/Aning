@@ -6,7 +6,7 @@ export const usePasswordFormValidation = (categories: Category[]) => {
 
   const validateForm = (formData: PasswordEntry): boolean => {
     const newErrors: Record<string, string> = {};
-    const selectedCategory = categories.find(c => c.id === formData.category_id);
+    const selectedCategory = categories.find((c) => c.id === formData.category_id);
 
     if (!formData.title?.trim()) {
       newErrors.title = '标题不能为空';
@@ -70,13 +70,13 @@ export const usePasswordFormValidation = (categories: Category[]) => {
   };
 
   const setSubmitError = (error: string) => {
-    setErrors(prev => ({ ...prev, submit: error }));
+    setErrors((prev) => ({ ...prev, submit: error }));
   };
 
   return {
     errors,
     validateForm,
     clearErrors,
-    setSubmitError
+    setSubmitError,
   };
 };

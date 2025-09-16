@@ -8,34 +8,39 @@ import { ConfirmDeleteModal } from '@/components/common/ConfirmDeleteModal';
 const colors = [
   {
     name: 'green',
-    border: 'border-green-400 dark:border-green-500', bg: 'rgba(34, 197, 94, 0.2)',
-    header: 'bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-700'
+    border: 'border-green-400 dark:border-green-500',
+    bg: 'rgba(34, 197, 94, 0.2)',
+    header: 'bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-700',
   },
   {
     name: 'blue',
-    border: 'border-blue-400 dark:border-blue-500', bg: 'rgba(59, 130, 246, 0.2)',
-    header: 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700'
+    border: 'border-blue-400 dark:border-blue-500',
+    bg: 'rgba(59, 130, 246, 0.2)',
+    header: 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700',
   },
   {
     name: 'purple',
-    border: 'border-purple-400 dark:border-purple-500', bg: 'rgba(147, 51, 234, 0.2)',
-    header: 'bg-purple-50 dark:bg-purple-900/30 border-purple-200 dark:border-purple-700'
+    border: 'border-purple-400 dark:border-purple-500',
+    bg: 'rgba(147, 51, 234, 0.2)',
+    header: 'bg-purple-50 dark:bg-purple-900/30 border-purple-200 dark:border-purple-700',
   },
   {
     name: 'yellow',
-    border: 'border-yellow-400 dark:border-yellow-500', bg: 'rgba(234, 179, 8, 0.2)',
-    header: 'bg-yellow-50 dark:bg-yellow-900/30 border-yellow-200 dark:border-yellow-700'
+    border: 'border-yellow-400 dark:border-yellow-500',
+    bg: 'rgba(234, 179, 8, 0.2)',
+    header: 'bg-yellow-50 dark:bg-yellow-900/30 border-yellow-200 dark:border-yellow-700',
   },
   {
     name: 'red',
-    border: 'border-red-400 dark:border-red-500', bg: 'rgba(239, 68, 68, 0.2)',
-    header: 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-700'
+    border: 'border-red-400 dark:border-red-500',
+    bg: 'rgba(239, 68, 68, 0.2)',
+    header: 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-700',
   },
   {
     name: 'gray',
     border: 'theme-border-primary',
     bg: 'rgba(var(--bg-tertiary), 0.8)',
-    header: 'theme-bg-secondary/30 theme-border-secondary'
+    header: 'theme-bg-secondary/30 theme-border-secondary',
   },
 ];
 
@@ -46,14 +51,14 @@ export const NoteCard: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos }
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [dimensions, setDimensions] = useState({
     width: data.width || 280,
-    height: data.height || 180
+    height: data.height || 180,
   });
   const [isResizing, setIsResizing] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
-  const startMousePosRef = useRef<{x: number, y: number} | null>(null);
-  const startDimensionsRef = useRef<{width: number, height: number} | null>(null);
+  const startMousePosRef = useRef<{ x: number; y: number } | null>(null);
+  const startDimensionsRef = useRef<{ width: number; height: number } | null>(null);
   const handleResizeRef = useRef<((e: MouseEvent) => void) | null>(null);
   const handleResizeEndRef = useRef<(() => void) | null>(null);
   const { currentBoard, updateBoard, deleteNode } = useMindBoardStore();
@@ -71,25 +76,34 @@ export const NoteCard: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos }
 
   const updateNodeData = useCallback(() => {
     if (currentBoard) {
-      const updatedNodes = currentBoard.nodes.map(node =>
+      const updatedNodes = currentBoard.nodes.map((node) =>
         node.id === id
           ? {
-            ...node,
-            data: {
-              ...node.data,
-              content,
-              colorIndex,
-              width: dimensions.width,
-              height: dimensions.height,
-              title: data.title || data.sourceCardTitle || '笔记卡片'
-            },
-            style: { ...node.style, width: dimensions.width, height: dimensions.height }
-          }
+              ...node,
+              data: {
+                ...node.data,
+                content,
+                colorIndex,
+                width: dimensions.width,
+                height: dimensions.height,
+                title: data.title || data.sourceCardTitle || '笔记卡片',
+              },
+              style: { ...node.style, width: dimensions.width, height: dimensions.height },
+            }
           : node
       );
       updateBoard(currentBoard.id, { nodes: updatedNodes });
     }
-  }, [content, colorIndex, dimensions, data.title, data.sourceCardTitle, id, currentBoard, updateBoard]);
+  }, [
+    content,
+    colorIndex,
+    dimensions,
+    data.title,
+    data.sourceCardTitle,
+    id,
+    currentBoard,
+    updateBoard,
+  ]);
 
   const handleBlur = useCallback(() => {
     setIsEditing(false);
@@ -114,11 +128,14 @@ export const NoteCard: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos }
     }
   };
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Escape') {
-      handleBlur();
-    }
-  }, [handleBlur]);
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (e.key === 'Escape') {
+        handleBlur();
+      }
+    },
+    [handleBlur]
+  );
 
   // 创建稳定的 handleResize 函数
   useEffect(() => {
@@ -155,7 +172,8 @@ export const NoteCard: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos }
     let tooltip = cardRef.current.querySelector('.resize-tooltip') as HTMLElement;
     if (!tooltip) {
       tooltip = document.createElement('div');
-      tooltip.className = 'resize-tooltip absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm z-50';
+      tooltip.className =
+        'resize-tooltip absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm z-50';
       cardRef.current.appendChild(tooltip);
     }
 
@@ -182,7 +200,7 @@ export const NoteCard: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos }
       // 更新React状态
       setDimensions({
         width: finalWidth,
-        height: finalHeight
+        height: finalHeight,
       });
 
       // 隐藏尺寸提示
@@ -194,13 +212,13 @@ export const NoteCard: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos }
 
       // 更新存储的数据
       if (currentBoard) {
-        const updatedNodes = currentBoard.nodes.map(node =>
+        const updatedNodes = currentBoard.nodes.map((node) =>
           node.id === id
             ? {
-              ...node,
-              data: { ...node.data, content, colorIndex, width: finalWidth, height: finalHeight },
-              style: { ...node.style, width: finalWidth, height: finalHeight }
-            }
+                ...node,
+                data: { ...node.data, content, colorIndex, width: finalWidth, height: finalHeight },
+                style: { ...node.style, width: finalWidth, height: finalHeight },
+              }
             : node
         );
         updateBoard(currentBoard.id, { nodes: updatedNodes });
@@ -237,7 +255,7 @@ export const NoteCard: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos }
         x: (xPos || 0) - padding,
         y: (yPos || 0) - padding,
         width: dimensions.width + padding * 2,
-        height: dimensions.height + padding * 2
+        height: dimensions.height + padding * 2,
       },
       { duration: 800, padding: 0.1 }
     );
@@ -251,41 +269,46 @@ export const NoteCard: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos }
     setColorIndex(index);
     setShowColorPicker(false);
     if (currentBoard) {
-      const updatedNodes = currentBoard.nodes.map(node =>
-        node.id === id
-          ? { ...node, data: { ...node.data, colorIndex: index } }
-          : node
+      const updatedNodes = currentBoard.nodes.map((node) =>
+        node.id === id ? { ...node, data: { ...node.data, colorIndex: index } } : node
       );
       updateBoard(currentBoard.id, { nodes: updatedNodes });
     }
   };
 
   return (
-    <div className="note-card-node relative group">{/* 简化连接点 - 只保留基本的4个方向 */}
-      
+    <div className="note-card-node relative group">
+      {/* 简化连接点 - 只保留基本的4个方向 */}
+
       {/* Floating operation buttons - only show when selected */}
       {selected && (
         <div className="absolute -top-9 left-1/2 transform -translate-x-1/2 z-50 nodrag">
           <div className="flex items-center justify-center gap-1">
             {/* Color picker  */}
-      <div className="relative">
-              <button onClick={() => setShowColorPicker(!showColorPicker)}
-            className="w-6 h-6 rounded-lg flex items-center justify-center bg-black/70 dark:bg-white/10 hover:bg-black/60 dark:hover:bg-white/20 transition-all"
+            <div className="relative">
+              <button
+                onClick={() => setShowColorPicker(!showColorPicker)}
+                className="w-6 h-6 rounded-lg flex items-center justify-center bg-black/70 dark:bg-white/10 hover:bg-black/60 dark:hover:bg-white/20 transition-all"
                 title="更改颜色"
               >
                 <Paintbrush2 className="w-3.5 h-3.5 theme-text-primary" />
               </button>
-              
+
               {showColorPicker && (
                 <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-30">
                   <div className="flex gap-1 p-2 backdrop-blur-sm bg-white/95 dark:bg-black/95 rounded-lg shadow-lg">
                     {colors.map((color, index) => (
-                      <button key={color.name} onClick={() => handleColorPickerChange(index)}
-                        
-            className={`w-6 h-6 rounded-full border-2 hover:scale-110 transition-all ${
+                      <button
+                        key={color.name}
+                        onClick={() => handleColorPickerChange(index)}
+                        className={`w-6 h-6 rounded-full border-2 hover:scale-110 transition-all ${
                           index === colorIndex ? 'ring-2 ring-blue-400' : ''
                         }`}
-                        style={{ backgroundColor: color.bg.includes('var(--') ? 'rgba(148, 163, 184, 0.5)' : color.bg }}
+                        style={{
+                          backgroundColor: color.bg.includes('var(--')
+                            ? 'rgba(148, 163, 184, 0.5)'
+                            : color.bg,
+                        }}
                         title={color.name}
                       />
                     ))}
@@ -293,23 +316,26 @@ export const NoteCard: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos }
                 </div>
               )}
             </div>
-            
-            <button onClick={handleFocus}
-            className="w-6 h-6 rounded-lg flex items-center justify-center bg-black/70 dark:bg-white/10 hover:bg-black/60 dark:hover:bg-white/20 transition-all"
+
+            <button
+              onClick={handleFocus}
+              className="w-6 h-6 rounded-lg flex items-center justify-center bg-black/70 dark:bg-white/10 hover:bg-black/60 dark:hover:bg-white/20 transition-all"
               title="聚焦卡片"
             >
               <Target className="w-3.5 h-3.5 theme-text-primary" />
             </button>
-            
-            <button onClick={handleEdit}
-            className="w-6 h-6 rounded-lg flex items-center justify-center bg-black/70 dark:bg-white/10 hover:bg-black/60 dark:hover:bg-white/20 transition-all"
+
+            <button
+              onClick={handleEdit}
+              className="w-6 h-6 rounded-lg flex items-center justify-center bg-black/70 dark:bg-white/10 hover:bg-black/60 dark:hover:bg-white/20 transition-all"
               title="编辑笔记"
             >
               <Edit className="w-3.5 h-3.5 theme-text-primary" />
             </button>
-            
-            <button onClick={handleDelete}
-            className="w-6 h-6 rounded-lg flex items-center justify-center bg-black/70 dark:bg-white/10 hover:bg-black/60 dark:hover:bg-white/20 transition-all"
+
+            <button
+              onClick={handleDelete}
+              className="w-6 h-6 rounded-lg flex items-center justify-center bg-black/70 dark:bg-white/10 hover:bg-black/60 dark:hover:bg-white/20 transition-all"
               title="删除卡片"
             >
               <Trash2 className="w-3.5 h-3.5 theme-text-error" />
@@ -318,61 +344,65 @@ export const NoteCard: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos }
         </div>
       )}
 
-<div
-  ref={cardRef}
-  className={`theme-card-glass rounded-lg border-2 ${currentColor.border} relative overflow-hidden flex flex-col cursor-pointer`}
-  style={{
-    backgroundColor: currentColor.bg,
-    width: `${dimensions.width}px`,
-    height: `${dimensions.height}px`,
-    minWidth: '250px',
-    minHeight: '200px'
-  }}
-  onClick={handleClick}
-  onDoubleClick={handleDoubleClick}
->
-  {/* 简化的调整大小控制柄 */}
-  {selected && (
-    <div className="absolute -bottom-1 -right-1 w-4 h-4 cursor-nw-resize nodrag"
-      onMouseDown={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        startMousePosRef.current = { x: e.clientX, y: e.clientY };
-        startDimensionsRef.current = { width: dimensions.width, height: dimensions.height };
-        setIsResizing(true);
-      }}
-      title="拖拽调整大小"
-    >
-      <div className="w-3 h-3 rounded-full bg-gray-400/50 hover:bg-gray-600/70 transition-colors" />
-    </div>
-  )}
-        
+      <div
+        ref={cardRef}
+        className={`theme-card-glass rounded-lg border-2 ${currentColor.border} relative overflow-hidden flex flex-col cursor-pointer`}
+        style={{
+          backgroundColor: currentColor.bg,
+          width: `${dimensions.width}px`,
+          height: `${dimensions.height}px`,
+          minWidth: '250px',
+          minHeight: '200px',
+        }}
+        onClick={handleClick}
+        onDoubleClick={handleDoubleClick}
+      >
+        {/* 简化的调整大小控制柄 */}
+        {selected && (
+          <div
+            className="absolute -bottom-1 -right-1 w-4 h-4 cursor-nw-resize nodrag"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              startMousePosRef.current = { x: e.clientX, y: e.clientY };
+              startDimensionsRef.current = { width: dimensions.width, height: dimensions.height };
+              setIsResizing(true);
+            }}
+            title="拖拽调整大小"
+          >
+            <div className="w-3 h-3 rounded-full bg-gray-400/50 hover:bg-gray-600/70 transition-colors" />
+          </div>
+        )}
+
         <div className="px-4 py-2 theme-bg-secondary/30 border-b theme-border-secondary backdrop-blur-sm">
           <span className="text-sm font-medium theme-text-primary truncate block">
             {data.title || data.sourceCardTitle || '笔记卡片'}
           </span>
         </div>
-        
+
         <div className="p-4 flex-1 overflow-hidden">
           {isEditing ? (
-            <textarea value={content} onChange={(e) => setContent(e.target.value)}
-              onBlur={handleBlur} onKeyDown={handleKeyDown}
-              
-            className="w-full h-full p-2 bg-white/95 dark:bg-gray-800/95 border theme-border-secondary rounded outline-none resize-none text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+            <textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              onBlur={handleBlur}
+              onKeyDown={handleKeyDown}
+              className="w-full h-full p-2 bg-white/95 dark:bg-gray-800/95 border theme-border-secondary rounded outline-none resize-none text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
               autoFocus
               placeholder="支持 Markdown 格式..."
             />
           ) : (
             <div className="h-full overflow-y-auto theme-text-primary">
               {content ? (
-                <div className="whitespace-pre-wrap break-words text-sm leading-relaxed"
-                  dangerouslySetInnerHTML={{ 
+                <div
+                  className="whitespace-pre-wrap break-words text-sm leading-relaxed"
+                  dangerouslySetInnerHTML={{
                     __html: content
                       .replace(/&lt;/g, '<')
                       .replace(/&gt;/g, '>')
                       .replace(/&amp;/g, '&')
                       .replace(/&quot;/g, '"')
-                      .replace(/&#x27;/g, "'")
+                      .replace(/&#x27;/g, "'"),
                   }}
                 />
               ) : (
@@ -421,15 +451,3 @@ export const NoteCard: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos }
     </div>
   );
 };
-
-
-
-
-
-
-
-
-
-
-
-

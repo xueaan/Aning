@@ -8,34 +8,39 @@ import { ConfirmDeleteModal } from '@/components/common/ConfirmDeleteModal';
 const colors = [
   {
     name: 'blue',
-    border: 'border-blue-400 dark:border-blue-500', bg: 'rgba(59, 130, 246, 0.2)',
-    text: 'text-blue-800 dark:text-blue-200'
+    border: 'border-blue-400 dark:border-blue-500',
+    bg: 'rgba(59, 130, 246, 0.2)',
+    text: 'text-blue-800 dark:text-blue-200',
   },
   {
     name: 'green',
-    border: 'border-green-400 dark:border-green-500', bg: 'rgba(34, 197, 94, 0.2)',
-    text: 'text-green-800 dark:text-green-200'
+    border: 'border-green-400 dark:border-green-500',
+    bg: 'rgba(34, 197, 94, 0.2)',
+    text: 'text-green-800 dark:text-green-200',
   },
   {
     name: 'purple',
-    border: 'border-purple-400 dark:border-purple-500', bg: 'rgba(147, 51, 234, 0.2)',
-    text: 'text-purple-800 dark:text-purple-200'
+    border: 'border-purple-400 dark:border-purple-500',
+    bg: 'rgba(147, 51, 234, 0.2)',
+    text: 'text-purple-800 dark:text-purple-200',
   },
   {
     name: 'yellow',
-    border: 'border-yellow-400 dark:border-yellow-500', bg: 'rgba(234, 179, 8, 0.2)',
-    text: 'text-yellow-800 dark:text-yellow-200'
+    border: 'border-yellow-400 dark:border-yellow-500',
+    bg: 'rgba(234, 179, 8, 0.2)',
+    text: 'text-yellow-800 dark:text-yellow-200',
   },
   {
     name: 'red',
-    border: 'border-red-400 dark:border-red-500', bg: 'rgba(239, 68, 68, 0.2)',
-    text: 'text-red-800 dark:text-red-200'
+    border: 'border-red-400 dark:border-red-500',
+    bg: 'rgba(239, 68, 68, 0.2)',
+    text: 'text-red-800 dark:text-red-200',
   },
   {
     name: 'gray',
     border: 'theme-border-primary',
     bg: 'rgba(var(--bg-tertiary), 0.8)',
-    text: 'theme-text-primary'
+    text: 'theme-text-primary',
   },
 ];
 
@@ -62,12 +67,12 @@ export const MindMapNode: React.FC<NodeProps> = ({ data, id, selected, xPos, yPo
 
   const updateNodeData = useCallback(() => {
     if (currentBoard) {
-      const updatedNodes = currentBoard.nodes.map(node =>
+      const updatedNodes = currentBoard.nodes.map((node) =>
         node.id === id
           ? {
-            ...node,
-            data: { ...node.data, label, colorIndex }
-          }
+              ...node,
+              data: { ...node.data, label, colorIndex },
+            }
           : node
       );
       updateBoard(currentBoard.id, { nodes: updatedNodes });
@@ -78,10 +83,8 @@ export const MindMapNode: React.FC<NodeProps> = ({ data, id, selected, xPos, yPo
     setColorIndex(index);
     setShowColorPicker(false);
     if (currentBoard) {
-      const updatedNodes = currentBoard.nodes.map(node =>
-        node.id === id
-          ? { ...node, data: { ...node.data, colorIndex: index } }
-          : node
+      const updatedNodes = currentBoard.nodes.map((node) =>
+        node.id === id ? { ...node, data: { ...node.data, colorIndex: index } } : node
       );
       updateBoard(currentBoard.id, { nodes: updatedNodes });
     }
@@ -113,12 +116,12 @@ export const MindMapNode: React.FC<NodeProps> = ({ data, id, selected, xPos, yPo
         type: 'mindMapNode',
         position: {
           x: (xPos || 0) + 200,
-          y: (yPos || 0) + Math.random() * 100 - 50
+          y: (yPos || 0) + Math.random() * 100 - 50,
         },
         data: {
           label: '子节点',
-          colorIndex: Math.floor(Math.random() * colors.length)
-        }
+          colorIndex: Math.floor(Math.random() * colors.length),
+        },
       };
 
       const newEdge = {
@@ -126,7 +129,7 @@ export const MindMapNode: React.FC<NodeProps> = ({ data, id, selected, xPos, yPo
         source: id,
         target: newNodeId,
         type: 'mindMapEdge',
-        animated: false
+        animated: false,
       };
 
       const updatedNodes = [...currentBoard.nodes, newNode];
@@ -134,7 +137,7 @@ export const MindMapNode: React.FC<NodeProps> = ({ data, id, selected, xPos, yPo
 
       updateBoard(currentBoard.id, {
         nodes: updatedNodes,
-        edges: updatedEdges
+        edges: updatedEdges,
       });
     }
   };
@@ -155,7 +158,7 @@ export const MindMapNode: React.FC<NodeProps> = ({ data, id, selected, xPos, yPo
         x: (xPos || 0) - padding,
         y: (yPos || 0) - padding,
         width: 200 + padding * 2,
-        height: 80 + padding * 2
+        height: 80 + padding * 2,
       },
       { duration: 800, padding: 0.1 }
     );
@@ -174,33 +177,41 @@ export const MindMapNode: React.FC<NodeProps> = ({ data, id, selected, xPos, yPo
 
   return (
     <div className="mindmap-node relative group">
-      <Handle type="target" 
+      <Handle
+        type="target"
         position={Position.Left}
         className="w-3 h-3 !bg-blue-500 border-2 border-white shadow-md"
       />
-      
+
       {/* Floating operation buttons - only show when selected */}
       {selected && (
         <div className="absolute -top-9 left-1/2 transform -translate-x-1/2 z-50 nodrag">
           <div className="flex items-center justify-center gap-1">
             {/* Color picker */}
             <div className="relative">
-              <button onClick={() => setShowColorPicker(!showColorPicker)}
-            className="w-6 h-6 rounded-lg flex items-center justify-center bg-black/70 dark:bg-white/10 hover:bg-black/60 dark:hover:bg-white/20 transition-all"
+              <button
+                onClick={() => setShowColorPicker(!showColorPicker)}
+                className="w-6 h-6 rounded-lg flex items-center justify-center bg-black/70 dark:bg-white/10 hover:bg-black/60 dark:hover:bg-white/20 transition-all"
                 title="更改颜色"
               >
                 <Paintbrush2 className="w-3.5 h-3.5 theme-text-primary" />
               </button>
-              
+
               {showColorPicker && (
                 <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-30">
                   <div className="flex gap-1 p-2 backdrop-blur-sm bg-white/95 dark:bg-black/95 rounded-lg shadow-lg">
                     {colors.map((color, index) => (
-                      <button key={color.name} onClick={() => handleColorChange(index)}
+                      <button
+                        key={color.name}
+                        onClick={() => handleColorChange(index)}
                         className={`w-6 h-6 rounded-full border-2 hover:scale-110 transition-all ${
                           index === colorIndex ? 'ring-2 ring-blue-400' : ''
                         }`}
-                        style={{ backgroundColor: color.bg.includes('var(--') ? 'rgba(148, 163, 184, 0.5)' : color.bg }}
+                        style={{
+                          backgroundColor: color.bg.includes('var(--')
+                            ? 'rgba(148, 163, 184, 0.5)'
+                            : color.bg,
+                        }}
                         title={color.name}
                       />
                     ))}
@@ -208,30 +219,34 @@ export const MindMapNode: React.FC<NodeProps> = ({ data, id, selected, xPos, yPo
                 </div>
               )}
             </div>
-            
-            <button onClick={handleFocus}
-            className="w-6 h-6 rounded-lg flex items-center justify-center bg-black/70 dark:bg-white/10 hover:bg-black/60 dark:hover:bg-white/20 transition-all"
+
+            <button
+              onClick={handleFocus}
+              className="w-6 h-6 rounded-lg flex items-center justify-center bg-black/70 dark:bg-white/10 hover:bg-black/60 dark:hover:bg-white/20 transition-all"
               title="聚焦节点"
             >
               <Target className="w-3.5 h-3.5 theme-text-primary" />
             </button>
-            
-            <button onClick={handleEdit}
-            className="w-6 h-6 rounded-lg flex items-center justify-center bg-black/70 dark:bg-white/10 hover:bg-black/60 dark:hover:bg-white/20 transition-all"
+
+            <button
+              onClick={handleEdit}
+              className="w-6 h-6 rounded-lg flex items-center justify-center bg-black/70 dark:bg-white/10 hover:bg-black/60 dark:hover:bg-white/20 transition-all"
               title="编辑节点"
             >
               <Edit className="w-3.5 h-3.5 theme-text-primary" />
             </button>
 
-            <button onClick={handleAddChild}
-            className="w-6 h-6 rounded-lg flex items-center justify-center bg-black/70 dark:bg-white/10 hover:bg-black/60 dark:hover:bg-white/20 transition-all"
+            <button
+              onClick={handleAddChild}
+              className="w-6 h-6 rounded-lg flex items-center justify-center bg-black/70 dark:bg-white/10 hover:bg-black/60 dark:hover:bg-white/20 transition-all"
               title="添加子节点"
             >
               <Plus className="w-3.5 h-3.5 theme-text-primary" />
             </button>
-            
-            <button onClick={handleDelete}
-            className="w-6 h-6 rounded-lg flex items-center justify-center bg-black/70 dark:bg-white/10 hover:bg-black/60 dark:hover:bg-white/20 transition-all"
+
+            <button
+              onClick={handleDelete}
+              className="w-6 h-6 rounded-lg flex items-center justify-center bg-black/70 dark:bg-white/10 hover:bg-black/60 dark:hover:bg-white/20 transition-all"
               title="删除节点"
             >
               <Trash2 className="w-3.5 h-3.5 theme-text-error" />
@@ -240,25 +255,28 @@ export const MindMapNode: React.FC<NodeProps> = ({ data, id, selected, xPos, yPo
         </div>
       )}
 
-      <div className={`px-4 py-2 rounded-lg border-2 ${currentColor.border} ${currentColor.text} cursor-pointer transition-all hover:scale-105 min-w-[120px] max-w-[200px] text-center shadow-md`}
+      <div
+        className={`px-4 py-2 rounded-lg border-2 ${currentColor.border} ${currentColor.text} cursor-pointer transition-all hover:scale-105 min-w-[120px] max-w-[200px] text-center shadow-md`}
         style={{ backgroundColor: currentColor.bg }}
         onDoubleClick={handleDoubleClick}
       >
         {isEditing ? (
-          <input ref={inputRef} value={label}
-            onChange={(e) => setLabel(e.target.value)} onBlur={handleBlur}
+          <input
+            ref={inputRef}
+            value={label}
+            onChange={(e) => setLabel(e.target.value)}
+            onBlur={handleBlur}
             onKeyDown={handleKeyDown}
             className="bg-transparent border-none outline-none text-center w-full font-medium"
             placeholder="输入节点名称"
           />
         ) : (
-          <span className="font-medium text-sm">
-            {label}
-          </span>
+          <span className="font-medium text-sm">{label}</span>
         )}
       </div>
 
-      <Handle type="source"
+      <Handle
+        type="source"
         position={Position.Right}
         className="w-3 h-3 !bg-blue-500 border-2 border-white shadow-md"
       />
@@ -275,15 +293,3 @@ export const MindMapNode: React.FC<NodeProps> = ({ data, id, selected, xPos, yPo
     </div>
   );
 };
-
-
-
-
-
-
-
-
-
-
-
-

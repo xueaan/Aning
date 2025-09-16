@@ -21,7 +21,7 @@ export const CardGrid: React.FC<CardGridProps> = ({
   onExpandCard,
   onCreateBox,
   viewMode = 'grid',
-  className = ''
+  className = '',
 }) => {
   // 按更新时间排序笔记
   const sortedCards = React.useMemo(() => {
@@ -48,13 +48,12 @@ export const CardGrid: React.FC<CardGridProps> = ({
       <div className={cn('flex items-center justify-center h-full', className)}>
         <div className="text-center max-w-md">
           <FileText size={64} className="mx-auto mb-6 theme-text-tertiary" />
-          <h3 className="text-xl font-semibold theme-text-primary mb-3">
-            欢迎使用笔记管理
-          </h3>
+          <h3 className="text-xl font-semibold theme-text-primary mb-3">欢迎使用笔记管理</h3>
           <p className="theme-text-secondary mb-6 leading-relaxed">
             开始创建你的第一个笔记盒，用于组织和管理你的想法与记录
           </p>
-          <button onClick={onCreateBox}
+          <button
+            onClick={onCreateBox}
             className="inline-flex items-center gap-2 px-6 py-3 theme-button-primary rounded-lg font-medium transition-colors"
           >
             <Plus size={18} />
@@ -71,9 +70,7 @@ export const CardGrid: React.FC<CardGridProps> = ({
       <div className={cn('flex items-center justify-center h-full', className)}>
         <div className="text-center max-w-md">
           <FileText size={64} className="mx-auto mb-6 theme-text-tertiary" />
-          <h3 className="text-xl font-semibold theme-text-primary mb-3">
-            还没有笔记
-          </h3>
+          <h3 className="text-xl font-semibold theme-text-primary mb-3">还没有笔记</h3>
           <p className="theme-text-secondary mb-6 leading-relaxed">
             点击右下角的按钮开始创建你的第一篇笔记
           </p>
@@ -89,10 +86,10 @@ export const CardGrid: React.FC<CardGridProps> = ({
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {sortedCards.map((card) => (
-              <Card 
-                key={card.id} 
+              <Card
+                key={card.id}
                 card={card}
-                onDelete={onDeleteCard} 
+                onDelete={onDeleteCard}
                 onExpand={onExpandCard}
                 className="transform transition-all duration-200 hover:scale-105"
               />
@@ -109,10 +106,12 @@ export const CardGrid: React.FC<CardGridProps> = ({
       <div className="p-6">
         <div className="space-y-4">
           {sortedCards.map((card) => (
-            <Card key={card.id} card={card}
-              onDelete={onDeleteCard} onExpand={onExpandCard}
-              
-            className="transform transition-all duration-200 hover:scale-[1.02]"
+            <Card
+              key={card.id}
+              card={card}
+              onDelete={onDeleteCard}
+              onExpand={onExpandCard}
+              className="transform transition-all duration-200 hover:scale-[1.02]"
             />
           ))}
         </div>
@@ -120,10 +119,3 @@ export const CardGrid: React.FC<CardGridProps> = ({
     </div>
   );
 };
-
-
-
-
-
-
-

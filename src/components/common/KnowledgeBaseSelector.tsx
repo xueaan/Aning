@@ -16,14 +16,10 @@ interface KnowledgeBaseSelectorProps {
 export const KnowledgeBaseSelector: React.FC<KnowledgeBaseSelectorProps> = ({
   className = '',
   onCreateKnowledgeBase,
-  onEditKnowledgeBase
+  onEditKnowledgeBase,
 }) => {
-  const {
-    knowledgeBases,
-    currentKnowledgeBase,
-    setCurrentKnowledgeBase,
-    deleteKnowledgeBase
-  } = useKnowledgeOperations();
+  const { knowledgeBases, currentKnowledgeBase, setCurrentKnowledgeBase, deleteKnowledgeBase } =
+    useKnowledgeOperations();
 
   // 获取知识库图标，处理null/undefined/空字符串情况
   const getKnowledgeBaseIcon = (kb: typeof currentKnowledgeBase) => {
@@ -63,7 +59,7 @@ export const KnowledgeBaseSelector: React.FC<KnowledgeBaseSelectorProps> = ({
       const rect = buttonRef.current.getBoundingClientRect();
       setDropdownPosition({
         top: rect.bottom + 4,
-        left: rect.left
+        left: rect.left,
       });
     }
   };
@@ -72,7 +68,7 @@ export const KnowledgeBaseSelector: React.FC<KnowledgeBaseSelectorProps> = ({
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        dropdownRef.current && 
+        dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node) &&
         buttonRef.current &&
         !buttonRef.current.contains(event.target as Node)
@@ -137,7 +133,8 @@ export const KnowledgeBaseSelector: React.FC<KnowledgeBaseSelectorProps> = ({
   return (
     <div className={cn('relative', className)}>
       {/* 选择器按钮*/}
-      <button ref={buttonRef}
+      <button
+        ref={buttonRef}
         onClick={toggleDropdown}
         className={cn(
           'flex items-center gap-2 px-2 py-1.5 text-sm font-normal rounded transition-all duration-200',
@@ -154,102 +151,112 @@ export const KnowledgeBaseSelector: React.FC<KnowledgeBaseSelectorProps> = ({
             {currentKnowledgeBase?.name || '选择知识库'}
           </span>
         </div>
-        <ChevronDown className={cn(
-          'w-4 h-4 theme-text-secondary transition-transform flex-shrink-0',
-          isOpen && 'rotate-180'
-        )}
+        <ChevronDown
+          className={cn(
+            'w-4 h-4 theme-text-secondary transition-transform flex-shrink-0',
+            isOpen && 'rotate-180'
+          )}
         />
       </button>
 
-      {isOpen && createPortal(
-        <div ref={dropdownRef}
-          className="fixed z-[9999] rounded-xl shadow-2xl max-h-80 overflow-hidden w-80 feather-glass-deco"
-          style={{
-            top: `${dropdownPosition.top}px`,
-            left: `${dropdownPosition.left}px`
-          }}
-        >
-          {knowledgeBases.length > 0 ? (
-            <>
-              {knowledgeBases.map((kb) => (
-                <div key={kb.id}
-                  className={cn(
-                    'w-full flex items-center gap-2 px-3 py-1.5 transition-all duration-200 group',
-                    'hover:bg-white/10 dark:hover:bg-white/5',
-                    currentKnowledgeBase?.id === kb.id && 'theme-bg-accent/20'
-                  )}
-                >
-                  <button onClick={() => handleSelect(kb)}
-                    className="flex-1 flex items-center gap-2 text-left min-w-0"
+      {isOpen &&
+        createPortal(
+          <div
+            ref={dropdownRef}
+            className="fixed z-[9999] rounded-xl shadow-2xl max-h-80 overflow-hidden w-80 feather-glass-deco"
+            style={{
+              top: `${dropdownPosition.top}px`,
+              left: `${dropdownPosition.left}px`,
+            }}
+          >
+            {knowledgeBases.length > 0 ? (
+              <>
+                {knowledgeBases.map((kb) => (
+                  <div
+                    key={kb.id}
+                    className={cn(
+                      'w-full flex items-center gap-2 px-3 py-1.5 transition-all duration-200 group',
+                      'hover:bg-white/10 dark:hover:bg-white/5',
+                      currentKnowledgeBase?.id === kb.id && 'theme-bg-accent/20'
+                    )}
                   >
-                    <span className="flex-shrink-0 flex items-center">
-                      {getKnowledgeBaseIcon(kb)}
-                    </span>
-                    <span className="text-sm font-medium truncate flex-1 theme-text-primary">
-                      {kb.name}
-                    </span>
-                    {currentKnowledgeBase?.id === kb.id && (
-                      <div className="w-1.5 h-1.5 rounded-full theme-bg-accent flex-shrink-0" />
-                    )}
-                  </button>
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    {onEditKnowledgeBase && (
-                      <button onClick={(e) => handleEdit(e, kb)}
-                        className="p-1 rounded hover:bg-white/20 theme-text-secondary hover:theme-text-primary transition-colors"
-                        title="编辑知识库"
-                      >
-                        <Edit2 size={14} />
-                      </button>
-                    )}
-                    <button onClick={(e) => handleDelete(e, kb)}
-                      className="p-1 rounded hover:bg-red-500/20 theme-text-secondary hover:text-red-400 transition-colors"
-                      title="删除知识库"
+                    <button
+                      onClick={() => handleSelect(kb)}
+                      className="flex-1 flex items-center gap-2 text-left min-w-0"
                     >
-                      <Trash2 size={14} />
+                      <span className="flex-shrink-0 flex items-center">
+                        {getKnowledgeBaseIcon(kb)}
+                      </span>
+                      <span className="text-sm font-medium truncate flex-1 theme-text-primary">
+                        {kb.name}
+                      </span>
+                      {currentKnowledgeBase?.id === kb.id && (
+                        <div className="w-1.5 h-1.5 rounded-full theme-bg-accent flex-shrink-0" />
+                      )}
                     </button>
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {onEditKnowledgeBase && (
+                        <button
+                          onClick={(e) => handleEdit(e, kb)}
+                          className="p-1 rounded hover:bg-white/20 theme-text-secondary hover:theme-text-primary transition-colors"
+                          title="编辑知识库"
+                        >
+                          <Edit2 size={14} />
+                        </button>
+                      )}
+                      <button
+                        onClick={(e) => handleDelete(e, kb)}
+                        className="p-1 rounded hover:bg-red-500/20 theme-text-secondary hover:text-red-400 transition-colors"
+                        title="删除知识库"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
 
-              {/* 分隔线 */}
-              <div className="border-t border-white/10 my-1" />
+                {/* 分隔线 */}
+                <div className="border-t border-white/10 my-1" />
 
-              {/* 创建新知识库按钮 */}
-              {onCreateKnowledgeBase && (
-                <button onClick={() => {
-                    onCreateKnowledgeBase();
-                    setIsOpen(false);
-                  }}
-                  className="w-full flex items-center gap-2 px-3 py-2 theme-text-secondary hover:theme-text-primary hover:bg-white/10 dark:hover:bg-white/5 transition-all duration-200"
-                >
-                  <Plus size={16} />
-                  <span className="text-sm">新建知识库</span>
-                </button>
-              )}
-            </>
-          ) : (
-            <div className="p-4 text-center">
-              <p className="theme-text-secondary text-sm mb-3">暂无知识库</p>
-              {onCreateKnowledgeBase && (
-                <button onClick={() => {
-                    onCreateKnowledgeBase();
-                    setIsOpen(false);
-                  }}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg theme-bg-accent theme-text-on-accent hover:theme-bg-accent-hover transition-colors"
-                >
-                  <Plus size={16} />
-                  <span className="text-sm font-medium">创建第一个知识库</span>
-                </button>
-              )}
-            </div>
-          )}
-        </div>,
-        document.body
-      )}
+                {/* 创建新知识库按钮 */}
+                {onCreateKnowledgeBase && (
+                  <button
+                    onClick={() => {
+                      onCreateKnowledgeBase();
+                      setIsOpen(false);
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 theme-text-secondary hover:theme-text-primary hover:bg-white/10 dark:hover:bg-white/5 transition-all duration-200"
+                  >
+                    <Plus size={16} />
+                    <span className="text-sm">新建知识库</span>
+                  </button>
+                )}
+              </>
+            ) : (
+              <div className="p-4 text-center">
+                <p className="theme-text-secondary text-sm mb-3">暂无知识库</p>
+                {onCreateKnowledgeBase && (
+                  <button
+                    onClick={() => {
+                      onCreateKnowledgeBase();
+                      setIsOpen(false);
+                    }}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg theme-bg-accent theme-text-on-accent hover:theme-bg-accent-hover transition-colors"
+                  >
+                    <Plus size={16} />
+                    <span className="text-sm font-medium">创建第一个知识库</span>
+                  </button>
+                )}
+              </div>
+            )}
+          </div>,
+          document.body
+        )}
 
       {/* 删除确认对话框 */}
       {showDeleteConfirm && deleteTarget && (
-        <ConfirmDeleteModal isOpen={showDeleteConfirm}
+        <ConfirmDeleteModal
+          isOpen={showDeleteConfirm}
           onClose={() => {
             setShowDeleteConfirm(false);
             setDeleteTarget(null);
@@ -263,6 +270,3 @@ export const KnowledgeBaseSelector: React.FC<KnowledgeBaseSelectorProps> = ({
     </div>
   );
 };
-
-
-

@@ -1,10 +1,10 @@
-﻿import { Command, CommandInput } from "@/components/ui/command";
-import { Button } from "@/components/ui/button";
-import { ArrowUp, X } from "lucide-react";
-import { useEditor } from "novel";
-import { useState } from "react";
-import { useAppStore } from "@/stores";
-import { callAiService } from "@/utils/aiUtils";
+﻿import { Command, CommandInput } from '@/components/ui/command';
+import { Button } from '@/components/ui/button';
+import { ArrowUp, X } from 'lucide-react';
+import { useEditor } from 'novel';
+import { useState } from 'react';
+import { useAppStore } from '@/stores';
+import { callAiService } from '@/utils/aiUtils';
 
 interface AISelectorProps {
   open: boolean;
@@ -14,7 +14,7 @@ interface AISelectorProps {
 export const AISelector = ({ open: _open, onOpenChange }: AISelectorProps) => {
   const { editor } = useEditor();
   const { aiConfig } = useAppStore();
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [hasCompletion, setHasCompletion] = useState(false);
 
@@ -22,12 +22,12 @@ export const AISelector = ({ open: _open, onOpenChange }: AISelectorProps) => {
 
   const handleSubmit = async () => {
     if (!inputValue.trim()) return;
-    
+
     const currentProvider = aiConfig.currentProvider;
     const config = aiConfig[currentProvider];
-    
+
     if (!config.enabled || !config.apiKey) {
-      console.warn("AI service not configured or disabled");
+      console.warn('AI service not configured or disabled');
       return;
     }
 
@@ -37,13 +37,13 @@ export const AISelector = ({ open: _open, onOpenChange }: AISelectorProps) => {
         editor.state.selection.from,
         editor.state.selection.to
       );
-      
-      const prompt = selectedText 
+
+      const prompt = selectedText
         ? `根据以下文本进行操作：${inputValue}\n\n原文：${selectedText}`
         : inputValue;
-        
+
       const result = await callAiService(currentProvider, config, prompt);
-      
+
       if (result.success && result.content) {
         // 插入 AI 生成的内容
         if (selectedText) {
@@ -55,15 +55,14 @@ export const AISelector = ({ open: _open, onOpenChange }: AISelectorProps) => {
         }
         setHasCompletion(true);
       } else {
-        console.error("AI request failed:", result.message);
+        console.error('AI request failed:', result.message);
       }
     } catch (error) {
-      console.error("AI request error:", error);
+      console.error('AI request error:', error);
     } finally {
       setIsLoading(false);
     }
   };
-
 
   return (
     <Command className="bg-transparent w-[400px] border-0">
@@ -83,7 +82,7 @@ export const AISelector = ({ open: _open, onOpenChange }: AISelectorProps) => {
               value={inputValue}
               onValueChange={setInputValue}
               autoFocus
-              placeholder={hasCompletion ? "告诉AI接下来要做什么" : "让AI编辑或生成内容..."}
+              placeholder={hasCompletion ? '告诉AI接下来要做什么' : '让AI编辑或生成内容...'}
               className="bg-transparent border-0 border-b border-white/20 focus:border-white/40 rounded-none"
             />
             <Button
@@ -103,7 +102,7 @@ export const AISelector = ({ open: _open, onOpenChange }: AISelectorProps) => {
                 size="sm"
                 onClick={() => {
                   setHasCompletion(false);
-                  setInputValue("");
+                  setInputValue('');
                   onOpenChange(false);
                 }}
               >
@@ -116,10 +115,3 @@ export const AISelector = ({ open: _open, onOpenChange }: AISelectorProps) => {
     </Command>
   );
 };
-
-
-
-
-
-
-

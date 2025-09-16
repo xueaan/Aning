@@ -11,23 +11,23 @@ export interface UseThemeReturn {
   noiseLevel: number;
   gradientAngle: number;
   blendMode: number;
-  
+
   // 当前渐变配置
   currentGradient: GradientTheme | undefined;
-  
+
   // 主题切换方法
   setTheme: (theme: 'light' | 'dark' | 'auto') => void;
   toggleTheme: () => void;
-  
+
   // 渐变主题配置
   setGradientTheme: (themeId: string) => void;
   setNoiseLevel: (level: number) => void;
   setGradientAngle: (angle: number) => void;
   setBlendMode: (mode: number) => void;
-  
+
   // 主题CSS变量
   getThemeStyles: () => React.CSSProperties;
-  
+
   // 主题工具方法
   applyTheme: (element?: HTMLElement) => void;
   getThemeClass: (baseClass: string) => string;
@@ -45,7 +45,7 @@ export const useTheme = (): UseThemeReturn => {
     setGradientTheme,
     setNoiseLevel,
     setGradientAngle,
-    setBlendMode
+    setBlendMode,
   } = useAppStore();
 
   // 获取当前实际主题（处理auto模式）
@@ -60,20 +60,20 @@ export const useTheme = (): UseThemeReturn => {
   const currentGradient = useMemo(() => {
     const theme = getGradientTheme(gradientTheme);
     if (!theme) return undefined;
-    
+
     // 应用角度和混合色处理
     const processedGradient = processGradient(theme.gradient, blendMode, gradientAngle);
-    
+
     return {
       ...theme,
-      gradient: processedGradient
+      gradient: processedGradient,
     };
   }, [gradientTheme, gradientAngle, blendMode]);
 
   // 生成主题CSS变量样式（注意：App.tsx 直接设置了这些变量，这个方法目前未使用）
   const getThemeStyles = useCallback((): React.CSSProperties => {
     const styles: any = {};
-    
+
     if (currentGradient) {
       styles['--gradient-theme'] = currentGradient.gradient;
       // 透明度控制已经在 App.tsx 中正确实现
@@ -84,19 +84,25 @@ export const useTheme = (): UseThemeReturn => {
   }, [currentGradient]);
 
   // 应用主题到DOM元素（只处理主题切换，不设置渐变变量）
-  const applyTheme = useCallback((element: HTMLElement = document.documentElement) => {
-    // 设置主题属性
-    element.setAttribute('data-theme', currentTheme);
-    element.className = element.className.replace(/(^|\s)(light|dark)(\s|$)/g, ' ').trim();
-    element.classList.add(currentTheme);
-    
-    // 注意：不再设置渐变相关CSS变量到全局，这些变量只在App.tsx的局部作用域中设置
-  }, [currentTheme]);
+  const applyTheme = useCallback(
+    (element: HTMLElement = document.documentElement) => {
+      // 设置主题属性
+      element.setAttribute('data-theme', currentTheme);
+      element.className = element.className.replace(/(^|\s)(light|dark)(\s|$)/g, ' ').trim();
+      element.classList.add(currentTheme);
+
+      // 注意：不再设置渐变相关CSS变量到全局，这些变量只在App.tsx的局部作用域中设置
+    },
+    [currentTheme]
+  );
 
   // 生成带主题前缀的CSS类
-  const getThemeClass = useCallback((baseClass: string) => {
-    return `${baseClass} theme-${currentTheme}`;
-  }, [currentTheme]);
+  const getThemeClass = useCallback(
+    (baseClass: string) => {
+      return `${baseClass} theme-${currentTheme}`;
+    },
+    [currentTheme]
+  );
 
   // 监听系统主题变化（auto模式）
   useEffect(() => {
@@ -135,11 +141,6 @@ export const useTheme = (): UseThemeReturn => {
     setBlendMode,
     getThemeStyles,
     applyTheme,
-    getThemeClass
+    getThemeClass,
   };
 };
-
-
-
-
-

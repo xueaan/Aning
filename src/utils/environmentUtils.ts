@@ -25,12 +25,11 @@ export const isTauriEnvironment = (): boolean => {
 
   try {
     // 检查 Tauri 特有的全局对象
-    const hasTauriAPI = typeof window !== 'undefined' &&
-                       window.__TAURI__ !== undefined;
+    const hasTauriAPI = typeof window !== 'undefined' && window.__TAURI__ !== undefined;
 
     // 检查 Tauri 运行时标识
-    const hasTauriRuntime = typeof window !== 'undefined' &&
-                           window.__TAURI_INTERNALS__ !== undefined;
+    const hasTauriRuntime =
+      typeof window !== 'undefined' && window.__TAURI_INTERNALS__ !== undefined;
 
     _isTauriEnvironment = hasTauriAPI || hasTauriRuntime;
   } catch (error) {

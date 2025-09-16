@@ -14,20 +14,24 @@ export const exportToPNG = async (element: HTMLElement, fileName: string = 'mind
         // 过滤掉可能引起 CORS 问题的外部资源
         if (node.nodeName === 'LINK' && node instanceof HTMLLinkElement) {
           // 过滤掉 Google Fonts 等外部字体链接
-          if (node.href.includes('fonts.googleapis.com') ||
-              node.href.includes('fonts.gstatic.com')) {
+          if (
+            node.href.includes('fonts.googleapis.com') ||
+            node.href.includes('fonts.gstatic.com')
+          ) {
             return false;
           }
         }
         // 过滤掉外部样式表
         if (node.nodeName === 'STYLE' && node.textContent) {
-          if (node.textContent.includes('@import') &&
-              node.textContent.includes('fonts.googleapis.com')) {
+          if (
+            node.textContent.includes('@import') &&
+            node.textContent.includes('fonts.googleapis.com')
+          ) {
             return false;
           }
         }
         return true;
-      }
+      },
     });
 
     const link = document.createElement('a');
@@ -42,7 +46,7 @@ export const exportToPNG = async (element: HTMLElement, fileName: string = 'mind
       const dataUrl = await toPng(element, {
         backgroundColor: '#ffffff',
         cacheBust: true, // 强制刷新缓存
-        skipFonts: true  // 确保跳过字体
+        skipFonts: true, // 确保跳过字体
       });
 
       const link = document.createElement('a');
@@ -82,12 +86,17 @@ export const importFromJSON = (file: File): Promise<Board> => {
         const result = event.target?.result;
         if (typeof result === 'string') {
           const board = JSON.parse(result) as Board;
-          
+
           // 验证数据结构
-          if (!board.id || !board.title || !Array.isArray(board.nodes) || !Array.isArray(board.edges)) {
+          if (
+            !board.id ||
+            !board.title ||
+            !Array.isArray(board.nodes) ||
+            !Array.isArray(board.edges)
+          ) {
             throw new Error('无效的思维板数据格式');
           }
-          
+
           // 生成新的ID避免冲突
           board.id = `imported-${Date.now()}`;
           board.title = `${board.title} (导入)`;
@@ -130,23 +139,18 @@ export const pasteNodesFromClipboard = async (): Promise<any[] | null> => {
     if (!Array.isArray(nodes)) {
       return null;
     }
-    
+
     // 生成新的节点ID并调整位置
-    return nodes.map(node => ({
+    return nodes.map((node) => ({
       ...node,
       id: `${node.type}-${Date.now()}-${Math.random()}`,
       position: {
         x: node.position.x + 50,
-        y: node.position.y + 50
-      }
+        y: node.position.y + 50,
+      },
     }));
   } catch (error) {
     console.error('粘贴失败:', error);
     return null;
   }
 };
-
-
-
-
-

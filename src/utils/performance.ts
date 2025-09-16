@@ -23,13 +23,13 @@ export class PerformanceMonitor {
     const startTime = this.timers.get(label);
     if (startTime) {
       const duration = performance.now() - startTime;
-      
+
       if (!this.metrics.has(label)) {
         this.metrics.set(label, []);
       }
       this.metrics.get(label)!.push(duration);
       this.timers.delete(label);
-      
+
       return duration;
     }
     return 0;
@@ -55,16 +55,16 @@ export class PerformanceMonitor {
   // 获取所有指标
   getMetrics() {
     const result: Record<string, { count: number; average: number; total: number }> = {};
-    
+
     for (const [label, times] of this.metrics.entries()) {
       const total = times.reduce((a, b) => a + b, 0);
       result[label] = {
         count: times.length,
         average: total / times.length,
-        total
+        total,
       };
     }
-    
+
     return result;
   }
 }
@@ -77,17 +77,17 @@ export function measurePerformance(_label: string) {
       const monitor = PerformanceMonitor.getInstance();
       const fullLabel = `${target.constructor.name}.${propertyName}`;
       monitor.start(fullLabel);
-      
+
       try {
         const result = method.apply(this, args);
-        
+
         // 处理 Promise
         if (result instanceof Promise) {
           return result.finally(() => {
             monitor.end(fullLabel);
           });
         }
-        
+
         monitor.end(fullLabel);
         return result;
       } catch (error) {
@@ -101,7 +101,7 @@ export function measurePerformance(_label: string) {
 // React Hook - 用于监控组件渲染性能
 export function usePerformanceMonitor(componentName: string) {
   const monitor = PerformanceMonitor.getInstance();
-  
+
   React.useEffect(() => {
     monitor.start(`${componentName} mount`);
     return () => {

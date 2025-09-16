@@ -1,7 +1,7 @@
 ﻿import { ReactNodeViewRenderer } from '@tiptap/react';
 import { CodeBlockLowlight } from '@tiptap/extension-code-block-lowlight';
 import { common, createLowlight } from 'lowlight';
-import {CodeBlockComponent } from './CodeBlockComponent';
+import { CodeBlockComponent } from './CodeBlockComponent';
 
 // 创建 lowlight 实例并注册支持的语言
 const lowlight = createLowlight(common);
@@ -92,17 +92,13 @@ export const EnhancedBlockExtension = CodeBlockLowlight.extend({
         }
 
         return editor.commands.exit();
-      }
+      },
     };
-  }
-}).configure({ 
+  },
+}).configure({
   lowlight,
   defaultLanguage: '',
   HTMLAttributes: {
-    class: 'hljs'
-  }
+    class: 'hljs',
+  },
 });
-
-
-
-

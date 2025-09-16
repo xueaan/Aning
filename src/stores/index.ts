@@ -12,6 +12,7 @@ export { useHabitStore } from './habitStore';
 export { usePasswordStore } from './passwordStore';
 export { useDialogueContextStore } from './dialogueContextStore';
 export { useCardBoxStore } from './cardBoxStore';
+export { useBookStore } from './bookStore';
 
 // 知识库子模块 stores
 export { useKnowledgeBaseStore } from './knowledge/knowledgeBaseStore';
@@ -27,4 +28,3 @@ export type { PasswordStore } from './passwordStore';
 export type { HomeStore } from './homeStore';
 export type { DialogueContextStore } from './dialogueContextStore';
 export type { CardBox, Card, CardBoxUpdate, CardUpdate } from './cardBoxStore';
-

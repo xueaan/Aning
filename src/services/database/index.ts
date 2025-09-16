@@ -5,7 +5,7 @@ import { PageRepository } from './repositories';
 class DatabaseService {
   private static instance: DatabaseService;
   private initialized = false;
-  
+
   public pages: PageRepository;
   public migrations: MigrationService;
 
@@ -23,7 +23,7 @@ class DatabaseService {
 
   async initialize(): Promise<void> {
     if (this.initialized) return;
-    
+
     try {
       await dbConnection.initialize();
       await this.migrations.runMigrations();
@@ -46,8 +46,8 @@ class DatabaseService {
     return {
       connection: dbConnection.getStats(),
       pages: {
-        total: 0 // this.pages.count() - placeholder
-      }
+        total: 0, // this.pages.count() - placeholder
+      },
       // notes: this.notes.getStatsByModule(),
       // timeline: {
       //   weather: this.timeline.getStatsByWeather(),

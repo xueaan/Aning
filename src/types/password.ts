@@ -17,16 +17,16 @@ export interface PasswordEntry {
   username?: string;
   password?: string; // 用于创建/更新时传递明文密码
   // 网站分类字段
-  url?: string;           // 网站地址
+  url?: string; // 网站地址
   // 服务器分类字段
-  ip?: string;            // 服务器IP
+  ip?: string; // 服务器IP
   // 数据库分类字段
-  db_type?: string;       // 数据库类型
-  db_ip?: string;         // 数据库IP
-  db_username?: string;   // 数据库用户名
+  db_type?: string; // 数据库类型
+  db_ip?: string; // 数据库IP
+  db_username?: string; // 数据库用户名
   // 应用分类字段
-  app_name?: string;      // 应用名称
-  
+  app_name?: string; // 应用名称
+
   category_id?: number;
   is_favorite: boolean;
   last_used_at?: string;
@@ -40,16 +40,16 @@ export interface PasswordEntryDisplay {
   title: string;
   username?: string;
   // 网站分类字段
-  url?: string;           // 网站地址
+  url?: string; // 网站地址
   // 服务器分类字段
-  ip?: string;            // 服务器IP
+  ip?: string; // 服务器IP
   // 数据库分类字段
-  db_type?: string;       // 数据库类型
-  db_ip?: string;         // 数据库IP
-  db_username?: string;   // 数据库用户名
+  db_type?: string; // 数据库类型
+  db_ip?: string; // 数据库IP
+  db_username?: string; // 数据库用户名
   // 应用分类字段
-  app_name?: string;      // 应用名称
-  
+  app_name?: string; // 应用名称
+
   category_id?: number;
   is_favorite: boolean;
   last_used_at?: string;
@@ -94,12 +94,7 @@ export interface PasswordSearchFilters {
 }
 
 // 排序选项
-export type PasswordSortBy = 
-  | 'title' 
-  | 'created_at' 
-  | 'updated_at' 
-  | 'last_used_at' 
-  | 'category';
+export type PasswordSortBy = 'title' | 'created_at' | 'updated_at' | 'last_used_at' | 'category';
 
 export type PasswordSortOrder = 'asc' | 'desc';
 
@@ -109,12 +104,12 @@ export interface PasswordSortOptions {
 }
 
 // 密码操作类型
-export type PasswordActionType = 
-  | 'view' 
-  | 'copy_username' 
-  | 'copy_password' 
-  | 'edit' 
-  | 'delete' 
+export type PasswordActionType =
+  | 'view'
+  | 'copy_username'
+  | 'copy_password'
+  | 'edit'
+  | 'delete'
   | 'toggle_favorite'
   | 'open_url';
 
@@ -170,35 +165,35 @@ export interface PasswordComponentState {
   categories: PasswordCategory[];
   selectedCategory?: PasswordCategory;
   selectedEntry?: PasswordEntryDisplay;
-  
+
   // UI状态
   searchQuery: string;
   filters: PasswordSearchFilters;
   sortOptions: PasswordSortOptions;
-  
+
   // 编辑状态
   isCreating: boolean;
   isEditing: boolean;
   editingEntry?: PasswordEntryDisplay;
-  
+
   // 密码生成器状态
   generatorOptions: PasswordGeneratorOptions;
   generatedPassword?: string;
-  
+
   // 安全状态
   vaultStatus: VaultStatus;
   sessionId?: string;
   masterPasswordAttempts: number;
-  
+
   // 加载状态
   isLoading: boolean;
   error?: string;
 }
 
 // 密码事件类型
-export type PasswordEventType = 
+export type PasswordEventType =
   | 'entry_created'
-  | 'entry_updated' 
+  | 'entry_updated'
   | 'entry_deleted'
   | 'entry_accessed'
   | 'category_created'
@@ -239,67 +234,56 @@ export const DEFAULT_PASSWORD_GENERATOR_OPTIONS: PasswordGeneratorOptions = {
   include_uppercase: true,
   include_lowercase: true,
   include_numbers: true,
-  include_symbols: true
+  include_symbols: true,
 };
 
 export const DEFAULT_SORT_OPTIONS: PasswordSortOptions = {
   sortBy: 'title',
-  sortOrder: 'asc'
+  sortOrder: 'asc',
 };
 
 export const DEFAULT_SEARCH_FILTERS: PasswordSearchFilters = {
-  query: ''
+  query: '',
 };
 
 // 密码强度判断函数
 export const getPasswordStrength = (score: number): PasswordStrengthResult => {
   let level: PasswordStrength;
   let feedback: string[] = [];
-  
+
   if (score < 30) {
     level = 'weak';
-    feedback = [
-      '密码太短，建议至少8个字符', 
-      '添加大写字母、数字和特殊字符', 
-      '避免使用常见词汇'
-    ];
+    feedback = ['密码太短，建议至少8个字符', '添加大写字母、数字和特殊字符', '避免使用常见词汇'];
   } else if (score < 60) {
     level = 'fair';
-    feedback = [
-      '密码强度一般', 
-      '考虑增加密码长度', 
-      '添加更多字符类型'
-    ];
+    feedback = ['密码强度一般', '考虑增加密码长度', '添加更多字符类型'];
   } else if (score < 80) {
     level = 'good';
-    feedback = [
-      '密码强度良好',
-      '可以考虑进一步增强'
-    ];
+    feedback = ['密码强度良好', '可以考虑进一步增强'];
   } else {
     level = 'strong';
     feedback = ['密码强度很高！'];
   }
-  
+
   return { score, level, feedback };
 };
 
 // 密码强度颜色映射
 export const PASSWORD_STRENGTH_COLORS = {
-  weak: '#ef4444',     // red-500
-  fair: '#f59e0b',     // amber-500
-  good: '#3b82f6',     // blue-500
-  strong: '#10b981',   // emerald-500
+  weak: '#ef4444', // red-500
+  fair: '#f59e0b', // amber-500
+  good: '#3b82f6', // blue-500
+  strong: '#10b981', // emerald-500
 } as const;
 
 // 默认分类图标
 export const DEFAULT_CATEGORY_ICONS = {
-  '网站账号': '🌐',
-  '应用软件': '📱',
-  '服务器': '🖥️',
-  '数据库': '🗄️',
-  '邮箱': '📧',
-  '社交媒体': '💬',
-  '金融理财': '💰',
-  '其他': '🔐'
+  网站账号: '🌐',
+  应用软件: '📱',
+  服务器: '🖥️',
+  数据库: '🗄️',
+  邮箱: '📧',
+  社交媒体: '💬',
+  金融理财: '💰',
+  其他: '🔐',
 } as const;

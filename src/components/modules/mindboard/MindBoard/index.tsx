@@ -10,6 +10,5 @@ export const MindBoard: React.FC = () => {
     return <BoardCanvas />;
   }
 
-  return <BoardList/>;
+  return <BoardList />;
 };
-

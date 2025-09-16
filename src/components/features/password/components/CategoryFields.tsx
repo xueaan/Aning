@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { PasswordEntry, Category } from '@/types/password';
 
@@ -17,30 +17,108 @@ const InputField: React.FC<{
   error?: string;
   required?: boolean;
   type?: string;
-}> = ({ label, value, onChange, placeholder, error, required = false, type = "text" }) => (
-  <div>
-    <label className="block text-sm font-medium theme-text-secondary mb-2">
-      {label} {required && '*'}
-    </label>
-    <input
-      type={type}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
-      className={cn(
-        'w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:theme-ring-accent transition-all theme-text-primary placeholder:theme-text-tertiary feather-glass-deco',
-        error ? 'border border-red-400/40' : 'border border-white/20'
+  formatType?: 'url' | 'ip' | 'default';
+}> = ({
+  label,
+  value,
+  onChange,
+  placeholder,
+  error,
+  required = false,
+  type = 'text',
+  formatType = 'default',
+}) => {
+  const [isFocused, setIsFocused] = useState(false);
+
+  // URL格式化和验证
+  const formatUrl = (input: string): string => {
+    if (!input) return input;
+
+    // 移除多余的空格
+    input = input.trim();
+
+    // 如果用户输入了完整的协议，保留它
+    if (input.match(/^https?:\/\//)) {
+      return input;
+    }
+
+    // 对于IP地址或localhost，使用http
+    if (input.match(/^(localhost|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(:\d+)?/)) {
+      return input; // 不自动添加协议，让用户明确指定
+    }
+
+    return input;
+  };
+
+  // IP格式验证提示
+  const getIpHint = (input: string): string | null => {
+    if (!input) return null;
+
+    // 基本的IP格式检查
+    const ipPattern = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/;
+    const ipWithPortPattern = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+$/;
+
+    if (ipPattern.test(input) || ipWithPortPattern.test(input)) {
+      const parts = input.split(':')[0].split('.');
+      const invalidParts = parts.filter((part) => parseInt(part) > 255);
+      if (invalidParts.length > 0) {
+        return 'IP地址每段应在0-255之间';
+      }
+    }
+
+    return null;
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let newValue = e.target.value;
+
+    if (formatType === 'url' && !isFocused) {
+      newValue = formatUrl(newValue);
+    }
+
+    onChange(newValue);
+  };
+
+  const hint = formatType === 'ip' ? getIpHint(value) : null;
+
+  return (
+    <div>
+      <label className="block text-sm font-medium theme-text-secondary mb-2">
+        {label} {required && '*'}
+      </label>
+      <input
+        type={type}
+        value={value}
+        onChange={handleChange}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => {
+          setIsFocused(false);
+          if (formatType === 'url') {
+            onChange(formatUrl(value));
+          }
+        }}
+        placeholder={placeholder}
+        className={cn(
+          'w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:theme-ring-accent transition-all theme-text-primary placeholder:theme-text-tertiary feather-glass-deco',
+          error ? 'border border-red-400/40' : 'border border-white/20'
+        )}
+      />
+      {error && <p className="mt-1 text-xs theme-text-error">{error}</p>}
+      {hint && !error && <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">{hint}</p>}
+      {formatType === 'url' && value && !value.match(/^https?:\/\//) && !error && (
+        <p className="mt-1 text-xs theme-text-tertiary">
+          提示：保存时将自动添加 http:// 或 https://
+        </p>
       )}
-    />
-    {error && <p className="mt-1 text-xs theme-text-error">{error}</p>}
-  </div>
-);
+    </div>
+  );
+};
 
 export const CategoryFields: React.FC<CategoryFieldsProps> = ({
   category,
   formData,
   errors,
-  updateField
+  updateField,
 }) => {
   if (category.name === '网站') {
     return (
@@ -49,9 +127,10 @@ export const CategoryFields: React.FC<CategoryFieldsProps> = ({
           label="网站地址"
           value={formData.url || ''}
           onChange={(value) => updateField('url', value)}
-          placeholder="https://example.com"
+          placeholder="example.com 或 10.63.5.106:7080"
           error={errors.url}
           required
+          formatType="url"
         />
         <InputField
           label="账号"
@@ -95,9 +174,10 @@ export const CategoryFields: React.FC<CategoryFieldsProps> = ({
           label="服务器IP"
           value={formData.ip || ''}
           onChange={(value) => updateField('ip', value)}
-          placeholder="192.168.1.1"
+          placeholder="192.168.1.1 或 192.168.1.1:22"
           error={errors.ip}
           required
+          formatType="ip"
         />
         <InputField
           label="账号"
@@ -126,9 +206,10 @@ export const CategoryFields: React.FC<CategoryFieldsProps> = ({
           label="数据库IP"
           value={formData.db_ip || ''}
           onChange={(value) => updateField('db_ip', value)}
-          placeholder="192.168.1.100"
+          placeholder="192.168.1.100 或 localhost:3306"
           error={errors.db_ip}
           required
+          formatType="ip"
         />
         <InputField
           label="数据库用户名"

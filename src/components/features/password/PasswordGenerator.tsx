@@ -3,7 +3,7 @@ import { usePasswordStore } from '@/stores';
 import {
   PasswordGeneratorOptions,
   PasswordStrengthResult,
-  PASSWORD_STRENGTH_COLORS
+  PASSWORD_STRENGTH_COLORS,
 } from '@/types/password';
 import { X } from 'lucide-react';
 import { RefreshCw, Eye, EyeOff, Copy } from 'lucide-react';
@@ -17,14 +17,14 @@ interface PasswordGeneratorProps {
 export const PasswordGenerator: React.FC<PasswordGeneratorProps> = ({
   onPasswordSelect,
   initialOptions,
-  standalone = false
+  standalone = false,
 }) => {
   const {
     generatorOptions,
     generatedPassword,
     setGeneratorOptions,
     generatePassword,
-    checkPasswordStrength
+    checkPasswordStrength,
   } = usePasswordStore();
 
   const [showPassword, setShowPassword] = useState(true);
@@ -42,7 +42,7 @@ export const PasswordGenerator: React.FC<PasswordGeneratorProps> = ({
   // 检查密码强度
   useEffect(() => {
     if (generatedPassword) {
-      checkPasswordStrength(generatedPassword).then(strength => {
+      checkPasswordStrength(generatedPassword).then((strength) => {
         setPasswordStrength(strength);
       });
     }
@@ -85,7 +85,8 @@ export const PasswordGenerator: React.FC<PasswordGeneratorProps> = ({
     const newOptions = { ...generatorOptions, [key]: value };
 
     // 确保至少有一个字符类型被选中
-    const hasAnyCharType = newOptions.include_lowercase ||
+    const hasAnyCharType =
+      newOptions.include_lowercase ||
       newOptions.include_uppercase ||
       newOptions.include_numbers ||
       newOptions.include_symbols;
@@ -117,8 +118,7 @@ export const PasswordGenerator: React.FC<PasswordGeneratorProps> = ({
   };
 
   return (
-    <div className={`rounded-xl feather-glass-deco ${standalone ? 'shadow-lg' : ''}`}
-    >
+    <div className={`rounded-xl feather-glass-deco ${standalone ? 'shadow-lg' : ''}`}>
       {/* 头部 */}
       {standalone && (
         <div className="flex items-center justify-between p-4 border-b border-white/10">
@@ -126,76 +126,70 @@ export const PasswordGenerator: React.FC<PasswordGeneratorProps> = ({
             <RefreshCw size={16} />
             密码生成器
           </h3>
-          <button 
+          <button
             onClick={() => {}}
             className="p-1.5 rounded-lg transition-all hover:scale-105 theme-text-secondary hover:theme-text-primary feather-glass-deco"
           >
-              <X size={16} />
+            <X size={16} />
           </button>
         </div>
       )}
-      
+
       <div className="p-3 space-y-3">
         {/* 生成的密码 */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium text-text-primary">生成的密码</label>
             <div className="flex items-center gap-2">
-              <button 
+              <button
                 onClick={() => setShowPassword(!showPassword)}
                 className="p-1.5 text-text-tertiary hover:text-text-primary rounded"
                 title={showPassword ? '隐藏密码' : '显示密码'}
               >
-          {showPassword ? (
-            <EyeOff size={16} />
-          ) : (
-            <Eye size={16} />
-          )}
-        </button>
-      <button 
-        onClick={handleGenerate} 
-        disabled={isGenerating}
-        className="p-1.5 text-text-tertiary hover:text-accent rounded"
-        title="重新生成"
-      >
-          {isGenerating ? (
-            <div className="animate-spin w-3.5 h-3.5 border border-text-tertiary border-t-transparent rounded-full" />
-          ) : (
-            <RefreshCw size={16} />
-          )}
-        </button>
-      </div>
-    </div>
-      
-      {/* 密码显示区域 */}
-      <div className="relative">
-        <input type="text"
-          value={showPassword ? (generatedPassword || '') : '••••••••••••••••'}
-          readOnly
-          className="w-full px-4 py-3 pr-12 font-mono text-sm bg-bg-tertiary border border-border-primary rounded-lg text-text-primary"
-        />
-        <button onClick={handlePlus}
-          className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-1.5 rounded transition-colors ${copySuccess
-            ? 'theme-text-success'
-            : 'text-text-tertiary hover:text-text-primary'
-          }`}
-          title={copySuccess ? '已复制!' : '复制密码'}
-        >
-          {copySuccess ? (
-            <Copy size={14} />
-          ) : (
-            <Copy size={14} />
-          )}
-        </button>
-      </div>
-    </div>
-      
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+              <button
+                onClick={handleGenerate}
+                disabled={isGenerating}
+                className="p-1.5 text-text-tertiary hover:text-accent rounded"
+                title="重新生成"
+              >
+                {isGenerating ? (
+                  <div className="animate-spin w-3.5 h-3.5 border border-text-tertiary border-t-transparent rounded-full" />
+                ) : (
+                  <RefreshCw size={16} />
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* 密码显示区域 */}
+          <div className="relative">
+            <input
+              type="text"
+              value={showPassword ? generatedPassword || '' : '••••••••••••••••'}
+              readOnly
+              className="w-full px-4 py-3 pr-12 font-mono text-sm bg-bg-tertiary border border-border-primary rounded-lg text-text-primary"
+            />
+            <button
+              onClick={handlePlus}
+              className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-1.5 rounded transition-colors ${
+                copySuccess ? 'theme-text-success' : 'text-text-tertiary hover:text-text-primary'
+              }`}
+              title={copySuccess ? '已复制!' : '复制密码'}
+            >
+              {copySuccess ? <Copy size={14} /> : <Copy size={14} />}
+            </button>
+          </div>
+        </div>
+
         {/* 密码强度指示器 */}
         {passwordStrength && (
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="theme-text-secondary">强度:</span>
-              <span className="font-medium capitalize"
+              <span
+                className="font-medium capitalize"
                 style={{ color: getStrengthColor(passwordStrength) }}
               >
                 {passwordStrength.level === 'weak' && '弱'}
@@ -205,25 +199,27 @@ export const PasswordGenerator: React.FC<PasswordGeneratorProps> = ({
               </span>
             </div>
             <div className="w-full bg-bg-tertiary rounded-full h-2">
-              <div className="h-2 rounded-full transition-all duration-300"
+              <div
+                className="h-2 rounded-full transition-all duration-300"
                 style={{
                   width: `${getStrengthPercentage(passwordStrength)}%`,
-                  backgroundColor: getStrengthColor(passwordStrength)
+                  backgroundColor: getStrengthColor(passwordStrength),
                 }}
               />
             </div>
           </div>
         )}
-      
-      {/* 基本选项 */}
-      <div className="space-y-3">
-        {/* 密码长度 */}
-        <div className="space-y-2">
+
+        {/* 基本选项 */}
+        <div className="space-y-3">
+          {/* 密码长度 */}
+          <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-sm font-medium text-text-primary">长度</label>
               <span className="text-sm theme-text-secondary">{generatorOptions.length}</span>
             </div>
-            <input type="range"
+            <input
+              type="range"
               min="8"
               max="64"
               value={generatorOptions.length}
@@ -234,78 +230,74 @@ export const PasswordGenerator: React.FC<PasswordGeneratorProps> = ({
               <span>8</span>
               <span>64</span>
             </div>
+          </div>
+
+          {/* 字符类型选项 */}
+          <div className="grid grid-cols-2 gap-3">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={generatorOptions.include_uppercase}
+                onChange={(e) => updateOption('include_uppercase', e.target.checked)}
+                className="w-4 h-4 bg-transparent border-2 theme-border rounded theme-text-accent"
+              />
+              <span className="text-sm theme-text-secondary">大写字母 (A-Z)</span>
+            </label>
+
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={generatorOptions.include_lowercase}
+                onChange={(e) => updateOption('include_lowercase', e.target.checked)}
+                className="w-4 h-4 bg-transparent border-2 theme-border rounded theme-text-accent"
+              />
+              <span className="text-sm theme-text-secondary">小写字母 (a-z)</span>
+            </label>
+
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={generatorOptions.include_numbers}
+                onChange={(e) => updateOption('include_numbers', e.target.checked)}
+                className="w-4 h-4 bg-transparent border-2 theme-border rounded theme-text-accent"
+              />
+              <span className="text-sm theme-text-secondary">数字 (0-9)</span>
+            </label>
+
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={generatorOptions.include_symbols}
+                onChange={(e) => updateOption('include_symbols', e.target.checked)}
+                className="w-4 h-4 bg-transparent border-2 theme-border rounded theme-text-accent"
+              />
+              <span className="text-sm theme-text-secondary">符号 (!@#$...)</span>
+            </label>
+          </div>
         </div>
-        
-        {/* 字符类型选项 */}
-        <div className="grid grid-cols-2 gap-3">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox"
-              checked={generatorOptions.include_uppercase}
-              onChange={(e) => updateOption('include_uppercase', e.target.checked)}
-              className="w-4 h-4 bg-transparent border-2 theme-border rounded theme-text-accent"
-            />
-            <span className="text-sm theme-text-secondary">大写字母 (A-Z)</span>
-          </label>
 
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox"
-              checked={generatorOptions.include_lowercase}
-              onChange={(e) => updateOption('include_lowercase', e.target.checked)}
-              className="w-4 h-4 bg-transparent border-2 theme-border rounded theme-text-accent"
-            />
-            <span className="text-sm theme-text-secondary">小写字母 (a-z)</span>
-          </label>
-
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox"
-              checked={generatorOptions.include_numbers}
-              onChange={(e) => updateOption('include_numbers', e.target.checked)}
-              className="w-4 h-4 bg-transparent border-2 theme-border rounded theme-text-accent"
-            />
-            <span className="text-sm theme-text-secondary">数字 (0-9)</span>
-          </label>
-
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox"
-              checked={generatorOptions.include_symbols}
-              onChange={(e) => updateOption('include_symbols', e.target.checked)}
-              className="w-4 h-4 bg-transparent border-2 theme-border rounded theme-text-accent"
-            />
-            <span className="text-sm theme-text-secondary">符号 (!@#$...)</span>
-          </label>
-        </div>
-      </div>
-      
-      {/* 操作按钮 */}
-      <div className="flex gap-3 pt-2">
-        <button onClick={handleGenerate} disabled={isGenerating}
-          className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-bg-tertiary hover:bg-bg-primary border border-border-primary rounded-lg theme-text-secondary hover:text-text-primary transition-colors"
-        >
-          <RefreshCw size={16} />
-          重新生成
-        </button>
-
-        {onPasswordSelect && generatedPassword && (
+        {/* 操作按钮 */}
+        <div className="flex gap-3 pt-2">
           <button
-            onClick={handleSelect}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 theme-bg-accent theme-text-on-accent rounded-lg hover:theme-bg-accent-hover transition-colors"
+            onClick={handleGenerate}
+            disabled={isGenerating}
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-bg-tertiary hover:bg-bg-primary border border-border-primary rounded-lg theme-text-secondary hover:text-text-primary transition-colors"
           >
-            <Copy size={14} />
-            使用此密码
+            <RefreshCw size={16} />
+            重新生成
           </button>
-        )}
-      </div>
+
+          {onPasswordSelect && generatedPassword && (
+            <button
+              onClick={handleSelect}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 theme-bg-accent theme-text-on-accent rounded-lg hover:theme-bg-accent-hover transition-colors"
+            >
+              <Copy size={14} />
+              使用此密码
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
 };
-
-
-
-
-
-
-
-
-
-

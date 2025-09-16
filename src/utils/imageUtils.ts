@@ -33,10 +33,10 @@ export const compressImage = (file: File, options: CompressOptions): Promise<str
     img.onload = () => {
       // 计算压缩后的尺寸
       let { width, height } = img;
-      
+
       if (width > options.maxWidth || height > options.maxHeight) {
         const aspectRatio = width / height;
-        
+
         if (width > height) {
           width = options.maxWidth;
           height = options.maxWidth / aspectRatio;
@@ -91,7 +91,7 @@ export const validateImageFile = (
 ): string | null => {
   // 检查文件类型
   if (!allowedTypes.includes(file.type)) {
-    return `不支持的图片格式，仅支持: ${allowedTypes.map(t => t.split('/')[1].toUpperCase()).join(', ')}`;
+    return `不支持的图片格式，仅支持: ${allowedTypes.map((t) => t.split('/')[1].toUpperCase()).join(', ')}`;
   }
 
   // 检查文件大小
@@ -116,9 +116,9 @@ export const processImageUpload = async (
 ): Promise<string> => {
   const {
     quality = 0.85,
-    maxWidth = 1200,  // 降低默认最大宽度
-    maxHeight = 800,  // 降低默认最大高度
-    maxSize = 5
+    maxWidth = 1200, // 降低默认最大宽度
+    maxHeight = 800, // 降低默认最大高度
+    maxSize = 5,
   } = options;
 
   // 验证文件
@@ -137,27 +137,27 @@ export const processImageUpload = async (
       compressionOptions = {
         quality: 0.95,
         maxWidth: Math.min(maxWidth, 1200),
-        maxHeight: Math.min(maxHeight, 800)
+        maxHeight: Math.min(maxHeight, 800),
       };
     } else if (fileSizeMB < 2) {
       // 中等图片 (500KB-2MB): 中等质量压缩
       compressionOptions = {
         quality,
         maxWidth,
-        maxHeight
+        maxHeight,
       };
     } else {
       // 大图片(>2MB): 积极压缩
       compressionOptions = {
         quality: 0.75,
         maxWidth: Math.min(maxWidth, 1000),
-        maxHeight: Math.min(maxHeight, 667)
+        maxHeight: Math.min(maxHeight, 667),
       };
     }
 
     // 压缩图片并直接返回base64
     const base64 = await compressImage(file, compressionOptions);
-    
+
     return base64;
   } catch (error) {
     console.error('图片处理失败:', error);
@@ -172,21 +172,15 @@ export const getImageFromBase64 = (base64: string) => {
   const [header] = base64.split(',');
   const matches = header.match(/data:([^;]+)/);
   const mimeType = matches ? matches[1] : 'unknown';
-  
+
   // 估算文件大小 (Base64 比原文件大约33%)
   const sizeInBytes = Math.round((base64.length * 3) / 4);
   const sizeInMB = (sizeInBytes / (1024 * 1024)).toFixed(2);
-  
+
   return {
     mimeType,
     sizeInBytes,
     sizeInMB: parseFloat(sizeInMB),
-    format: mimeType.split('/')[1]?.toUpperCase() || 'UNKNOWN'
+    format: mimeType.split('/')[1]?.toUpperCase() || 'UNKNOWN',
   };
 };
-
-
-
-
-
-

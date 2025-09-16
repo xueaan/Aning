@@ -1,12 +1,6 @@
 ﻿import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { 
-  Habit, 
-  HabitRecord, 
-  HabitStats, 
-  HabitWithStats,
-  HabitViewType 
-} from '@/types';
+import { Habit, HabitRecord, HabitStats, HabitWithStats, HabitViewType } from '@/types';
 import { DatabaseAPI } from '@/services/api/database';
 import { DatabaseInitializer } from '@/services/database/initializer';
 import { formatDate } from '@/utils/timeUtils';
@@ -16,39 +10,44 @@ export interface HabitStore {
   habits: HabitWithStats[];
   records: HabitRecord[];
   isLoading: boolean;
-  
+
   // 视图状态
   currentView: HabitViewType;
   selectedHabitId: number | null;
   selectedDate: string; // YYYY-MM-DD 格式
-  
+
   // 搜索和过滤
   searchQuery: string;
   filterActive: boolean;
-  
+
   // 习惯操作方法
   loadHabits: () => Promise<void>;
   createHabit: (habit: Omit<Habit, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
   updateHabit: (id: number, updates: Partial<Habit>) => Promise<void>;
   deleteHabit: (id: number) => Promise<void>;
   toggleHabitActive: (id: number) => Promise<void>;
-  
+
   // 记录操作方法
   loadRecords: (habitId?: number, dateRange?: { start: string; end: string }) => Promise<void>;
-  recordHabitCompletion: (habitId: number, date: string, count?: number, notes?: string) => Promise<void>;
+  recordHabitCompletion: (
+    habitId: number,
+    date: string,
+    count?: number,
+    notes?: string
+  ) => Promise<void>;
   undoHabitCompletion: (habitId: number, date: string) => Promise<void>;
   updateHabitRecord: (recordId: number, updates: Partial<HabitRecord>) => Promise<void>;
   deleteHabitRecord: (recordId: number) => Promise<void>;
-  
+
   // 视图控制方法
   setCurrentView: (view: HabitViewType) => void;
   setSelectedHabit: (id: number | null) => void;
   setSelectedDate: (date: string) => void;
-  
+
   // 搜索和过滤方法
   setSearchQuery: (query: string) => void;
   setFilterActive: (active: boolean) => void;
-  
+
   // 辅助方法
   getTodayHabits: () => HabitWithStats[];
   getHabitsByDate: (date: string) => HabitRecord[];
@@ -82,9 +81,9 @@ export const useHabitStore = create<HabitStore>()(
         try {
           // 确保数据库已初始化
           await DatabaseInitializer.ensureInitialized();
-          
+
           const dbHabits = await DatabaseAPI.getHabits();
-          
+
           // 如果没有习惯，直接返回空数组
           if (dbHabits.length === 0) {
             set({ habits: [], records: [], isLoading: false });
@@ -99,62 +98,72 @@ export const useHabitStore = create<HabitStore>()(
               allRecords.push(...records);
             }
           }
-          
+
           // 获取今日日期
           const today = formatDate(new Date());
-          
+
           // 加载基础习惯信息和计算真实统计
           const basicHabits: HabitWithStats[] = await Promise.all(
             dbHabits.map(async (dbHabit) => {
               // 获取今日记录
               const todayRecords = await DatabaseAPI.getHabitRecords(dbHabit.id!, today, today);
-              const todayRecord = todayRecords.length > 0 ? {
-                id: todayRecords[0].id,
-                habit_id: todayRecords[0].habit_id,
-                date: todayRecords[0].date,
-                completed_count: todayRecords[0].count || 1,
-                notes: '',
-                created_at: todayRecords[0].created_at,
-                updated_at: todayRecords[0].created_at
-              } : undefined;
-              
+              const todayRecord =
+                todayRecords.length > 0
+                  ? {
+                      id: todayRecords[0].id,
+                      habit_id: todayRecords[0].habit_id,
+                      date: todayRecords[0].date,
+                      completed_count: todayRecords[0].count || 1,
+                      notes: '',
+                      created_at: todayRecords[0].created_at,
+                      updated_at: todayRecords[0].created_at,
+                    }
+                  : undefined;
+
               // 获取此习惯的所有记录
-              const habitRecords = allRecords.filter(r => r.habit_id === dbHabit.id);
-              
+              const habitRecords = allRecords.filter((r) => r.habit_id === dbHabit.id);
+
               // 计算真实统计数据
-              const totalDays = Math.max(1, Math.ceil((Date.now() - new Date(dbHabit.created_at).getTime()) / (1000 * 60 * 60 * 24)));
+              const totalDays = Math.max(
+                1,
+                Math.ceil(
+                  (Date.now() - new Date(dbHabit.created_at).getTime()) / (1000 * 60 * 60 * 24)
+                )
+              );
               const completedDays = habitRecords.length;
               const completionRate = Math.round((completedDays / totalDays) * 100);
-              
+
               // 计算连续天数
               let currentStreak = 0;
               let longestStreak = 0;
               let tempStreak = 0;
-              
+
               // 按日期排序记录
-              const sortedRecords = habitRecords.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-              
+              const sortedRecords = habitRecords.sort(
+                (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+              );
+
               // 计算当前连续天数
               const currentDate = new Date();
               for (let i = 0; i < 30; i++) {
                 const checkDate = new Date(currentDate);
                 checkDate.setDate(checkDate.getDate() - i);
                 const dateStr = formatDate(checkDate);
-                
-                if (sortedRecords.some(r => r.date === dateStr)) {
+
+                if (sortedRecords.some((r) => r.date === dateStr)) {
                   currentStreak = i + 1;
                 } else {
                   break;
                 }
               }
-              
+
               // 计算最长连续天数
-              const recordDates = new Set(habitRecords.map(r => r.date));
+              const recordDates = new Set(habitRecords.map((r) => r.date));
               for (let i = 0; i < 365; i++) {
                 const checkDate = new Date();
                 checkDate.setDate(checkDate.getDate() - i);
                 const dateStr = formatDate(checkDate);
-                
+
                 if (recordDates.has(dateStr)) {
                   tempStreak++;
                   longestStreak = Math.max(longestStreak, tempStreak);
@@ -162,17 +171,17 @@ export const useHabitStore = create<HabitStore>()(
                   tempStreak = 0;
                 }
               }
-              
+
               // 本周完成情况
               const weekAgo = new Date();
               weekAgo.setDate(weekAgo.getDate() - 7);
-              const thisWeekRecords = habitRecords.filter(r => new Date(r.date) >= weekAgo);
-              
+              const thisWeekRecords = habitRecords.filter((r) => new Date(r.date) >= weekAgo);
+
               // 本月完成情况
               const monthAgo = new Date();
               monthAgo.setMonth(monthAgo.getMonth() - 1);
-              const thisMonthRecords = habitRecords.filter(r => new Date(r.date) >= monthAgo);
-              
+              const thisMonthRecords = habitRecords.filter((r) => new Date(r.date) >= monthAgo);
+
               return {
                 id: dbHabit.id!,
                 name: dbHabit.name,
@@ -193,25 +202,24 @@ export const useHabitStore = create<HabitStore>()(
                   longest_streak: longestStreak,
                   completion_rate: completionRate,
                   this_week_completion: thisWeekRecords.length,
-                  this_month_completion: thisMonthRecords.length
-                }
+                  this_month_completion: thisMonthRecords.length,
+                },
               };
             })
           );
-          
+
           // 转换记录格式
-          const records: HabitRecord[] = allRecords.map(dbRecord => ({
+          const records: HabitRecord[] = allRecords.map((dbRecord) => ({
             id: dbRecord.id,
             habit_id: dbRecord.habit_id,
             date: dbRecord.date,
             completed_count: dbRecord.count || 1,
             notes: '',
             created_at: dbRecord.created_at,
-            updated_at: dbRecord.created_at
+            updated_at: dbRecord.created_at,
           }));
-          
+
           set({ habits: basicHabits, records, isLoading: false });
-          
         } catch (error) {
           set({ habits: [], records: [], isLoading: false });
         }
@@ -226,9 +234,9 @@ export const useHabitStore = create<HabitStore>()(
             color: habitData.color,
             frequency: habitData.frequency,
             target_count: habitData.target_count || 1,
-            is_active: true
+            is_active: true,
           });
-          
+
           // 重新加载习惯列表
           await get().loadHabits();
         } catch (error) {
@@ -238,7 +246,7 @@ export const useHabitStore = create<HabitStore>()(
 
       updateHabit: async (id, updates) => {
         try {
-          const habit = get().habits.find(h => h.id === id);
+          const habit = get().habits.find((h) => h.id === id);
           if (!habit) throw new Error('习惯未找到');
 
           await DatabaseAPI.updateHabit(id, {
@@ -249,9 +257,9 @@ export const useHabitStore = create<HabitStore>()(
             frequency: updates.frequency || habit.frequency,
             target_count: updates.target_count || habit.target_count,
             is_active: updates.is_active !== undefined ? updates.is_active : habit.is_active,
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
           });
-          
+
           // 重新加载习惯列表
           await get().loadHabits();
         } catch (error) {
@@ -262,7 +270,7 @@ export const useHabitStore = create<HabitStore>()(
       deleteHabit: async (id) => {
         try {
           await DatabaseAPI.deleteHabit(id);
-          
+
           // 重新加载习惯列表
           await get().loadHabits();
         } catch (error) {
@@ -271,7 +279,7 @@ export const useHabitStore = create<HabitStore>()(
       },
 
       toggleHabitActive: async (id) => {
-        const habit = get().habits.find(h => h.id === id);
+        const habit = get().habits.find((h) => h.id === id);
         if (habit) {
           await get().updateHabit(id, { is_active: !habit.is_active });
         }
@@ -284,24 +292,24 @@ export const useHabitStore = create<HabitStore>()(
             set({ records: [] });
             return;
           }
-          
+
           const dbRecords = await DatabaseAPI.getHabitRecords(
             habitId,
             dateRange?.start,
             dateRange?.end
           );
-          
+
           // 转换数据库记录为应用记录格式
-          const records: HabitRecord[] = dbRecords.map(dbRecord => ({
+          const records: HabitRecord[] = dbRecords.map((dbRecord) => ({
             id: dbRecord.id,
             habit_id: dbRecord.habit_id,
             date: dbRecord.date,
             completed_count: dbRecord.count || 1,
             notes: '',
             created_at: dbRecord.created_at,
-            updated_at: dbRecord.created_at
+            updated_at: dbRecord.created_at,
           }));
-          
+
           set({ records });
         } catch (error) {
           console.error('Failed to load habit records:', error);
@@ -311,14 +319,13 @@ export const useHabitStore = create<HabitStore>()(
 
       recordHabitCompletion: async (habitId, date, count = 1, notes) => {
         try {
-          
           // 对于习惯打卡，通常每天只记录一次完成，count=1
           // 使用数据库的 INSERT OR REPLACE 来确保每天只有一条记录
           const recordId = await DatabaseAPI.recordHabitCompletion(habitId, date, count, notes);
-          
+
           // 局部更新状态，避免全部刷新
-          set(state => {
-            const updatedHabits = state.habits.map(habit => {
+          set((state) => {
+            const updatedHabits = state.habits.map((habit) => {
               if (habit.id === habitId) {
                 // 更新今日记录
                 const updatedHabit = { ...habit };
@@ -329,9 +336,9 @@ export const useHabitStore = create<HabitStore>()(
                   completed_count: count,
                   notes: notes,
                   created_at: new Date().toISOString(),
-                  updated_at: new Date().toISOString()
+                  updated_at: new Date().toISOString(),
                 };
-                
+
                 // 更新统计数据
                 if (updatedHabit.stats) {
                   updatedHabit.stats.completed_days += 1;
@@ -347,7 +354,7 @@ export const useHabitStore = create<HabitStore>()(
               }
               return habit;
             });
-            
+
             return { habits: updatedHabits };
           });
         } catch (error) {
@@ -356,7 +363,7 @@ export const useHabitStore = create<HabitStore>()(
             date,
             count,
             notes,
-            error
+            error,
           });
           throw error;
         }
@@ -364,12 +371,12 @@ export const useHabitStore = create<HabitStore>()(
 
       updateHabitRecord: async (recordId, updates) => {
         try {
-          set(state => ({
-            records: state.records.map(record =>
+          set((state) => ({
+            records: state.records.map((record) =>
               record.id === recordId
                 ? { ...record, ...updates, updated_at: new Date().toISOString() }
                 : record
-            )
+            ),
           }));
         } catch (error) {
           console.error('Failed to update habit record:', error);
@@ -380,31 +387,46 @@ export const useHabitStore = create<HabitStore>()(
       undoHabitCompletion: async (habitId, date) => {
         try {
           await DatabaseAPI.undoHabitCompletion(habitId, date);
-          
+
           // 局部更新状态，避免全部刷新
-          set(state => {
-            const updatedHabits = state.habits.map(habit => {
+          set((state) => {
+            const updatedHabits = state.habits.map((habit) => {
               if (habit.id === habitId) {
                 // 清除今日记录
                 const updatedHabit = { ...habit };
                 updatedHabit.today_record = undefined;
-                
+
                 // 更新统计数据
                 if (updatedHabit.stats) {
-                  updatedHabit.stats.completed_days = Math.max(0, updatedHabit.stats.completed_days - 1);
-                  updatedHabit.stats.current_streak = Math.max(0, updatedHabit.stats.current_streak - 1);
-                  updatedHabit.stats.this_week_completion = Math.max(0, updatedHabit.stats.this_week_completion - 1);
-                  updatedHabit.stats.this_month_completion = Math.max(0, updatedHabit.stats.this_month_completion - 1);
-                  updatedHabit.stats.completion_rate = updatedHabit.stats.total_days > 0 
-                    ? Math.round((updatedHabit.stats.completed_days / updatedHabit.stats.total_days) * 100)
-                    : 0;
+                  updatedHabit.stats.completed_days = Math.max(
+                    0,
+                    updatedHabit.stats.completed_days - 1
+                  );
+                  updatedHabit.stats.current_streak = Math.max(
+                    0,
+                    updatedHabit.stats.current_streak - 1
+                  );
+                  updatedHabit.stats.this_week_completion = Math.max(
+                    0,
+                    updatedHabit.stats.this_week_completion - 1
+                  );
+                  updatedHabit.stats.this_month_completion = Math.max(
+                    0,
+                    updatedHabit.stats.this_month_completion - 1
+                  );
+                  updatedHabit.stats.completion_rate =
+                    updatedHabit.stats.total_days > 0
+                      ? Math.round(
+                          (updatedHabit.stats.completed_days / updatedHabit.stats.total_days) * 100
+                        )
+                      : 0;
                 }
 
                 return updatedHabit;
               }
               return habit;
             });
-            
+
             return { habits: updatedHabits };
           });
         } catch (error) {
@@ -414,8 +436,8 @@ export const useHabitStore = create<HabitStore>()(
 
       deleteHabitRecord: async (recordId) => {
         try {
-          set(state => ({
-            records: state.records.filter(record => record.id !== recordId)
+          set((state) => ({
+            records: state.records.filter((record) => record.id !== recordId),
           }));
         } catch (error) {
           console.error('Failed to delete habit record:', error);
@@ -434,68 +456,66 @@ export const useHabitStore = create<HabitStore>()(
       // 辅助方法
       getTodayHabits: () => {
         const { habits, filterActive } = get();
-        let todayHabits = habits.filter(habit => habit.is_active);
-        
+        let todayHabits = habits.filter((habit) => habit.is_active);
+
         if (filterActive) {
-          todayHabits = todayHabits.filter(habit => habit.today_record);
+          todayHabits = todayHabits.filter((habit) => habit.today_record);
         }
 
         return todayHabits;
       },
 
       getHabitsByDate: (date) => {
-        return get().records.filter(record => record.date === date);
+        return get().records.filter((record) => record.date === date);
       },
 
       getHabitStats: (habitId) => {
-        const habit = get().habits.find(h => h.id === habitId);
+        const habit = get().habits.find((h) => h.id === habitId);
         return habit?.stats;
       },
 
       getOverallStats: () => {
         const { habits } = get();
-        const activeHabits = habits.filter(h => h.is_active);
+        const activeHabits = habits.filter((h) => h.is_active);
         const todayTotal = activeHabits.length;
-        const todayCompleted = activeHabits.filter(h => h.today_record).length;
-        const avgCompletionRate = activeHabits.length > 0
-          ? activeHabits.reduce((sum, h) => sum + (h.stats?.completion_rate || 0), 0) / activeHabits.length
-          : 0;
+        const todayCompleted = activeHabits.filter((h) => h.today_record).length;
+        const avgCompletionRate =
+          activeHabits.length > 0
+            ? activeHabits.reduce((sum, h) => sum + (h.stats?.completion_rate || 0), 0) /
+              activeHabits.length
+            : 0;
 
         return {
           totalHabits: habits.length,
           activeHabits: activeHabits.length,
           todayCompleted,
           todayTotal,
-          averageCompletionRate: Math.round(avgCompletionRate)
+          averageCompletionRate: Math.round(avgCompletionRate),
         };
       },
 
       getStreakData: (habitId, days) => {
-        const records = get().records.filter(r => r.habit_id === habitId);
+        const records = get().records.filter((r) => r.habit_id === habitId);
         const today = new Date();
         const streakData: { date: string; completed: boolean }[] = [];
-        
+
         for (let i = days - 1; i >= 0; i--) {
           const date = new Date(today);
           date.setDate(date.getDate() - i);
           const dateStr = formatDate(date);
-          const record = records.find(r => r.date === dateStr);
-          
+          const record = records.find((r) => r.date === dateStr);
+
           streakData.push({
             date: dateStr,
-            completed: record ? record.completed_count > 0 : false
+            completed: record ? record.completed_count > 0 : false,
           });
         }
 
         return streakData;
-      }
+      },
     }),
     {
-      name: 'habit-store'
+      name: 'habit-store',
     }
   )
 );
-
-
-
-

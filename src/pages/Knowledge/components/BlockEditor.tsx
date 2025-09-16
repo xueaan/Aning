@@ -5,11 +5,10 @@ import { useAppStore } from '@/stores';
 import { useKnowledgeOperations } from '@/stores/knowledgeStore';
 import { NovelEditor, type NovelEditorRef } from '@/components/editor/Novel';
 import { RichEditorToolbar } from '@/components/editor/RichEditorToolbar';
-import { Eye } from 'lucide-react';
+import { Eye, FolderOpen } from 'lucide-react';
 import { debounce } from '@/utils/debounce';
 import { DatabaseAPI } from '@/services/api/database';
-import { extractHeadings, type OutlineItem } from './HeadingExtractor';
-import { getActiveHeadingId } from './HeadingExtractor';
+import { extractHeadings, getActiveHeadingId, type OutlineItem } from './HeadingExtractor';
 
 interface BlockEditorProps {
   knowledgeBaseId?: string;
@@ -19,6 +18,8 @@ interface BlockEditorProps {
   onHeadingsChange?: (headings: OutlineItem[]) => void;
   onOutlineToggle?: (visible: boolean) => void;
   isOutlineVisible?: boolean;
+  onKnowledgeTreeToggle?: (visible: boolean) => void;
+  isKnowledgeTreeVisible?: boolean;
   className?: string;
   readOnly?: boolean;
 }
@@ -29,8 +30,10 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
   onHeadingsChange,
   onOutlineToggle,
   isOutlineVisible = false,
+  onKnowledgeTreeToggle,
+  isKnowledgeTreeVisible = false,
   className = '',
-  readOnly = false
+  readOnly = false,
 }) => {
   const editorRef = useRef<NovelEditorRef>(null);
   const [editorContent, setEditorContent] = useState('');
@@ -58,7 +61,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
         // 如果有块数据，合并所有块的内容
         const htmlContent = blocks
           .sort((a, b) => a.order_index - b.order_index)
-          .map(block => {
+          .map((block) => {
             // 根据块类型转换为HTML
             switch (block.block_type) {
               case 'heading':
@@ -96,25 +99,29 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
         }
       } else {
         // 如果没有块数据，尝试从页面标题创建初始内容
-        
+
         // 尝试从知识库操作中获取当前页面信息
-        const currentPage = knowledgeOps.pages.find(p => p.id === pid);
-        if (currentPage && currentPage.title && currentPage.title.trim() !== '' && !currentPage.title.startsWith('新页面')) {
+        const currentPage = knowledgeOps.pages.find((p) => p.id === pid);
+        if (
+          currentPage &&
+          currentPage.title &&
+          currentPage.title.trim() !== '' &&
+          !currentPage.title.startsWith('新页面')
+        ) {
           // 如果页面有标题且不是默认的"新页面"，使用标题作为初始内容
           const initialContent = `<h2>${currentPage.title}</h2><p></p>`;
           setEditorContent(initialContent);
-          
+
           // 自动保存这个初始内容到数据库
           try {
             await DatabaseAPI.createBlock(pid, 'heading', currentPage.title);
             await DatabaseAPI.createBlock(pid, 'paragraph', '');
-          } catch (error) {
-          }
+          } catch (error) {}
         } else {
           // 显示空内容
           setEditorContent('<p></p>');
         }
-        
+
         // 清空标题
         if (onHeadingsChange) {
           onHeadingsChange([]);
@@ -151,14 +158,16 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
       // 通知父组件数据变化（用于兼容）
       if (onBlocksChange) {
         try {
-          const blocks: Partial<BackendBlock>[] = [{
-            id: existingBlocks.length > 0 ? existingBlocks[0].id : `${pageId}-new`,
-            page_id: pageId,
-            block_type: 'paragraph',
-            content: content,
-            order_index: 0,
-            updated_at: Date.now()
-          }];
+          const blocks: Partial<BackendBlock>[] = [
+            {
+              id: existingBlocks.length > 0 ? existingBlocks[0].id : `${pageId}-new`,
+              page_id: pageId,
+              block_type: 'paragraph',
+              content: content,
+              order_index: 0,
+              updated_at: Date.now(),
+            },
+          ];
           onBlocksChange(blocks);
         } catch (error) {
           console.warn('Failed to convert Novel data to blocks:', error);
@@ -321,7 +330,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
   // 监听滚动更新活跃标题
   useEffect(() => {
     const updateActiveHeading = () => {
-      getActiveHeadingId(headings.map(h => h.id));
+      getActiveHeadingId(headings.map((h) => h.id));
       // 暂时注释掉，等后续需要时再启用
     };
 
@@ -346,19 +355,30 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
     const subtitleColor = isDark ? 'text-gray-400' : 'text-gray-400';
 
     return (
-      <div className={cn(
-        'flex-1 flex items-center justify-center',
-        placeholderText, placeholderBg,
-        className
-      )}>
+      <div
+        className={cn(
+          'flex-1 flex items-center justify-center',
+          placeholderText,
+          placeholderBg,
+          className
+        )}
+      >
         <div className="text-center">
-          <svg className={`w-16 h-16 mx-auto mb-4 ${iconColor}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          <svg
+            className={`w-16 h-16 mx-auto mb-4 ${iconColor}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="1.5"
+              d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+            />
           </svg>
           <h3 className="text-lg font-medium mb-2">选择一个页面开始编辑</h3>
-          <p className={`text-sm ${subtitleColor}`}>
-            从左侧选择已有页面，或创建新页面
-          </p>
+          <p className={`text-sm ${subtitleColor}`}>从左侧选择已有页面，或创建新页面</p>
         </div>
       </div>
     );
@@ -370,11 +390,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
     const containerBg = isDark ? 'bg-black/20' : 'bg-white/20';
 
     return (
-      <div className={cn(
-        'flex-1 flex items-center justify-center',
-        containerBg,
-        className
-      )}>
+      <div className={cn('flex-1 flex items-center justify-center', containerBg, className)}>
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
           <span className="text-sm text-gray-500">正在加载页面内容...</span>
@@ -447,30 +463,46 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
   };
 
   return (
-    <div className={cn(
-      'flex-1 flex flex-col relative',
-      'bg-transparent',
-      className
-    )}>
+    <div className={cn('flex-1 flex flex-col relative', 'bg-transparent', className)}>
       {/* 顶部工具栏 - 与大纲按钮对齐 */}
       <div className="sticky top-0 z-20">
         <div className="flex items-start justify-between px-6 py-3">
-          {/* 左侧工具栏 */}
+          {/* 左侧按钮 - 目录 */}
+          <div className="flex-shrink-0 mr-4">
+            <button
+              onClick={() => onKnowledgeTreeToggle?.(!isKnowledgeTreeVisible)}
+              className={cn(
+                'flex items-center gap-2 px-3 py-1.5 rounded-md transition-all duration-200 text-sm',
+                'theme-bg-secondary/50 hover:theme-bg-secondary',
+                'theme-text-secondary hover:theme-text-primary',
+                'border theme-border-primary'
+              )}
+            >
+              <FolderOpen className="w-4 h-4" />
+              <span>目录</span>
+            </button>
+          </div>
+
+          {/* 中间工具栏 */}
           <div className="flex-1 min-w-0">
-            <RichEditorToolbar 
-              onFormat={handleFormat} 
+            <RichEditorToolbar
+              onFormat={handleFormat}
               onInsertImage={handleInsertImage}
               activeFormats={activeFormats}
               className="bg-transparent border-none shadow-none"
             />
           </div>
+
+          {/* 右侧按钮 - 大纲 */}
           <div className="flex-shrink-0 ml-4">
             {headings.length > 0 && (
-              <button 
-                onClick={() => onOutlineToggle?.(!isOutlineVisible)} 
+              <button
+                onClick={() => onOutlineToggle?.(!isOutlineVisible)}
                 className={cn(
-                  'flex items-center gap-2 px-2 py-1 transition-all duration-200 text-sm',
-                  'theme-text-secondary hover:theme-text-primary'
+                  'flex items-center gap-2 px-3 py-1.5 rounded-md transition-all duration-200 text-sm',
+                  'theme-bg-secondary/50 hover:theme-bg-secondary',
+                  'theme-text-secondary hover:theme-text-primary',
+                  'border theme-border-primary'
                 )}
               >
                 <Eye className="w-4 h-4" />
@@ -483,13 +515,13 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
 
       {/* 编辑器内容区域 - 完全融入背景 */}
       <div className="flex-1 overflow-y-auto">
-        <NovelEditor 
-          ref={editorRef} 
+        <NovelEditor
+          ref={editorRef}
           value={editorContent}
-          onChange={handleContentChange} 
+          onChange={handleContentChange}
           onSave={handleSave}
           placeholder="开始书写你的想法..."
-          readOnly={readOnly} 
+          readOnly={readOnly}
           theme={theme}
           className="w-full min-h-full knowledge-editor"
         />

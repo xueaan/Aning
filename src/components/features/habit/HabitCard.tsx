@@ -19,7 +19,7 @@ export const HabitCard: React.FC<HabitCardProps> = ({
   onUndo,
   onEdit,
   onDelete,
-  showActions = true
+  showActions = true,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -82,32 +82,41 @@ export const HabitCard: React.FC<HabitCardProps> = ({
       className={`rounded-xl p-6 transition-all hover:shadow-lg duration-500 relative feather-glass-deco ${isCompleted ? 'ring-2 ring-green-500/20' : ''}`}
       style={{
         transform: 'translateZ(0)',
-        transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
+        transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
       }}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4 flex-1">
           {/* 习惯图标 */}
-          <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl transition-all ${isCompleted
-              ? 'bg-green-500/20 theme-text-success shadow-lg shadow-green-500/25'
-              : 'opacity-80'
+          <div
+            className={`w-12 h-12 rounded-full flex items-center justify-center text-xl transition-all ${
+              isCompleted
+                ? 'bg-green-500/20 theme-text-success shadow-lg shadow-green-500/25'
+                : 'opacity-80'
             }`}
             style={{
               backgroundColor: isCompleted ? undefined : habit.color + '20',
-              color: isCompleted ? undefined : habit.color
+              color: isCompleted ? undefined : habit.color,
             }}
           >
-            {isCompleted ? <CheckCircle2 size={16} /> : React.createElement(getIconComponent(habit.icon), {
-              theme: 'outline',
-              size: 20,
-              fill: 'currentColor',
-              strokeWidth: 2
-            })}
+            {isCompleted ? (
+              <CheckCircle2 size={16} />
+            ) : (
+              React.createElement(getIconComponent(habit.icon), {
+                theme: 'outline',
+                size: 20,
+                fill: 'currentColor',
+                strokeWidth: 2,
+              })
+            )}
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <h3 className={`font-medium transition-colors ${isCompleted ? 'theme-text-success' : 'theme-text-primary'
-                }`}>
+              <h3
+                className={`font-medium transition-colors ${
+                  isCompleted ? 'theme-text-success' : 'theme-text-primary'
+                }`}
+              >
                 {habit.name}
               </h3>
               {streak > 0 && (
@@ -119,19 +128,18 @@ export const HabitCard: React.FC<HabitCardProps> = ({
             </div>
 
             {habit.description && (
-              <p className={`text-sm mb-2 transition-colors ${isCompleted ? 'theme-text-success/80' : 'theme-text-secondary'
-                }`}>
+              <p
+                className={`text-sm mb-2 transition-colors ${
+                  isCompleted ? 'theme-text-success/80' : 'theme-text-secondary'
+                }`}
+              >
                 {habit.description}
               </p>
             )}
 
             <div className="flex items-center gap-4">
-              <span className="text-xs theme-text-secondary">
-                连续 {streak} 天
-              </span>
-              <span className="text-xs theme-text-secondary">
-                完成率 {completionRate}%
-              </span>
+              <span className="text-xs theme-text-secondary">连续 {streak} 天</span>
+              <span className="text-xs theme-text-secondary">完成率 {completionRate}%</span>
               <div className="w-16 h-1.5 theme-bg-tertiary rounded-full overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
@@ -143,7 +151,7 @@ export const HabitCard: React.FC<HabitCardProps> = ({
             </div>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-3">
           {/* 完成状态 */}
           {isCompleted ? (
@@ -151,10 +159,10 @@ export const HabitCard: React.FC<HabitCardProps> = ({
               <motion.div
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ 
-                  type: "spring",
+                transition={{
+                  type: 'spring',
                   stiffness: 260,
-                  damping: 20
+                  damping: 20,
                 }}
                 className="flex items-center gap-2 theme-text-success"
               >
@@ -194,19 +202,26 @@ export const HabitCard: React.FC<HabitCardProps> = ({
               whileTap={{ scale: 0.98 }}
             >
               <motion.div
-                animate={isAnimating ? {
-                  scale: [1, 1.15, 1],
-                  opacity: [1, 0.8, 1]
-                } : {}}
+                animate={
+                  isAnimating
+                    ? {
+                        scale: [1, 1.15, 1],
+                        opacity: [1, 0.8, 1],
+                      }
+                    : {}
+                }
                 transition={{
                   duration: 0.4,
-                  ease: "easeInOut"
+                  ease: 'easeInOut',
                 }}
               >
                 <CheckCircle2 size={16} />
               </motion.div>
-              <span className={`transition-opacity duration-300 ${isAnimating ? 'opacity-70' : 'opacity-100'
-              }`}>
+              <span
+                className={`transition-opacity duration-300 ${
+                  isAnimating ? 'opacity-70' : 'opacity-100'
+                }`}
+              >
                 {isAnimating ? '打卡中...' : '完成'}
               </span>
             </motion.button>
@@ -215,12 +230,14 @@ export const HabitCard: React.FC<HabitCardProps> = ({
           {/* 操作菜单 */}
           {showActions && (
             <div className="relative">
-              <button 
+              <button
                 onClick={() => setShowMenu(!showMenu)}
                 className="w-8 h-8 rounded-full transition-colors flex items-center justify-center shadow-sm feather-glass-deco"
               >
-                <MoreHorizontal size={16} 
-                  className="theme-text-secondary hover:theme-text-primary" />
+                <MoreHorizontal
+                  size={16}
+                  className="theme-text-secondary hover:theme-text-primary"
+                />
               </button>
 
               <AnimatePresence>

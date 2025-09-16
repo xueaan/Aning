@@ -7,28 +7,33 @@ import { ConfirmDeleteModal } from '@/components/common/ConfirmDeleteModal';
 const colors = [
   {
     name: 'blue',
-    border: 'border-blue-400 dark:border-blue-500', bg: 'rgba(59, 130, 246, 0.2)'
+    border: 'border-blue-400 dark:border-blue-500',
+    bg: 'rgba(59, 130, 246, 0.2)',
   },
   {
     name: 'green',
-    border: 'border-green-400 dark:border-green-500', bg: 'rgba(34, 197, 94, 0.2)'
+    border: 'border-green-400 dark:border-green-500',
+    bg: 'rgba(34, 197, 94, 0.2)',
   },
   {
     name: 'yellow',
-    border: 'border-yellow-400 dark:border-yellow-500', bg: 'rgba(234, 179, 8, 0.2)'
+    border: 'border-yellow-400 dark:border-yellow-500',
+    bg: 'rgba(234, 179, 8, 0.2)',
   },
   {
     name: 'red',
-    border: 'border-red-400 dark:border-red-500', bg: 'rgba(239, 68, 68, 0.2)'
+    border: 'border-red-400 dark:border-red-500',
+    bg: 'rgba(239, 68, 68, 0.2)',
   },
   {
     name: 'purple',
-    border: 'border-purple-400 dark:border-purple-500', bg: 'rgba(147, 51, 234, 0.2)'
+    border: 'border-purple-400 dark:border-purple-500',
+    bg: 'rgba(147, 51, 234, 0.2)',
   },
   {
     name: 'gray',
     border: 'theme-border-primary',
-    bg: 'rgba(var(--bg-tertiary), 0.8)'
+    bg: 'rgba(var(--bg-tertiary), 0.8)',
   },
 ];
 
@@ -39,15 +44,15 @@ export const ImageCard: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos 
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [dimensions, setDimensions] = useState({
     width: data.width || 280,
-    height: data.height || 180
+    height: data.height || 180,
   });
   const [isResizing, setIsResizing] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
-  const startMousePosRef = useRef<{x: number, y: number} | null>(null);
-  const startDimensionsRef = useRef<{width: number, height: number} | null>(null);
+  const startMousePosRef = useRef<{ x: number; y: number } | null>(null);
+  const startDimensionsRef = useRef<{ width: number; height: number } | null>(null);
   const handleResizeRef = useRef<((e: MouseEvent) => void) | null>(null);
   const handleResizeEndRef = useRef<(() => void) | null>(null);
   const { currentBoard, updateBoard, deleteNode } = useMindBoardStore();
@@ -116,13 +121,19 @@ export const ImageCard: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos 
 
   const updateNodeData = (url: string) => {
     if (currentBoard) {
-      const updatedNodes = currentBoard.nodes.map(node =>
+      const updatedNodes = currentBoard.nodes.map((node) =>
         node.id === id
           ? {
-            ...node,
-            data: { ...node.data, imageUrl: url, colorIndex, width: dimensions.width, height: dimensions.height },
-            style: { ...node.style, width: dimensions.width, height: dimensions.height }
-          }
+              ...node,
+              data: {
+                ...node.data,
+                imageUrl: url,
+                colorIndex,
+                width: dimensions.width,
+                height: dimensions.height,
+              },
+              style: { ...node.style, width: dimensions.width, height: dimensions.height },
+            }
           : node
       );
       updateBoard(currentBoard.id, { nodes: updatedNodes });
@@ -133,10 +144,8 @@ export const ImageCard: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos 
     setColorIndex(index);
     setShowColorPicker(false);
     if (currentBoard) {
-      const updatedNodes = currentBoard.nodes.map(node =>
-        node.id === id
-          ? { ...node, data: { ...node.data, colorIndex: index } }
-          : node
+      const updatedNodes = currentBoard.nodes.map((node) =>
+        node.id === id ? { ...node, data: { ...node.data, colorIndex: index } } : node
       );
       updateBoard(currentBoard.id, { nodes: updatedNodes });
     }
@@ -159,7 +168,6 @@ export const ImageCard: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos 
       }
     }
   };
-
 
   // 流畅的大小调整处理
   // 创建稳定的 handleResize 函数
@@ -197,7 +205,8 @@ export const ImageCard: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos 
     let tooltip = cardRef.current.querySelector('.resize-tooltip') as HTMLElement;
     if (!tooltip) {
       tooltip = document.createElement('div');
-      tooltip.className = 'resize-tooltip absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm z-50';
+      tooltip.className =
+        'resize-tooltip absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm z-50';
       cardRef.current.appendChild(tooltip);
     }
 
@@ -224,7 +233,7 @@ export const ImageCard: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos 
       // 更新React状态
       setDimensions({
         width: finalWidth,
-        height: finalHeight
+        height: finalHeight,
       });
 
       // 隐藏尺寸提示
@@ -236,13 +245,19 @@ export const ImageCard: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos 
 
       // 更新存储的数据
       if (currentBoard) {
-        const updatedNodes = currentBoard.nodes.map(node =>
+        const updatedNodes = currentBoard.nodes.map((node) =>
           node.id === id
             ? {
-              ...node,
-              data: { ...node.data, imageUrl, colorIndex, width: finalWidth, height: finalHeight },
-              style: { ...node.style, width: finalWidth, height: finalHeight }
-            }
+                ...node,
+                data: {
+                  ...node.data,
+                  imageUrl,
+                  colorIndex,
+                  width: finalWidth,
+                  height: finalHeight,
+                },
+                style: { ...node.style, width: finalWidth, height: finalHeight },
+              }
             : node
         );
         updateBoard(currentBoard.id, { nodes: updatedNodes });
@@ -279,7 +294,7 @@ export const ImageCard: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos 
         x: (xPos || 0) - padding,
         y: (yPos || 0) - padding,
         width: dimensions.width + padding * 2,
-        height: dimensions.height + padding * 2
+        height: dimensions.height + padding * 2,
       },
       { duration: 800, padding: 0.1 }
     );
@@ -303,32 +318,36 @@ export const ImageCard: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos 
         id="image-target-left"
         className="!w-3 !h-3 !bg-white/90 !border-2 !border-gray-400 hover:!border-blue-500 hover:!scale-110 transition-all"
       />
-      
+
       {/* Floating operation buttons - only show when selected */}
       {selected && (
         <div className="absolute -top-9 left-1/2 transform -translate-x-1/2 z-50 nodrag">
           <div className="flex items-center justify-center gap-1">
             {/* Color picker */}
             <div className="relative">
-              <button 
+              <button
                 onClick={() => setShowColorPicker(!showColorPicker)}
                 className="w-6 h-6 rounded-lg flex items-center justify-center bg-black/70 dark:bg-white/10 hover:bg-black/60 dark:hover:bg-white/20 transition-all"
                 title="更改颜色"
               >
                 <Paintbrush2 className="w-3.5 h-3.5 theme-text-primary" />
               </button>
-              
+
               {showColorPicker && (
                 <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-30">
                   <div className="flex gap-1 p-2 backdrop-blur-sm bg-white/95 dark:bg-black/95 rounded-lg shadow-lg">
                     {colors.map((color, index) => (
-                      <button 
-                        key={color.name} 
+                      <button
+                        key={color.name}
                         onClick={() => handleColorChange(index)}
                         className={`w-6 h-6 rounded-full border-2 hover:scale-110 transition-all ${
                           index === colorIndex ? 'ring-2 ring-blue-400' : ''
                         }`}
-                        style={{ backgroundColor: color.bg.includes('var(--') ? 'rgba(148, 163, 184, 0.5)' : color.bg }}
+                        style={{
+                          backgroundColor: color.bg.includes('var(--')
+                            ? 'rgba(148, 163, 184, 0.5)'
+                            : color.bg,
+                        }}
                         title={color.name}
                       />
                     ))}
@@ -336,24 +355,24 @@ export const ImageCard: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos 
                 </div>
               )}
             </div>
-            
-            <button 
+
+            <button
               onClick={handleFocus}
               className="w-6 h-6 rounded-lg flex items-center justify-center bg-black/70 dark:bg-white/10 hover:bg-black/60 dark:hover:bg-white/20 transition-all"
               title="聚焦卡片"
             >
               <Target className="w-3.5 h-3.5 theme-text-primary" />
             </button>
-            
-            <button 
+
+            <button
               onClick={handleEdit}
               className="w-6 h-6 rounded-lg flex items-center justify-center bg-black/70 dark:bg-white/10 hover:bg-black/60 dark:hover:bg-white/20 transition-all"
               title="编辑图片"
             >
               <Edit className="w-3.5 h-3.5 theme-text-primary" />
             </button>
-            
-            <button 
+
+            <button
               onClick={handleDelete}
               className="w-6 h-6 rounded-lg flex items-center justify-center bg-black/70 dark:bg-white/10 hover:bg-black/60 dark:hover:bg-white/20 transition-all"
               title="删除卡片"
@@ -364,7 +383,7 @@ export const ImageCard: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos 
         </div>
       )}
 
-      <div 
+      <div
         ref={cardRef}
         className={`feather-glass-deco rounded-lg border-2 ${currentColor.border} relative overflow-hidden`}
         style={{
@@ -372,15 +391,16 @@ export const ImageCard: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos 
           width: `${dimensions.width}px`,
           height: `${dimensions.height}px`,
           minWidth: '200px',
-          minHeight: '150px'
+          minHeight: '150px',
         }}
-        onPaste={handlePaste} 
+        onPaste={handlePaste}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
       >
         {/* 简化的调整大小控制柄 */}
         {selected && (
-          <div className="absolute -bottom-1 -right-1 w-4 h-4 cursor-nw-resize nodrag"
+          <div
+            className="absolute -bottom-1 -right-1 w-4 h-4 cursor-nw-resize nodrag"
             onMouseDown={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -396,12 +416,10 @@ export const ImageCard: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos 
         <div className="px-3 py-2 theme-bg-secondary/30 border-b theme-border-secondary flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ImageIcon className="w-4 h-4 theme-text-secondary" />
-            <span className="text-sm font-medium theme-text-primary">
-              图片卡片 
-            </span>
+            <span className="text-sm font-medium theme-text-primary">图片卡片</span>
           </div>
         </div>
-        
+
         <div className="p-4">
           {isLoading ? (
             <div className="flex items-center justify-center h-32">
@@ -409,25 +427,26 @@ export const ImageCard: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos 
             </div>
           ) : imageUrl ? (
             <div className="relative group">
-              <img src={imageUrl} alt="上传的图片"
+              <img
+                src={imageUrl}
+                alt="上传的图片"
                 className="w-full h-auto max-h-[300px] object-contain rounded"
               />
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center h-32 border-2 border-dashed theme-border-primary rounded cursor-pointer hover:theme-border-accent transition-colors"
+            <div
+              className="flex flex-col items-center justify-center h-32 border-2 border-dashed theme-border-primary rounded cursor-pointer hover:theme-border-accent transition-colors"
               onClick={() => fileInputRef.current?.click()}
             >
               <Upload className="w-8 h-8 theme-text-secondary mb-2" />
-              <p className="text-sm theme-text-secondary">
-                点击上传、粘贴或拖拽图片
-              </p>
-              <p className="text-xs theme-text-secondary mt-1">
-                支持 JPG、PNG、GIF 等格式
-              </p>
+              <p className="text-sm theme-text-secondary">点击上传、粘贴或拖拽图片</p>
+              <p className="text-xs theme-text-secondary mt-1">支持 JPG、PNG、GIF 等格式</p>
             </div>
           )}
-          
-          <input ref={fileInputRef} type="file"
+
+          <input
+            ref={fileInputRef}
+            type="file"
             accept="image/*"
             onChange={handleImageUpload}
             className="hidden"
@@ -460,15 +479,3 @@ export const ImageCard: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos 
     </div>
   );
 };
-
-
-
-
-
-
-
-
-
-
-
-

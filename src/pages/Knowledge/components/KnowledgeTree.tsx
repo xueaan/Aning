@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useKnowledgeOperations } from '@/stores/knowledgeStore';
-import { FolderOpen, Trash2, FileText, Plus, FolderMinus } from 'lucide-react';
+import {
+  FolderOpen,
+  Trash2,
+  FileText,
+  Plus,
+  FolderMinus,
+  ChevronRight,
+  ChevronDown,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { KnowledgeBase } from '@/types';
 import { EditKnowledgeBaseModal } from '@/components/modals/EditKnowledgeBaseModal';
@@ -14,13 +22,15 @@ interface KnowledgeTreeProps {
   onSelect?: (pageId: string) => void;
   selectedId?: string | null;
   searchQuery?: string;
+  forceExpandAll?: boolean;
 }
 
 export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
   className = '',
   onSelect,
   selectedId,
-  searchQuery: externalSearchQuery
+  searchQuery: externalSearchQuery,
+  forceExpandAll,
 }) => {
   const knowledgeOps = useKnowledgeOperations();
 
@@ -40,7 +50,7 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
   }>({
     visible: false,
     position: { x: 0, y: 0 },
-    knowledgeBase: null
+    knowledgeBase: null,
   });
 
   // 删除确认相关状态
@@ -49,11 +59,11 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
     knowledgeBase: KnowledgeBase | null;
   }>({
     isOpen: false,
-    knowledgeBase: null
+    knowledgeBase: null,
   });
   const [isDeletingKnowledgeBase, setIsDeletingKnowledgeBase] = useState(false);
 
-  // 删除页面确认状态  
+  // 删除页面确认状态
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -63,15 +73,18 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
 
   // 创建新页面
   const handleCreate = async (parentId?: string) => {
-    
     if (!knowledgeOps.currentKnowledgeBase) {
       return;
     }
 
     try {
       const newTitle = `新页面 ${new Date().toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' })}`;
-      
-      const newId = await knowledgeOps.createPage?.(knowledgeOps.currentKnowledgeBase.id, newTitle, parentId);
+
+      const newId = await knowledgeOps.createPage?.(
+        knowledgeOps.currentKnowledgeBase.id,
+        newTitle,
+        parentId
+      );
 
       // 确保知识库展开显示页面
       if (!expandedKnowledgeBases.has(knowledgeOps.currentKnowledgeBase.id)) {
@@ -98,7 +111,7 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
   const handleDeleteKnowledgeBase = (kb: KnowledgeBase) => {
     setDeleteConfirm({
       isOpen: true,
-      knowledgeBase: kb
+      knowledgeBase: kb,
     });
   };
 
@@ -111,7 +124,7 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
       await knowledgeOps.deleteKnowledgeBase?.(deleteConfirm.knowledgeBase.id);
       setDeleteConfirm({
         isOpen: false,
-        knowledgeBase: null
+        knowledgeBase: null,
       });
     } catch (error) {
       console.error('删除知识库失败:', error);
@@ -124,7 +137,7 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
   const handleCancelDelete = () => {
     setDeleteConfirm({
       isOpen: false,
-      knowledgeBase: null
+      knowledgeBase: null,
     });
   };
 
@@ -158,7 +171,7 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
 
   // 关闭右键菜单
   const handleCloseContextMenu = () => {
-    setContextMenu(prev => ({ ...prev, visible: false }));
+    setContextMenu((prev) => ({ ...prev, visible: false }));
   };
 
   // 刷新数据
@@ -191,38 +204,63 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
   // 递归渲染页面树节点
   const renderNode = (node: any, level: number = 0) => {
     const hasChildren = node.children && node.children.length > 0;
-    const isExpanded = knowledgeOps.expandedIds?.has(node.id);
+    // 如果有强制展开/折叠的状态，优先使用；否则使用expandedIds
+    const isExpanded =
+      forceExpandAll !== undefined ? forceExpandAll : knowledgeOps.expandedIds?.has(node.id);
     const paddingLeft = level * 20; // 每层缩进20px
 
     return (
-      <div key={node.id} 
-        className="space-y-2">
-        <div className={cn(
-          'flex items-center justify-between group px-2 py-1.5 mx-0.5 my-0.5 rounded text-sm theme-text-primary hover:theme-bg-tertiary hover:theme-text-primary transition-all cursor-pointer',
-          selectedId === node.id && 'bg-blue-500/15 text-blue-200 border-l-2 border-blue-500 pl-1.5'
-        )} style={{ marginLeft: paddingLeft }}
+      <div key={node.id} className="space-y-2">
+        <div
+          className={cn(
+            'flex items-center justify-between group px-2 py-1.5 mx-0.5 my-0.5 rounded text-sm theme-text-primary hover:theme-bg-tertiary hover:theme-text-primary transition-all cursor-pointer',
+            selectedId === node.id &&
+              'bg-blue-500/15 text-blue-200 border-l-2 border-blue-500 pl-1.5'
+          )}
+          style={{ marginLeft: paddingLeft }}
         >
-          <div className="flex items-center gap-3 flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            {/* 展开/折叠箭头 - 只有有子节点时显示 */}
+            {hasChildren ? (
+              <div
+                className="w-4 h-4 flex items-center justify-center flex-shrink-0 cursor-pointer hover:theme-bg-secondary rounded transition-all"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  knowledgeOps.toggleExpansion?.(node.id);
+                }}
+                title={isExpanded ? '折叠' : '展开'}
+              >
+                {isExpanded ? (
+                  <ChevronDown className="w-3 h-3" />
+                ) : (
+                  <ChevronRight className="w-3 h-3" />
+                )}
+              </div>
+            ) : (
+              <div className="w-4 h-4" /> // 占位符，保持对齐
+            )}
+
             {/* 文件夹/文件图标 - 点击打开页面 */}
-            <div className="w-4 h-4 flex items-center justify-center flex-shrink-0 mr-1.5 cursor-pointer"
+            <div
+              className="w-4 h-4 flex items-center justify-center flex-shrink-0 cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
-                // 始终选择页面
+                // 选择页面
                 onSelect?.(node.id);
-                // 如果有子节点，也切换展开/折叠状态
-                if (hasChildren) {
-                  knowledgeOps.toggleExpansion?.(node.id);
-                }
               }}
             >
               {hasChildren ? (
-                <FolderMinus className="w-4 h-4" />
+                isExpanded ? (
+                  <FolderOpen className="w-4 h-4" />
+                ) : (
+                  <FolderMinus className="w-4 h-4" />
+                )
               ) : (
                 <FileText className="w-4 h-4" />
               )}
             </div>
             {editingId === node.id ? (
-              <input 
+              <input
                 type="text"
                 value={editingTitle}
                 onChange={(e) => setEditingTitle(e.target.value)}
@@ -250,7 +288,8 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
                 onClick={(e) => e.stopPropagation()}
               />
             ) : (
-              <div className="flex items-center gap-2 flex-1"
+              <div
+                className="flex items-center gap-2 flex-1"
                 onClick={(e) => {
                   e.stopPropagation();
                   onSelect?.(node.id);
@@ -273,7 +312,7 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
             )}
           </div>
           <div className="theme-knowledge-actions">
-            <button 
+            <button
               onClick={(e) => {
                 e.stopPropagation();
                 handleCreate(node.id);
@@ -283,7 +322,7 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
             >
               <Plus className="w-3 h-3" />
             </button>
-            <button 
+            <button
               onClick={(e) => {
                 e.stopPropagation();
                 handleDelete(node.id, node.title);
@@ -298,9 +337,7 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
         {/* 递归渲染子节点 */}
         {hasChildren && isExpanded && (
           <div className="space-y-2 pl-2">
-            {node.children.map((childNode: any) =>
-              renderNode(childNode, level + 1)
-            )}
+            {node.children.map((childNode: any) => renderNode(childNode, level + 1))}
           </div>
         )}
       </div>
@@ -315,9 +352,13 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
 
     if (currentSearchQuery?.trim()) {
       // 搜索模式：显示扁平化的匹配结果
-      return knowledgeOps.pages?.filter((page: any) =>
-        page.kb_id === knowledgeOps.currentKnowledgeBase!.id && page.title.toLowerCase().includes(currentSearchQuery.toLowerCase())
-      ) || [];
+      return (
+        knowledgeOps.pages?.filter(
+          (page: any) =>
+            page.kb_id === knowledgeOps.currentKnowledgeBase!.id &&
+            page.title.toLowerCase().includes(currentSearchQuery.toLowerCase())
+        ) || []
+      );
     }
 
     // 正常模式：显示树状结构
@@ -334,11 +375,12 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
               // 搜索模式：显示匹配的页面（扁平化）
               <div className="space-y-2">
                 {getFilteredTree().map((page: any) => (
-                  <div 
+                  <div
                     key={page.id}
                     className={cn(
                       'flex items-center px-2 py-1.5 mx-0.5 my-0.5 rounded text-sm theme-text-primary hover:theme-bg-tertiary hover:theme-text-primary transition-all cursor-pointer group',
-                      selectedId === page.id && 'bg-blue-500/15 text-blue-200 border-l-2 border-blue-500 pl-1.5'
+                      selectedId === page.id &&
+                        'bg-blue-500/15 text-blue-200 border-l-2 border-blue-500 pl-1.5'
                     )}
                     onClick={() => onSelect?.(page.id)}
                   >
@@ -365,29 +407,31 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
             </div>
           )}
 
-          {knowledgeOps.currentKnowledgeBase && getFilteredTree().length === 0 && !(externalSearchQuery || knowledgeOps.searchQuery)?.trim() && (
-            <div className="px-3 py-8 text-center theme-text-secondary">
-              <p className="text-sm mb-2">暂无页面</p>
-              <button 
-                onClick={() => handleCreate()}
-                className="theme-text-accent hover:theme-text-accent-hover text-sm"
-              >
-                创建第一个页面
-              </button>
-            </div>
-          )}
+          {knowledgeOps.currentKnowledgeBase &&
+            getFilteredTree().length === 0 &&
+            !(externalSearchQuery || knowledgeOps.searchQuery)?.trim() && (
+              <div className="px-3 py-8 text-center theme-text-secondary">
+                <p className="text-sm mb-2">暂无页面</p>
+                <button
+                  onClick={() => handleCreate()}
+                  className="theme-text-accent hover:theme-text-accent-hover text-sm"
+                >
+                  创建第一个页面
+                </button>
+              </div>
+            )}
         </div>
       </div>
 
       {/* 编辑知识库弹窗 */}
-      <EditKnowledgeBaseModal 
+      <EditKnowledgeBaseModal
         isOpen={showEditModal}
         onClose={handleCloseEditModal}
         knowledgeBase={editingKnowledgeBase}
       />
 
       {/* 右键菜单 */}
-      <KnowledgeBaseContextMenu 
+      <KnowledgeBaseContextMenu
         isVisible={contextMenu.visible}
         position={contextMenu.position}
         knowledgeBase={contextMenu.knowledgeBase}
@@ -402,7 +446,7 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
       />
 
       {/* 删除知识库确认对话框 */}
-      <ConfirmDeleteModal 
+      <ConfirmDeleteModal
         isOpen={deleteConfirm.isOpen}
         onClose={handleCancelDelete}
         onConfirm={handleConfirmDeleteKnowledgeBase}
@@ -412,23 +456,24 @@ export const KnowledgeTree: React.FC<KnowledgeTreeProps> = ({
       />
 
       {/* 删除页面确认对话框 */}
-      {showDeleteConfirm && createPortal(
-        <ConfirmDeleteModal
-          isOpen={showDeleteConfirm}
-          onClose={() => {
-            setShowDeleteConfirm(false);
-            setDeleteTarget(null);
-          }}
-          onConfirm={handleConfirmDeletePage}
-          title="删除页面"
-          itemName={deleteTarget?.title || ''}
-          isLoading={isDeleting}
-        />,
-        document.body
-      )}
+      {showDeleteConfirm &&
+        createPortal(
+          <ConfirmDeleteModal
+            isOpen={showDeleteConfirm}
+            onClose={() => {
+              setShowDeleteConfirm(false);
+              setDeleteTarget(null);
+            }}
+            onConfirm={handleConfirmDeletePage}
+            title="删除页面"
+            itemName={deleteTarget?.title || ''}
+            isLoading={isDeleting}
+          />,
+          document.body
+        )}
 
       {/* 创建知识库弹窗 */}
-      <CreateKnowledgeBaseModal 
+      <CreateKnowledgeBaseModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
       />

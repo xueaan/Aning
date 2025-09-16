@@ -8,17 +8,17 @@ interface EditorState {
   editingPageId: string | null;
   editingContent: string;
   editingTitle: string;
-  
+
   // 保存状态
   isSaving: boolean;
   lastSavedAt: number | null;
   hasUnsavedChanges: boolean;
   autoSaveEnabled: boolean;
-  
+
   // 块数据
   blocks: Block[];
   selectedBlocks: Set<string>;
-  
+
   // 版本控制
   history: Array<{ content: string; timestamp: number }>;
   historyIndex: number;
@@ -31,24 +31,29 @@ interface EditorActions {
   cancelEditing: () => void;
   updateContent: (content: string) => void;
   updateTitle: (title: string) => void;
-  
+
   // 自动保存
   enableAutoSave: () => void;
   disableAutoSave: () => void;
   triggerAutoSave: () => Promise<void>;
-  
+
   // 块操作
   loadBlocks: (pageId: string) => Promise<void>;
-  createBlock: (pageId: string, blockType: string, content: string, parentId?: string) => Promise<string>;
+  createBlock: (
+    pageId: string,
+    blockType: string,
+    content: string,
+    parentId?: string
+  ) => Promise<string>;
   updateBlock: (blockId: string, content: string) => Promise<void>;
   deleteBlock: (blockId: string) => Promise<void>;
   moveBlock: (blockId: string, newParentId?: string, newIndex?: number) => Promise<void>;
-  
+
   // 选择操作
   selectBlock: (blockId: string) => void;
   selectMultipleBlocks: (blockIds: string[]) => void;
   clearBlockSelection: () => void;
-  
+
   // 版本控制
   pushToHistory: (content: string) => void;
   undo: () => void;
@@ -81,7 +86,7 @@ export const useEditorStore = create<EditorStore>((set, get) => {
     startEditing: async (pageId: string) => {
       try {
         const pageData = await DatabaseAPI.getPageContent(pageId);
-        
+
         set({
           isEditing: true,
           editingPageId: pageId,
@@ -89,7 +94,7 @@ export const useEditorStore = create<EditorStore>((set, get) => {
           editingTitle: pageData.title || '',
           hasUnsavedChanges: false,
           history: [{ content: pageData.content || '', timestamp: Date.now() }],
-          historyIndex: 0
+          historyIndex: 0,
         });
 
         // 加载页面的块
@@ -105,14 +110,14 @@ export const useEditorStore = create<EditorStore>((set, get) => {
       if (!editingPageId) return;
 
       set({ isSaving: true });
-      
+
       try {
         await DatabaseAPI.updatePageContent(editingPageId, editingContent, editingTitle);
-        
+
         set({
           isSaving: false,
           hasUnsavedChanges: false,
-          lastSavedAt: Date.now()
+          lastSavedAt: Date.now(),
         });
       } catch (error) {
         console.error('保存失败:', error);
@@ -126,7 +131,7 @@ export const useEditorStore = create<EditorStore>((set, get) => {
         clearTimeout(autoSaveTimer);
         autoSaveTimer = null;
       }
-      
+
       set({
         isEditing: false,
         editingPageId: null,
@@ -136,21 +141,21 @@ export const useEditorStore = create<EditorStore>((set, get) => {
         blocks: [],
         selectedBlocks: new Set(),
         history: [],
-        historyIndex: -1
+        historyIndex: -1,
       });
     },
 
     updateContent: (content: string) => {
-      set(state => {
+      set((state) => {
         // 推送到历史记录
         const newHistory = state.history.slice(0, state.historyIndex + 1);
         newHistory.push({ content, timestamp: Date.now() });
-        
+
         return {
           editingContent: content,
           hasUnsavedChanges: true,
           history: newHistory.slice(-50), // 保留最近50个版本
-          historyIndex: Math.min(newHistory.length - 1, 49)
+          historyIndex: Math.min(newHistory.length - 1, 49),
         };
       });
 
@@ -163,7 +168,7 @@ export const useEditorStore = create<EditorStore>((set, get) => {
     updateTitle: (title: string) => {
       set({
         editingTitle: title,
-        hasUnsavedChanges: true
+        hasUnsavedChanges: true,
       });
     },
 
@@ -183,7 +188,7 @@ export const useEditorStore = create<EditorStore>((set, get) => {
       if (autoSaveTimer) {
         clearTimeout(autoSaveTimer);
       }
-      
+
       autoSaveTimer = setTimeout(async () => {
         if (get().hasUnsavedChanges) {
           await get().saveContent();
@@ -215,11 +220,11 @@ export const useEditorStore = create<EditorStore>((set, get) => {
     updateBlock: async (blockId: string, content: string) => {
       try {
         await DatabaseAPI.updateBlock(blockId, content);
-        
-        set(state => ({
-          blocks: state.blocks.map(block =>
+
+        set((state) => ({
+          blocks: state.blocks.map((block) =>
             block.id === blockId ? { ...block, content, updated_at: Date.now() } : block
-          )
+          ),
         }));
       } catch (error) {
         console.error('更新块失败:', error);
@@ -230,10 +235,10 @@ export const useEditorStore = create<EditorStore>((set, get) => {
     deleteBlock: async (blockId: string) => {
       try {
         await DatabaseAPI.deleteBlock(blockId);
-        
-        set(state => ({
-          blocks: state.blocks.filter(block => block.id !== blockId),
-          selectedBlocks: new Set([...state.selectedBlocks].filter(id => id !== blockId))
+
+        set((state) => ({
+          blocks: state.blocks.filter((block) => block.id !== blockId),
+          selectedBlocks: new Set([...state.selectedBlocks].filter((id) => id !== blockId)),
         }));
       } catch (error) {
         console.error('删除块失败:', error);
@@ -256,30 +261,30 @@ export const useEditorStore = create<EditorStore>((set, get) => {
 
     selectBlock: (blockId: string) => {
       set({
-        selectedBlocks: new Set([blockId])
+        selectedBlocks: new Set([blockId]),
       });
     },
 
     selectMultipleBlocks: (blockIds: string[]) => {
       set({
-        selectedBlocks: new Set(blockIds)
+        selectedBlocks: new Set(blockIds),
       });
     },
 
     clearBlockSelection: () => {
       set({
-        selectedBlocks: new Set()
+        selectedBlocks: new Set(),
       });
     },
 
     pushToHistory: (content: string) => {
-      set(state => {
+      set((state) => {
         const newHistory = state.history.slice(0, state.historyIndex + 1);
         newHistory.push({ content, timestamp: Date.now() });
-        
+
         return {
           history: newHistory.slice(-50),
-          historyIndex: Math.min(newHistory.length - 1, 49)
+          historyIndex: Math.min(newHistory.length - 1, 49),
         };
       });
     },
@@ -291,7 +296,7 @@ export const useEditorStore = create<EditorStore>((set, get) => {
         set({
           editingContent: history[newIndex].content,
           historyIndex: newIndex,
-          hasUnsavedChanges: true
+          hasUnsavedChanges: true,
         });
       }
     },
@@ -303,7 +308,7 @@ export const useEditorStore = create<EditorStore>((set, get) => {
         set({
           editingContent: history[newIndex].content,
           historyIndex: newIndex,
-          hasUnsavedChanges: true
+          hasUnsavedChanges: true,
         });
       }
     },
@@ -316,6 +321,6 @@ export const useEditorStore = create<EditorStore>((set, get) => {
     canRedo: () => {
       const { history, historyIndex } = get();
       return historyIndex < history.length - 1;
-    }
+    },
   };
 });

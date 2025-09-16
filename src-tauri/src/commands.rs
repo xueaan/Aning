@@ -3,6 +3,10 @@ use serde_json::Value;
 use std::sync::Arc;
 use tauri::{State, Manager};
 
+// 导入book模块
+pub mod book;
+pub mod douban;
+
 // 初始化数据库
 #[tauri::command]
 pub async fn db_init(db: State<'_, Arc<Database>>) -> Result<Value, String> {

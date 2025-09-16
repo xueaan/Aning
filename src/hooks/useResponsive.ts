@@ -15,35 +15,35 @@ interface ResponsiveState {
 
 // 断点定义（2025年显示器标准）
 const BREAKPOINTS = {
-  xs: 0,        // 极小窗口
-  sm: 768,      // 小窗口模式  
-  md: 1024,     // 中等窗口
-  lg: 1440,     // 标准桌面
-  xl: 1920,     // FHD全屏（主流起步）
-  '2xl': 2560,  // 2K/QHD及以上
+  xs: 0, // 极小窗口
+  sm: 768, // 小窗口模式
+  md: 1024, // 中等窗口
+  lg: 1440, // 标准桌面
+  xl: 1920, // FHD全屏（主流起步）
+  '2xl': 2560, // 2K/QHD及以上
 };
 
 // 自动折叠阈值（适配笔记本窗口模式）
 const AUTO_FOLD_THRESHOLDS = {
-  rightPanel: 1280,  // < 1280px 时右侧栏自动折叠
-  leftPanel: 1024,   // < 1024px 时左侧栏也自动折叠
+  rightPanel: 1280, // < 1280px 时右侧栏自动折叠
+  leftPanel: 1024, // < 1024px 时左侧栏也自动折叠
 };
 
 export const useResponsive = () => {
-  const { 
-    setSidebarOpen, 
+  const {
+    setSidebarOpen,
     setRightPanelOpen,
     setWindowWidth,
     setBreakpoint,
     userOverride,
-    setUserOverride
+    setUserOverride,
   } = useAppStore();
 
   const [state, setState] = useState<ResponsiveState>(() => {
     const width = window.innerWidth;
     const height = window.innerHeight;
     const breakpoint = getBreakpoint(width);
-    
+
     return {
       windowWidth: width,
       windowHeight: height,
@@ -51,7 +51,7 @@ export const useResponsive = () => {
       isMobile: width < BREAKPOINTS.sm,
       isTablet: width >= BREAKPOINTS.sm && width < BREAKPOINTS.lg,
       isDesktop: width >= BREAKPOINTS.lg,
-      isLargeDesktop: width >= BREAKPOINTS.xl
+      isLargeDesktop: width >= BREAKPOINTS.xl,
     };
   });
 
@@ -80,7 +80,7 @@ export const useResponsive = () => {
       isMobile: width < BREAKPOINTS.sm,
       isTablet: width >= BREAKPOINTS.sm && width < BREAKPOINTS.lg,
       isDesktop: width >= BREAKPOINTS.lg,
-      isLargeDesktop: width >= BREAKPOINTS.xl
+      isLargeDesktop: width >= BREAKPOINTS.xl,
     });
 
     // 更新 store
@@ -94,49 +94,55 @@ export const useResponsive = () => {
   }, [state.breakpoint]);
 
   // 自动折叠处理
-  const handleAutoFold = useCallback((width: number) => {
-    // 右侧栏自动折叠
-    if (width < AUTO_FOLD_THRESHOLDS.rightPanel && !userOverride?.rightSidebar) {
-      setRightPanelOpen(false);
-    } else if (width >= AUTO_FOLD_THRESHOLDS.rightPanel && !userOverride?.rightSidebar) {
-      setRightPanelOpen(true);
-    }
+  const handleAutoFold = useCallback(
+    (width: number) => {
+      // 右侧栏自动折叠
+      if (width < AUTO_FOLD_THRESHOLDS.rightPanel && !userOverride?.rightSidebar) {
+        setRightPanelOpen(false);
+      } else if (width >= AUTO_FOLD_THRESHOLDS.rightPanel && !userOverride?.rightSidebar) {
+        setRightPanelOpen(true);
+      }
 
-    // 左侧栏自动折叠
-    if (width < AUTO_FOLD_THRESHOLDS.leftPanel && !userOverride?.leftSidebar) {
-      setSidebarOpen(false);
-    } else if (width >= AUTO_FOLD_THRESHOLDS.leftPanel && !userOverride?.leftSidebar) {
-      setSidebarOpen(true);
-    }
-  }, [userOverride, setSidebarOpen, setRightPanelOpen]);
+      // 左侧栏自动折叠
+      if (width < AUTO_FOLD_THRESHOLDS.leftPanel && !userOverride?.leftSidebar) {
+        setSidebarOpen(false);
+      } else if (width >= AUTO_FOLD_THRESHOLDS.leftPanel && !userOverride?.leftSidebar) {
+        setSidebarOpen(true);
+      }
+    },
+    [userOverride, setSidebarOpen, setRightPanelOpen]
+  );
 
   // 手动切换侧边栏（记录用户操作）
-  const toggleSidebarWithOverride = useCallback((isLeft: boolean) => {
-    if (isLeft) {
-      const newState = !useAppStore.getState().sidebarOpen;
-      setSidebarOpen(newState);
-      setUserOverride({ ...userOverride, leftSidebar: true });
-      
-      // 5秒后清除用户覆盖状态
-      setTimeout(() => {
-        setUserOverride({ ...userOverride, leftSidebar: false });
-      }, 5000);
-    } else {
-      const newState = !useAppStore.getState().rightPanelOpen;
-      setRightPanelOpen(newState);
-      setUserOverride({ ...userOverride, rightSidebar: true });
-      
-      // 5秒后清除用户覆盖状态
-      setTimeout(() => {
-        setUserOverride({ ...userOverride, rightSidebar: false });
-      }, 5000);
-    }
-  }, [userOverride, setSidebarOpen, setRightPanelOpen, setUserOverride]);
+  const toggleSidebarWithOverride = useCallback(
+    (isLeft: boolean) => {
+      if (isLeft) {
+        const newState = !useAppStore.getState().sidebarOpen;
+        setSidebarOpen(newState);
+        setUserOverride({ ...userOverride, leftSidebar: true });
+
+        // 5秒后清除用户覆盖状态
+        setTimeout(() => {
+          setUserOverride({ ...userOverride, leftSidebar: false });
+        }, 5000);
+      } else {
+        const newState = !useAppStore.getState().rightPanelOpen;
+        setRightPanelOpen(newState);
+        setUserOverride({ ...userOverride, rightSidebar: true });
+
+        // 5秒后清除用户覆盖状态
+        setTimeout(() => {
+          setUserOverride({ ...userOverride, rightSidebar: false });
+        }, 5000);
+      }
+    },
+    [userOverride, setSidebarOpen, setRightPanelOpen, setUserOverride]
+  );
 
   // 监听窗口大小变化
   useEffect(() => {
     let resizeTimer: NodeJS.Timeout;
-    
+
     const debouncedResize = () => {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(handleResize, 150);
@@ -147,7 +153,7 @@ export const useResponsive = () => {
 
     // 添加监听器
     window.addEventListener('resize', debouncedResize);
-    
+
     return () => {
       window.removeEventListener('resize', debouncedResize);
       clearTimeout(resizeTimer);
@@ -158,7 +164,7 @@ export const useResponsive = () => {
     ...state,
     toggleSidebarWithOverride,
     breakpoints: BREAKPOINTS,
-    autoFoldThresholds: AUTO_FOLD_THRESHOLDS
+    autoFoldThresholds: AUTO_FOLD_THRESHOLDS,
   };
 };
 
@@ -174,8 +180,3 @@ export const isBreakpointOrLarger = (current: Breakpoint, target: Breakpoint): b
 export const isBreakpointOrSmaller = (current: Breakpoint, target: Breakpoint): boolean => {
   return BREAKPOINTS[current] <= BREAKPOINTS[target];
 };
-
-
-
-
-

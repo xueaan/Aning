@@ -8,36 +8,53 @@ interface PasswordStrengthIndicatorProps {
   } | null;
 }
 
-export const PasswordStrengthIndicator: React.FC<PasswordStrengthIndicatorProps> = ({ strength }) => {
+export const PasswordStrengthIndicator: React.FC<PasswordStrengthIndicatorProps> = ({
+  strength,
+}) => {
   if (!strength) return null;
 
   const getLevelText = (level: string) => {
     switch (level) {
-      case 'weak': return '弱';
-      case 'fair': return '一般';
-      case 'good': return '良好';
-      case 'strong': return '强';
-      default: return '';
+      case 'weak':
+        return '弱';
+      case 'fair':
+        return '一般';
+      case 'good':
+        return '良好';
+      case 'strong':
+        return '强';
+      default:
+        return '';
     }
   };
 
   const getLevelColor = (level: string) => {
     switch (level) {
-      case 'weak': return 'theme-text-error';
-      case 'fair': return 'text-yellow-500';
-      case 'good': return 'theme-text-accent';
-      case 'strong': return 'theme-text-success';
-      default: return '';
+      case 'weak':
+        return 'theme-text-error';
+      case 'fair':
+        return 'text-yellow-500';
+      case 'good':
+        return 'theme-text-accent';
+      case 'strong':
+        return 'theme-text-success';
+      default:
+        return '';
     }
   };
 
   const getBarColor = (level: string) => {
     switch (level) {
-      case 'weak': return 'status-error';
-      case 'fair': return 'bg-yellow-500';
-      case 'good': return 'theme-bg-accent';
-      case 'strong': return 'status-success';
-      default: return '';
+      case 'weak':
+        return 'status-error';
+      case 'fair':
+        return 'bg-yellow-500';
+      case 'good':
+        return 'theme-bg-accent';
+      case 'strong':
+        return 'status-success';
+      default:
+        return '';
     }
   };
 
@@ -50,11 +67,11 @@ export const PasswordStrengthIndicator: React.FC<PasswordStrengthIndicatorProps>
         </span>
       </div>
       <div className="w-full theme-bg-tertiary rounded-full h-1.5">
-        <div 
+        <div
           className={cn(
             'h-1.5 rounded-full transition-all duration-300',
             getBarColor(strength.level)
-          )} 
+          )}
           style={{ width: `${strength.score}%` }}
         />
       </div>

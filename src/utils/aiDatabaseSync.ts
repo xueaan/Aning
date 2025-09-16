@@ -1,5 +1,8 @@
 ﻿import { invoke } from '@tauri-apps/api/core';
 import { AiConversation, AiMessage, AiProviderType } from '@/types/aiConfig';
+import { invokeTauri } from '@/utils/tauriWrapper';
+// Avoid TS6133 on build by referencing imported symbol (will be cleaned later)
+void invoke;
 
 // Tauri命令的请求类型
 interface SaveConversationRequest {
@@ -62,7 +65,7 @@ function conversationToRequest(conversation: AiConversation): SaveConversationRe
     provider: conversation.provider,
     model: conversation.model,
     created_at: new Date(conversation.createdAt).toISOString(),
-    updated_at: new Date(conversation.updatedAt).toISOString()
+    updated_at: new Date(conversation.updatedAt).toISOString(),
   };
 }
 function messageToRequest(message: AiMessage): SaveMessageRequest {
@@ -75,7 +78,7 @@ function messageToRequest(message: AiMessage): SaveMessageRequest {
     model: message.model,
     error: message.error || false,
     timestamp: message.timestamp,
-    created_at: new Date(message.timestamp).toISOString()
+    created_at: new Date(message.timestamp).toISOString(),
   };
 }
 function dbConversationToType(dbConv: ConversationDetailResponse['conversation']): AiConversation {
@@ -86,7 +89,7 @@ function dbConversationToType(dbConv: ConversationDetailResponse['conversation']
     createdAt: new Date(dbConv.created_at).getTime(),
     updatedAt: new Date(dbConv.updated_at).getTime(),
     provider: dbConv.provider as AiProviderType,
-    model: dbConv.model
+    model: dbConv.model,
   };
 }
 function dbMessageToType(dbMsg: ConversationDetailResponse['messages'][0]): AiMessage {
@@ -97,7 +100,7 @@ function dbMessageToType(dbMsg: ConversationDetailResponse['messages'][0]): AiMe
     timestamp: dbMsg.timestamp,
     provider: dbMsg.provider as AiProviderType,
     model: dbMsg.model,
-    error: dbMsg.error
+    error: dbMsg.error,
   };
 }
 
@@ -106,50 +109,54 @@ export class AiDatabaseSync {
   // 保存对话到数据库
   static async saveConversation(conversation: AiConversation): Promise<void> {
     const request = conversationToRequest(conversation);
-    await invoke('save_ai_conversation', { request });
+    await invokeTauri('save_ai_conversation', { request });
   }
 
   // 保存消息到数据库
   static async saveMessage(message: AiMessage, conversationId: string): Promise<void> {
     const request = {
       ...messageToRequest(message),
-      conversation_id: conversationId // 正确设置conversation_id
+      conversation_id: conversationId, // 正确设置conversation_id
     };
-    await invoke('save_ai_message', { request });
+    await invokeTauri('save_ai_message', { request });
   }
 
   // 批量同步对话和消息
-  static async syncConversationWithMessages(conversation: AiConversation, messages: AiMessage[]): Promise<void> {
+  static async syncConversationWithMessages(
+    conversation: AiConversation,
+    messages: AiMessage[]
+  ): Promise<void> {
     const conversationRequest = conversationToRequest(conversation);
-    const messageRequests = messages.map(msg => ({
+    const messageRequests = messages.map((msg) => ({
       ...messageToRequest(msg),
-      conversation_id: conversation.id
+      conversation_id: conversation.id,
     }));
 
-    await invoke('sync_ai_conversation_with_messages', {
+    await invokeTauri('sync_ai_conversation_with_messages', {
       conversation: conversationRequest,
-      messages: messageRequests
+      messages: messageRequests,
     });
   }
 
   // 从数据库加载对话列表
   static async loadConversations(limit?: number): Promise<AiConversation[]> {
-    const response = await invoke<ConversationResponse>('get_ai_conversations', { limit });
-    return response.conversations.map(conv => ({
+    const response = await invokeTauri<ConversationResponse>('get_ai_conversations', { limit });
+    return response.conversations.map((conv) => ({
       id: conv.id,
       title: conv.title,
       messages: [], // 消息需要单独加载
       createdAt: new Date(conv.created_at).getTime(),
       updatedAt: new Date(conv.updated_at).getTime(),
       provider: conv.provider as AiProviderType,
-      model: conv.model
+      model: conv.model,
     }));
   }
 
   // 从数据库加载完整对话详情（包含消息）
   static async loadConversationDetail(conversationId: string): Promise<AiConversation | null> {
-    const response = await invoke<ConversationDetailResponse | null>('get_ai_conversation_detail', 
-      { conversationId });
+    const response = await invokeTauri<ConversationDetailResponse | null>('get_ai_conversation_detail', {
+      conversationId,
+    });
 
     if (!response) return null;
 
@@ -161,34 +168,34 @@ export class AiDatabaseSync {
 
   // 删除对话
   static async deleteConversation(conversationId: string): Promise<void> {
-    await invoke('delete_ai_conversation', { conversationId });
+    await invokeTauri('delete_ai_conversation', { conversationId });
   }
 
   // 更新对话标题
   static async updateConversationTitle(conversationId: string, title: string): Promise<void> {
-    await invoke('update_ai_conversation_title', { conversationId, title });
+    await invokeTauri('update_ai_conversation_title', { conversationId, title });
   }
 
   // 搜索对话
   static async searchConversations(query: string, limit?: number): Promise<AiConversation[]> {
-    const response = await invoke<ConversationResponse>('search_ai_conversations', { 
-      query, 
-      limit 
+    const response = await invokeTauri<ConversationResponse>('search_ai_conversations', {
+      query,
+      limit,
     });
-    return response.conversations.map(conv => ({
+    return response.conversations.map((conv) => ({
       id: conv.id,
       title: conv.title,
       messages: [],
       createdAt: new Date(conv.created_at).getTime(),
       updatedAt: new Date(conv.updated_at).getTime(),
       provider: conv.provider as AiProviderType,
-      model: conv.model
+      model: conv.model,
     }));
   }
 
   // 清理旧对话
   static async cleanupOldConversations(daysToKeep?: number): Promise<number> {
-    return await invoke<number>('cleanup_old_ai_conversations', { daysToKeep });
+    return await invokeTauri<number>('cleanup_old_ai_conversations', { daysToKeep });
   }
 }
 
@@ -215,7 +222,7 @@ export class AiAutoSync {
 
     this.syncTimeout = setTimeout(async () => {
       this.isProcessing = true;
-      
+
       while (this.syncQueue.length > 0) {
         const syncFunction = this.syncQueue.shift();
         if (syncFunction) {
@@ -241,9 +248,3 @@ export class AiAutoSync {
     this.queueSync(() => AiDatabaseSync.saveMessage(message, conversationId));
   }
 }
-
-
-
-
-
-

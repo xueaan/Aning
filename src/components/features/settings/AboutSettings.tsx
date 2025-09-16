@@ -37,11 +37,11 @@ export const Abouts: React.FC = () => {
         </p>
       </div>
       <div className="mb-12">
-        <a href="https://github.com/yourusername/anning"
+        <a
+          href="https://github.com/yourusername/anning"
           target="_blank"
           rel="noopener noreferrer"
-          
-            className="flex items-center gap-2 px-4 py-2 crystal-glass rounded-lg theme-text-secondary hover:theme-text transition-colors"
+          className="flex items-center gap-2 px-4 py-2 crystal-glass rounded-lg theme-text-secondary hover:theme-text transition-colors"
         >
           <Github size={16} />
           <span className="text-sm">GitHub</span>
@@ -49,21 +49,10 @@ export const Abouts: React.FC = () => {
       </div>
       <div className="text-center space-y-1">
         <p className="text-xs theme-text-secondary">
-          Made with <Activity size={12} 
-            className="inline text-red-500" /> by Anning Team
+          Made with <Activity size={12} className="inline text-red-500" /> by Anning Team
         </p>
-        <p className="text-xs theme-text-secondary">
-          © 2025 Anning. MIT License
-        </p>
+        <p className="text-xs theme-text-secondary">© 2025 Anning. MIT License</p>
       </div>
     </div>
   );
 };
-
-
-
-
-
-
-
-

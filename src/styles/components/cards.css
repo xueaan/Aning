@@ -14,7 +14,7 @@
   border: 1px solid rgba(var(--border-primary), 1);
   padding: var(--spacing-lg);
   transition: all var(--duration-normal) ease;
-  
+
   /* 默认文字颜色 */
   color: rgba(var(--text-primary), 1);
 }
@@ -24,7 +24,6 @@
   transform: translateY(-2px);
   border-color: rgba(var(--border-secondary), 1);
 }
-
 
 /* =================
    毛玻璃卡片样式 - 主要内容卡片
@@ -40,9 +39,9 @@
   position: relative;
   overflow: hidden;
   transition: all var(--duration-normal) cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   /* 高级阴影效果 */
-  box-shadow: 
+  box-shadow:
     0 8px 32px rgba(var(--bg-overlay), 0.12),
     0 4px 16px rgba(var(--color-accent), 0.06),
     inset 0 1px 0 rgba(var(--bg-overlay), 0.05);
@@ -68,7 +67,7 @@
 .theme-card-glass:hover {
   background: rgba(var(--bg-secondary), 0.8);
   border-color: rgba(var(--border-secondary), 0.6);
-  box-shadow: 
+  box-shadow:
     0 12px 40px rgba(var(--bg-overlay), 0.12),
     inset 0 1px 0 rgba(var(--bg-overlay), 0.1);
   transform: translateY(-2px) scale(1.02);
@@ -81,7 +80,7 @@
 .theme-card-glass.pinned {
   background: rgba(var(--color-accent), 0.15);
   border-color: rgba(var(--color-accent), 0.4);
-  box-shadow: 
+  box-shadow:
     0 8px 32px rgba(var(--color-accent), 0.2),
     inset 0 1px 0 rgba(var(--color-accent), 0.1);
 }
@@ -103,9 +102,9 @@
   border: 1px solid rgba(var(--border-primary), 0.2);
   border-radius: var(--radius-xl);
   padding: var(--spacing-xl);
-  
+
   /* 更强的阴影效果 */
-  box-shadow: 
+  box-shadow:
     0 32px 64px rgba(var(--bg-overlay), 0.15),
     inset 0 2px 0 rgba(var(--bg-overlay), 0.05);
 }
@@ -114,25 +113,25 @@
    深色主题优化
    ================= */
 
-[data-theme="dark"] .theme-card-glass {
+[data-theme='dark'] .theme-card-glass {
   background: rgba(var(--bg-primary), 0.9);
-  box-shadow: 
+  box-shadow:
     0 8px 32px rgba(var(--bg-overlay), 0.4),
     inset 0 1px 0 rgba(var(--bg-overlay), 0.1),
     inset 0 -1px 0 rgba(var(--bg-overlay), 0.02);
 }
 
-[data-theme="dark"] .theme-card-glass:hover {
+[data-theme='dark'] .theme-card-glass:hover {
   background: rgba(var(--bg-secondary), 0.95);
-  box-shadow: 
+  box-shadow:
     0 12px 40px rgba(var(--bg-overlay), 0.5),
     inset 0 1px 0 rgba(var(--bg-overlay), 0.15),
     inset 0 -1px 0 rgba(var(--bg-overlay), 0.05);
 }
 
-[data-theme="dark"] .theme-card-glass-expanded {
+[data-theme='dark'] .theme-card-glass-expanded {
   background: rgba(var(--bg-primary), 0.9);
-  box-shadow: 
+  box-shadow:
     0 32px 64px rgba(var(--bg-overlay), 0.5),
     inset 0 2px 0 rgba(var(--bg-overlay), 0.05);
 }
@@ -150,7 +149,7 @@
   padding: var(--spacing-lg);
   cursor: pointer;
   transition: all var(--duration-fast) ease;
-  
+
   /* 轻微阴影 */
   box-shadow: 0 2px 8px rgba(var(--bg-overlay), 0.04);
 }
@@ -170,20 +169,19 @@
 }
 
 /* 深色主题下的精致卡片 */
-[data-theme="dark"] .card-refined {
+[data-theme='dark'] .card-refined {
   background: rgba(var(--bg-tertiary), 0.7);
   border: 1px solid rgba(var(--border-primary), 0.3);
 }
 
-[data-theme="dark"] .card-refined:hover {
+[data-theme='dark'] .card-refined:hover {
   background: rgba(var(--bg-tertiary), 0.85);
 }
 
-[data-theme="dark"] .card-refined.active {
+[data-theme='dark'] .card-refined.active {
   background: rgba(var(--color-accent), 0.15);
   border: 1px solid rgba(var(--color-accent), 0.3);
 }
-
 
 /* =================
    卡片内容区域
@@ -233,5 +231,3 @@
 .theme-card-expand-btn:hover .icon {
   color: rgba(var(--text-inverse), 1);
 }
-
-

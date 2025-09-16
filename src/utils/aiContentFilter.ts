@@ -54,7 +54,10 @@ export function filterAIResponse(content: string, currentAgent?: AiAgent): strin
     filteredContent = filteredContent
       .replace(/^(您好！?\s*)$/, `您好！我是${agentRole}，很高兴为您提供专业服务。`)
       .replace(/^(你好！?\s*)$/, `你好！我是${agentRole}，有什么可以帮助您的吗？`)
-      .replace(/^(您好！?\s*)如果您需要.*?方面的帮助/, `您好！我是${agentRole}，如果您需要相关方面的帮助`);
+      .replace(
+        /^(您好！?\s*)如果您需要.*?方面的帮助/,
+        `您好！我是${agentRole}，如果您需要相关方面的帮助`
+      );
   }
 
   // 3. 清理多余的空格和换行
@@ -99,7 +102,11 @@ function getAgentRoleName(agentName: string): string {
  * @param currentAgent 当前智能体
  * @returns 过滤后的片段
  */
-export function filterStreamChunk(chunk: string, fullContent: string, _currentAgent?: AiAgent): string {
+export function filterStreamChunk(
+  chunk: string,
+  fullContent: string,
+  _currentAgent?: AiAgent
+): string {
   // 对于流式响应，我们需要更加谨慎，避免过度过滤导致显示不连贯
 
   // 如果内容包含明显的身份声明开头，进行过滤
@@ -109,7 +116,7 @@ export function filterStreamChunk(chunk: string, fullContent: string, _currentAg
     /AI助手/gi,
     /人工智能/gi,
     /Claude Code/gi,
-    /CLI工具/gi
+    /CLI工具/gi,
   ];
 
   let filteredChunk = chunk;
@@ -138,8 +145,8 @@ export function containsAIIdentity(content: string): boolean {
     /我是.*?AI助手/gi,
     /我是.*?人工智能/gi,
     /Claude Code/gi,
-    /CLI工具/gi
+    /CLI工具/gi,
   ];
 
-  return identityPatterns.some(pattern => pattern.test(content));
+  return identityPatterns.some((pattern) => pattern.test(content));
 }

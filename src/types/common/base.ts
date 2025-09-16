@@ -8,10 +8,10 @@ export interface TauriResponse<T = any> {
 }
 
 // 应用模块类型
-export type AppModule = 
+export type AppModule =
   | 'home'
   | 'editor'
-  | 'knowledge' 
+  | 'knowledge'
   | 'timeline'
   | 'cardbox'
   | 'mindboard'

@@ -16,14 +16,14 @@ export const MoveModal: React.FC<MoveModalProps> = ({
   onClose,
   onConfirm,
   sourceId,
-  mode
+  mode,
 }) => {
   // Store references removed - themeMode cleanup
   const { pageTree, pages } = useKnowledgeOperations();
   const [selectedParentId, setSelectedParentId] = useState<string | undefined>(undefined);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
-  const source = pages.find(p => p.id === sourceId);
+  const source = pages.find((p) => p.id === sourceId);
 
   useEffect(() => {
     if (isOpen) {
@@ -48,7 +48,7 @@ export const MoveModal: React.FC<MoveModalProps> = ({
   };
 
   const isDescendant = (pageId: string, ancestorId: string): boolean => {
-    const page = pages.find(p => p.id === pageId);
+    const page = pages.find((p) => p.id === pageId);
     if (!page || !page.parent_id) return false;
     if (page.parent_id === ancestorId) return true;
     return isDescendant(page.parent_id, ancestorId);
@@ -65,13 +65,14 @@ export const MoveModal: React.FC<MoveModalProps> = ({
 
     return (
       <div key={page.id}>
-        <div 
-          className={`flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-colors ${isDisabled
+        <div
+          className={`flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-colors ${
+            isDisabled
               ? 'opacity-50 cursor-not-allowed'
               : isSelected
                 ? 'theme-bg-accent theme-text-on-accent'
                 : 'hover:theme-bg-secondary/20'
-            }`}
+          }`}
           style={{ paddingLeft: `${8 + level * 16}px` }}
           onClick={() => {
             if (!isDisabled) {
@@ -80,32 +81,24 @@ export const MoveModal: React.FC<MoveModalProps> = ({
           }}
         >
           {hasChildren && (
-            <button 
+            <button
               onClick={(e) => {
                 e.stopPropagation();
                 toggleExpand(page.id);
               }}
               className="p-0.5 rounded hover:bg-black/10"
             >
-              {isExpanded ? (
-                <ChevronDown size={16} />
-              ) : (
-                <ChevronRight size={16} />
-              )}
+              {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
             </button>
           )}
           {!hasChildren && <div className="w-5" />}
-          
+
           <FileText size={16} />
-          <span className="text-sm truncate flex-1">
-            {page.title || '无标题'}
-          </span>
+          <span className="text-sm truncate flex-1">{page.title || '无标题'}</span>
         </div>
 
         {hasChildren && isExpanded && (
-          <div>
-            {page.children.map((child: any) => renderNode(child, level + 1))}
-          </div>
+          <div>{page.children.map((child: any) => renderNode(child, level + 1))}</div>
         )}
       </div>
     );
@@ -115,15 +108,15 @@ export const MoveModal: React.FC<MoveModalProps> = ({
 
   return (
     <AnimatePresence>
-      <motion.div 
-        initial={{ opacity: 0 }} 
+      <motion.div
+        initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center"
         onClick={onClose}
       >
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }} 
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
           className="w-[500px] max-h-[600px] flex flex-col rounded-xl shadow-2xl bg-bg-primary/90 backdrop-blur-md border border-border-primary/50"
@@ -139,7 +132,7 @@ export const MoveModal: React.FC<MoveModalProps> = ({
                 {mode === 'move' ? '移动' : '复制'} "{source?.title || '无标题'}" 到：
               </p>
             </div>
-            <button 
+            <button
               onClick={onClose}
               className="p-1.5 rounded-lg transition-colors theme-text-secondary hover:theme-text-primary hover:theme-bg-secondary/20"
             >
@@ -149,7 +142,7 @@ export const MoveModal: React.FC<MoveModalProps> = ({
 
           {/* 页面树 */}
           <div className="flex-1 p-4 overflow-y-auto">
-            <div 
+            <div
               className={`flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer mb-2 transition-colors ${
                 selectedParentId === undefined
                   ? 'theme-bg-accent theme-text-on-accent'
@@ -160,21 +153,19 @@ export const MoveModal: React.FC<MoveModalProps> = ({
               <FolderOpen size={16} />
               <span className="text-sm font-medium">根级页面</span>
             </div>
-            
-            <div className="space-y-1">
-              {pageTree.map(page => renderNode(page))}
-            </div>
+
+            <div className="space-y-1">{pageTree.map((page) => renderNode(page))}</div>
           </div>
 
           {/* 底部按钮 */}
           <div className="flex items-center justify-end gap-3 p-4 border-t border-border-primary/20">
-            <button 
+            <button
               onClick={onClose}
               className="px-4 py-2 rounded-lg font-medium transition-colors theme-text-secondary hover:theme-text-primary hover:theme-bg-secondary/20"
             >
               取消
             </button>
-            <button 
+            <button
               onClick={handleConfirm}
               className="px-4 py-2 rounded-lg font-medium transition-colors theme-bg-accent theme-text-on-accent hover:theme-bg-accent-hover"
             >

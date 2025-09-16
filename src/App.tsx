@@ -11,11 +11,7 @@ import { ConfirmDialog } from '@/components/modals/ConfirmDialog';
 import { Toast } from '@/components/common/Toast';
 
 function App() {
-  const {
-    initializeApp,
-    sidebarOpen,
-    fontFamily,
-    editorFontFamily} = useAppStore();
+  const { initializeApp, sidebarOpen, fontFamily, editorFontFamily } = useAppStore();
 
   useResponsive(); // Hook 会自动处理响应式逻辑
   const { currentGradient, noiseLevel } = useTheme();
@@ -23,20 +19,20 @@ function App() {
   // 应用字体类
   useEffect(() => {
     const fontClasses: Record<string, string> = {
-      'system': 'font-system',
+      system: 'font-system',
       'lxgw-neo-zhisong': 'font-lxgw-neo-zhisong',
-      'lxgw-neo-xihei': 'font-lxgw-neo-xihei'
+      'lxgw-neo-xihei': 'font-lxgw-neo-xihei',
     };
 
     const editorFontClasses: Record<string, string> = {
-      'default': 'editor-font-default'
+      default: 'editor-font-default',
     };
 
     // 移除所有字体类
-    Object.values(fontClasses).forEach(cls => {
+    Object.values(fontClasses).forEach((cls) => {
       document.documentElement.classList.remove(cls);
     });
-    Object.values(editorFontClasses).forEach(cls => {
+    Object.values(editorFontClasses).forEach((cls) => {
       document.documentElement.classList.remove(cls);
     });
 
@@ -53,7 +49,6 @@ function App() {
   useEffect(() => {
     const startupProcess = async () => {
       try {
-
         // 添加网络稳定性检查和重试机制
         const retryWithDelay = async (fn: () => Promise<any>, retries = 3, delay = 500) => {
           for (let i = 0; i < retries; i++) {
@@ -61,7 +56,7 @@ function App() {
               return await fn();
             } catch (error: any) {
               if (error?.message?.includes('ERR_NETWORK_CHANGED') && i < retries - 1) {
-                await new Promise(resolve => setTimeout(resolve, delay));
+                await new Promise((resolve) => setTimeout(resolve, delay));
                 delay *= 1.5; // 递增延迟
               } else {
                 throw error;
@@ -71,7 +66,9 @@ function App() {
         };
 
         // 并行初始化数据，带重试机制
-        const [appInitResult] = await Promise.allSettled([retryWithDelay(() => initializeApp()), new Promise(resolve => setTimeout(resolve, 50)) // 最小显示时间
+        const [appInitResult] = await Promise.allSettled([
+          retryWithDelay(() => initializeApp()),
+          new Promise((resolve) => setTimeout(resolve, 50)), // 最小显示时间
         ]);
 
         if (appInitResult.status === 'rejected') {
@@ -80,7 +77,9 @@ function App() {
         }
 
         // 显示环境信息
-        const { isTauriEnvironment, showEnvironmentBanner } = await import('@/utils/environmentUtils');
+        const { isTauriEnvironment, showEnvironmentBanner } = await import(
+          '@/utils/environmentUtils'
+        );
         showEnvironmentBanner();
 
         // 确保窗口显示（仅在Tauri环境中）
@@ -97,7 +96,6 @@ function App() {
         } catch (windowError: unknown) {
           console.warn('窗口操作跳过:', (windowError as Error).message);
         }
-
       } catch (error) {
         console.error('应用启动失败:', error);
       }
@@ -106,7 +104,7 @@ function App() {
     // 监听网络状态变化
     const handleOnline = () => {};
     const handleOffline = () => {};
-    
+
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
@@ -121,12 +119,17 @@ function App() {
   return (
     <TooltipProvider>
       <DndProvider backend={HTML5Backend}>
-        <div className="h-screen theme-text-primary overflow-hidden relative theme-gradient-bg with-noise"
-          style={{
-            '--gradient-theme': currentGradient?.gradient || 'linear-gradient(135deg, rgba(102, 126, 234, 1) 0%, rgba(240, 147, 251, 1) 50%, rgba(245, 87, 108, 1) 100%)',
-            '--bg-gradient-opacity-local': 1, // 现在由混合色控制强度
-            '--noise-opacity': Math.max(0.1, Math.min(1, noiseLevel / 50))
-          } as React.CSSProperties}
+        <div
+          className="h-screen theme-text-primary overflow-hidden relative theme-gradient-bg with-noise"
+          style={
+            {
+              '--gradient-theme':
+                currentGradient?.gradient ||
+                'linear-gradient(135deg, rgba(102, 126, 234, 1) 0%, rgba(240, 147, 251, 1) 50%, rgba(245, 87, 108, 1) 100%)',
+              '--bg-gradient-opacity-local': 1, // 现在由混合色控制强度
+              '--noise-opacity': Math.max(0.1, Math.min(1, noiseLevel / 50)),
+            } as React.CSSProperties
+          }
         >
           {/* 全局确认对话框 */}
           <ConfirmDialog />
@@ -143,12 +146,13 @@ function App() {
           </div>
           <div className="h-full flex overflow-hidden relative">
             {/* 左侧边栏 - 响应式，小屏幕自动折叠 */}
-            <div className={`transition-all duration-300 ${!sidebarOpen ? 'sidebar-collapsed' : ''}`}>
+            <div
+              className={`transition-all duration-300 ${!sidebarOpen ? 'sidebar-collapsed' : ''}`}
+            >
               <Sidebar />
             </div>
             <MainContent />
           </div>
-
         </div>
       </DndProvider>
     </TooltipProvider>
@@ -156,10 +160,3 @@ function App() {
 }
 
 export default App;
-
-
-
-
-
-
-

@@ -16,15 +16,10 @@ interface HabitFormProps {
 const FREQUENCIES: { value: HabitFrequency; label: string }[] = [
   { value: 'daily', label: '每日' },
   { value: 'weekly', label: '每周' },
-  { value: 'monthly', label: '每月' }
+  { value: 'monthly', label: '每月' },
 ];
 
-export const HabitForm: React.FC<HabitFormProps> = ({
-  habit,
-  isOpen,
-  onClose,
-  onSubmit
-}) => {
+export const HabitForm: React.FC<HabitFormProps> = ({ habit, isOpen, onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -32,7 +27,7 @@ export const HabitForm: React.FC<HabitFormProps> = ({
     color: '#3b82f6',
     frequency: 'daily' as HabitFrequency,
     target_count: 1,
-    is_active: true
+    is_active: true,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -48,7 +43,7 @@ export const HabitForm: React.FC<HabitFormProps> = ({
         color: '#3b82f6',
         frequency: habit.frequency,
         target_count: habit.target_count || 1,
-        is_active: habit.is_active
+        is_active: habit.is_active,
       });
     } else {
       resetForm();
@@ -64,7 +59,7 @@ export const HabitForm: React.FC<HabitFormProps> = ({
       color: '#3b82f6',
       frequency: 'daily',
       target_count: 1,
-      is_active: true
+      is_active: true,
     });
     setIsLoading(false);
   };
@@ -110,7 +105,10 @@ export const HabitForm: React.FC<HabitFormProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="feather-glass-modal-backdrop" onClick={(e) => e.target === e.currentTarget && handleClose()}>
+    <div
+      className="feather-glass-modal-backdrop"
+      onClick={(e) => e.target === e.currentTarget && handleClose()}
+    >
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -123,19 +121,21 @@ export const HabitForm: React.FC<HabitFormProps> = ({
           <h2 className="text-lg font-medium theme-text-primary">
             {habit ? '编辑习惯' : '创建习惯'}
           </h2>
-          <button onClick={handleClose}
+          <button
+            onClick={handleClose}
             className="p-1.5 rounded-lg transition-all hover:scale-105 theme-text-secondary hover:theme-text-primary feather-glass-deco"
           >
             <X size={16} />
           </button>
         </div>
-        
+
         {/* 表单内容 */}
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
           {/* 习惯名称 */}
           <div>
-            <input type="text"
-              value={formData.name} 
+            <input
+              type="text"
+              value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder="输入习惯名称..."
               className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:theme-ring-accent transition-all theme-text-primary placeholder:theme-text-tertiary feather-glass-deco"
@@ -143,14 +143,12 @@ export const HabitForm: React.FC<HabitFormProps> = ({
               maxLength={50}
               autoFocus
             />
-            {errors.name && (
-              <p className="theme-text-error text-xs mt-2">{errors.name}</p>
-            )}
+            {errors.name && <p className="theme-text-error text-xs mt-2">{errors.name}</p>}
           </div>
-          
+
           <div>
-            <textarea 
-              value={formData.description} 
+            <textarea
+              value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="简要描述这个习惯的意义和目标..."
               rows={3}
@@ -158,14 +156,12 @@ export const HabitForm: React.FC<HabitFormProps> = ({
               maxLength={200}
             />
           </div>
-          
+
           <div>
-            <label className="block text-sm font-medium theme-text-secondary mb-2">
-              选择图标
-            </label>
+            <label className="block text-sm font-medium theme-text-secondary mb-2">选择图标</label>
             <div className="rounded-lg p-3 feather-glass-deco">
-              <IconPicker 
-                selectedIcon={formData.icon} 
+              <IconPicker
+                selectedIcon={formData.icon}
                 onIconSelect={(iconName) => setFormData({ ...formData, icon: iconName })}
                 mode="inline"
                 size="sm"
@@ -174,19 +170,23 @@ export const HabitForm: React.FC<HabitFormProps> = ({
               />
             </div>
           </div>
-          
+
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium theme-text-secondary mb-2">
-                频率
-              </label>
-              <select 
-                value={formData.frequency} 
-                onChange={(e) => setFormData({ ...formData, frequency: e.target.value as HabitFrequency })}
+              <label className="block text-sm font-medium theme-text-secondary mb-2">频率</label>
+              <select
+                value={formData.frequency}
+                onChange={(e) =>
+                  setFormData({ ...formData, frequency: e.target.value as HabitFrequency })
+                }
                 className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:theme-ring-accent transition-all theme-text-primary feather-glass-deco"
               >
                 {FREQUENCIES.map((freq) => (
-                  <option key={freq.value} value={freq.value} className="theme-bg-primary theme-text-primary">
+                  <option
+                    key={freq.value}
+                    value={freq.value}
+                    className="theme-bg-primary theme-text-primary"
+                  >
                     {freq.label}
                   </option>
                 ))}
@@ -197,11 +197,14 @@ export const HabitForm: React.FC<HabitFormProps> = ({
               <label className="block text-sm font-medium theme-text-secondary mb-2">
                 目标次数
               </label>
-              <input type="number"
+              <input
+                type="number"
                 min="1"
                 max="99"
-                value={formData.target_count} 
-                onChange={(e) => setFormData({ ...formData, target_count: parseInt(e.target.value) || 1 })}
+                value={formData.target_count}
+                onChange={(e) =>
+                  setFormData({ ...formData, target_count: parseInt(e.target.value) || 1 })
+                }
                 className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:theme-ring-accent transition-all theme-text-primary feather-glass-deco"
               />
               {errors.target_count && (
@@ -209,30 +212,33 @@ export const HabitForm: React.FC<HabitFormProps> = ({
               )}
             </div>
           </div>
-          
+
           {/* 激活状态 */}
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium theme-text-primary">
-              激活习惯
-            </label>
-            <button type="button"
+            <label className="text-sm font-medium theme-text-primary">激活习惯</label>
+            <button
+              type="button"
               onClick={() => setFormData({ ...formData, is_active: !formData.is_active })}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-accent/30 ${formData.is_active ? 'theme-bg-accent' : 'theme-bg-secondary'}`}
             >
-              <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formData.is_active ? 'translate-x-6' : 'translate-x-1'}`} />
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formData.is_active ? 'translate-x-6' : 'translate-x-1'}`}
+              />
             </button>
           </div>
-          
+
           {/* 按钮组 */}
           <div className="flex gap-3 pt-2">
-            <button type="button"
+            <button
+              type="button"
               onClick={handleClose}
               className="flex-1 px-4 py-3 rounded-lg transition-all hover:scale-[1.02] theme-text-secondary feather-glass-deco"
               disabled={isLoading}
             >
               取消
             </button>
-            <button type="submit"
+            <button
+              type="submit"
               className="flex-1 px-4 py-3 theme-button-primary rounded-lg transition-all hover:scale-[1.02] disabled:opacity-50 flex items-center justify-center gap-2"
               disabled={isLoading || !formData.name.trim()}
             >

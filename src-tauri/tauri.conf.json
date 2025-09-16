@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "identifier": "com.noteapp.dev",
   "build": {
-    "beforeDevCommand": "npm run dev",
+    "beforeDevCommand": "pnpm dev",
+    "beforeBuildCommand": "pnpm build",
     "devUrl": "http://localhost:5000",
     "frontendDist": "../dist"
   },

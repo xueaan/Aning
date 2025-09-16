@@ -12,12 +12,14 @@ interface MessageListProps {
 
 export const MessageList: React.FC<MessageListProps> = ({
   streamingResponse = '',
-  isStreaming = false
+  isStreaming = false,
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { aiConfig, aiChat } = useAppStore();
-  
-  const currentConversation = aiChat.conversations.find(c => c.id === aiChat.currentConversationId);
+
+  const currentConversation = aiChat.conversations.find(
+    (c) => c.id === aiChat.currentConversationId
+  );
   const currentAgent = getCurrentAgent(aiConfig);
 
   // 自动滚动到最新消息
@@ -48,7 +50,7 @@ export const MessageList: React.FC<MessageListProps> = ({
           );
         }
       }
-      
+
       return (
         <div className="w-8 h-8 rounded-full theme-bg-secondary flex items-center justify-center theme-text-primary">
           <Bot size={16} />
@@ -61,13 +63,13 @@ export const MessageList: React.FC<MessageListProps> = ({
   const renderMessageContent = (message: AiMessage) => {
     return (
       <div className="flex-1 min-w-0">
-        <div className={`prose max-w-none ${
-          message.role === 'user' ? 'theme-text-primary' : 'theme-text-secondary'
-        }`}>
-          <div className="whitespace-pre-wrap break-words">
-            {message.content}
-          </div>
-          
+        <div
+          className={`prose max-w-none ${
+            message.role === 'user' ? 'theme-text-primary' : 'theme-text-secondary'
+          }`}
+        >
+          <div className="whitespace-pre-wrap break-words">{message.content}</div>
+
           {/* 图片显示 */}
           {message.hasImages && (
             <div className="mt-2 text-sm theme-text-tertiary">
@@ -75,7 +77,7 @@ export const MessageList: React.FC<MessageListProps> = ({
             </div>
           )}
         </div>
-        
+
         <div className="text-xs theme-text-tertiary mt-1">
           {new Date(message.timestamp).toLocaleTimeString()}
         </div>
@@ -88,12 +90,8 @@ export const MessageList: React.FC<MessageListProps> = ({
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center">
           <Bot size={48} className="theme-text-tertiary mx-auto mb-4" />
-          <h3 className="text-lg font-medium theme-text-secondary mb-2">
-            开始新的对话
-          </h3>
-          <p className="theme-text-tertiary">
-            选择一个AI助手，然后开始对话
-          </p>
+          <h3 className="text-lg font-medium theme-text-secondary mb-2">开始新的对话</h3>
+          <p className="theme-text-tertiary">选择一个AI助手，然后开始对话</p>
         </div>
       </div>
     );
@@ -106,29 +104,29 @@ export const MessageList: React.FC<MessageListProps> = ({
         {currentConversation.messages.map((message) => (
           <div
             key={message.id}
-            className={`flex gap-4 ${
-              message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
-            }`}
+            className={`flex gap-4 ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
           >
             {renderAvatar(message)}
-            
-            <div className={`flex-1 max-w-[80%] ${
-              message.role === 'user'
-                ? 'bg-accent text-white rounded-2xl rounded-tr-sm p-4'
-                : 'feather-glass-deco rounded-2xl rounded-tl-sm p-4'
-            }`}>
+
+            <div
+              className={`flex-1 max-w-[80%] ${
+                message.role === 'user'
+                  ? 'bg-accent text-white rounded-2xl rounded-tr-sm p-4'
+                  : 'feather-glass-deco rounded-2xl rounded-tl-sm p-4'
+              }`}
+            >
               {renderMessageContent(message)}
             </div>
           </div>
         ))}
-        
+
         {/* 流式响应中的消息 */}
         {isStreaming && (
           <div className="flex gap-4">
             <div className="w-8 h-8 rounded-full theme-bg-secondary flex items-center justify-center theme-text-primary">
               <Bot size={16} />
             </div>
-            
+
             <div className="flex-1 max-w-[80%] feather-glass-deco rounded-2xl rounded-tl-sm p-4">
               <div className="prose max-w-none theme-text-secondary">
                 <TypewriterMessage content={streamingResponse} />
@@ -136,7 +134,7 @@ export const MessageList: React.FC<MessageListProps> = ({
             </div>
           </div>
         )}
-        
+
         {/* 滚动锚点 */}
         <div ref={messagesEndRef} />
       </div>

@@ -1,11 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Search, X, Check } from 'lucide-react';
-import {
-  COMMON_ICONS,
-  getIconComponent,
-  isValidIcon,
-  DEFAULT_ICON
-} from '@/constants/commonIcons';
+import { COMMON_ICONS, getIconComponent, isValidIcon, DEFAULT_ICON } from '@/constants/commonIcons';
 
 export interface IconPickerProps {
   // 必需属性
@@ -33,7 +28,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({
   placeholder = '搜索图标...',
   showSearch = true,
   maxHeight = 'max-h-96',
-  className = ''
+  className = '',
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -43,20 +38,20 @@ export const IconPicker: React.FC<IconPickerProps> = ({
       iconSize: 16,
       iconContainer: 'w-8 h-8',
       grid: 'grid-cols-6',
-      text: 'text-xs'
+      text: 'text-xs',
     },
     md: {
       iconSize: 18,
       iconContainer: 'w-11 h-11',
       grid: 'grid-cols-6',
-      text: 'text-sm'
+      text: 'text-sm',
     },
     lg: {
       iconSize: 24,
       iconContainer: 'w-12 h-12',
       grid: 'grid-cols-4',
-      text: 'text-base'
-    }
+      text: 'text-base',
+    },
   };
 
   const config = sizeConfig[size];
@@ -68,12 +63,10 @@ export const IconPicker: React.FC<IconPickerProps> = ({
     }
 
     const searchLower = searchTerm.toLowerCase();
-    return COMMON_ICONS.map(category => ({
+    return COMMON_ICONS.map((category) => ({
       ...category,
-      icons: category.icons.filter(iconName =>
-        iconName.toLowerCase().includes(searchLower)
-      )
-    })).filter(category => category.icons.length > 0);
+      icons: category.icons.filter((iconName) => iconName.toLowerCase().includes(searchLower)),
+    })).filter((category) => category.icons.length > 0);
   }, [searchTerm]);
 
   // 处理图标选择
@@ -92,16 +85,17 @@ export const IconPicker: React.FC<IconPickerProps> = ({
     const isSelected = selectedIcon === iconName;
 
     return (
-      <button 
+      <button
         type="button"
-        key={iconName} 
+        key={iconName}
         onClick={() => handleIconClick(iconName)}
         className={`
           ${config.iconContainer} rounded-xl transition-all duration-300 ease-out
           flex items-center justify-center relative group transform-gpu
-          ${isSelected
-            ? 'theme-bg-accent theme-text-on-accent shadow-xl scale-110 ring-2 ring-accent/30'
-            : 'hover:scale-105 hover:shadow-md theme-text-secondary hover:theme-text-primary feather-glass-content hover:feather-glass-panel'
+          ${
+            isSelected
+              ? 'theme-bg-accent theme-text-on-accent shadow-xl scale-110 ring-2 ring-accent/30'
+              : 'hover:scale-105 hover:shadow-md theme-text-secondary hover:theme-text-primary feather-glass-content hover:feather-glass-panel'
           }
         `}
         title={iconName}
@@ -109,7 +103,11 @@ export const IconPicker: React.FC<IconPickerProps> = ({
         <IconComponent
           size={config.iconSize}
           strokeWidth={2}
-          className={isSelected ? 'theme-text-on-accent' : 'theme-text-secondary group-hover:theme-text-primary'}
+          className={
+            isSelected
+              ? 'theme-text-on-accent'
+              : 'theme-text-secondary group-hover:theme-text-primary'
+          }
         />
 
         {isSelected && (
@@ -129,9 +127,9 @@ export const IconPicker: React.FC<IconPickerProps> = ({
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-medium theme-text-primary">选择图标</h3>
           {onClose && (
-            <button 
+            <button
               type="button"
-              onClick={onClose} 
+              onClick={onClose}
               className="p-1 rounded-lg theme-text-secondary hover:theme-text-primary hover:theme-bg-secondary/50 transition-colors"
             >
               <X size={16} />
@@ -144,9 +142,9 @@ export const IconPicker: React.FC<IconPickerProps> = ({
       {showSearch && (
         <div className="relative mb-4">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 theme-text-secondary w-4 h-4" />
-          <input 
+          <input
             type="text"
-            placeholder={placeholder} 
+            placeholder={placeholder}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 rounded-lg outline-none theme-text-primary placeholder:theme-text-tertiary transition-all feather-glass-input"
@@ -163,7 +161,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({
           </div>
         ) : (
           <div className="space-y-5">
-            {filteredCategories.map(category => (
+            {filteredCategories.map((category) => (
               <div key={category.name}>
                 <h4 className={`${config.text} font-medium theme-text-secondary mb-3 px-1`}>
                   {category.label} ({category.icons.length})
@@ -181,7 +179,8 @@ export const IconPicker: React.FC<IconPickerProps> = ({
       {mode === 'modal' && (
         <div className="mt-4 pt-3 border-t theme-border">
           <p className="text-xs theme-text-tertiary">
-            当前选中：<span className="theme-text-primary font-medium">{selectedIcon || DEFAULT_ICON}</span>
+            当前选中：
+            <span className="theme-text-primary font-medium">{selectedIcon || DEFAULT_ICON}</span>
           </p>
         </div>
       )}
@@ -194,9 +193,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({
 
     return (
       <div className="feather-glass-modal modal-glass">
-        <div className="w-full max-w-2xl max-h-[90vh] overflow-hidden">
-          {content}
-        </div>
+        <div className="w-full max-w-2xl max-h-[90vh] overflow-hidden">{content}</div>
       </div>
     );
   }
@@ -219,36 +216,34 @@ export const IconButton: React.FC<IconButtonProps> = ({
   isSelected = false,
   onClick,
   size = 'md',
-  className = ''
+  className = '',
 }) => {
   const sizeConfig = {
     sm: { iconSize: 16, container: 'w-8 h-8' },
     md: { iconSize: 20, container: 'w-10 h-10' },
-    lg: { iconSize: 24, container: 'w-12 h-12' }
+    lg: { iconSize: 24, container: 'w-12 h-12' },
   };
 
   const config = sizeConfig[size];
   const IconComponent = getIconComponent(iconName);
 
   return (
-    <button 
+    <button
       type="button"
       onClick={() => onClick?.(iconName)}
       className={`
         ${config.container} rounded-lg transition-all duration-300 ease-out
         flex items-center justify-center transform-gpu
-        ${isSelected
-          ? 'theme-bg-accent theme-text-on-accent shadow-xl scale-110 ring-2 ring-accent/30'
-          : 'hover:scale-105 hover:shadow-md theme-text-secondary hover:theme-text-primary'
+        ${
+          isSelected
+            ? 'theme-bg-accent theme-text-on-accent shadow-xl scale-110 ring-2 ring-accent/30'
+            : 'hover:scale-105 hover:shadow-md theme-text-secondary hover:theme-text-primary'
         }
         ${className}
       `}
       title={iconName}
     >
-      <IconComponent
-        size={config.iconSize}
-        strokeWidth={2}
-      />
+      <IconComponent size={config.iconSize} strokeWidth={2} />
     </button>
   );
 };

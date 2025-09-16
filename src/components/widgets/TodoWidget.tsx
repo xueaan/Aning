@@ -2,7 +2,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { RotateCw, CheckCircle2, Circle } from 'lucide-react';
 import { useTaskBoxStore } from '@/stores';
-import { Task, TaskPriority } from '@/types';
+import { Task } from '@/types';
 import { listContainerVariants, listItemVariants } from '@/config/animation';
 import { Skeleton } from '../ui/Skeleton';
 
@@ -10,14 +10,14 @@ const priorityLabels = {
   urgent: '紧急',
   high: '高',
   medium: '中',
-  low: '低'
+  low: '低',
 };
 
 const priorityColors = {
   urgent: 'priority-urgent',
   high: 'priority-high',
   medium: 'priority-medium',
-  low: 'priority-low'
+  low: 'priority-low',
 };
 
 export const TodoWidget: React.FC = () => {
@@ -118,14 +118,15 @@ export const TodoWidget: React.FC = () => {
         </div>
       ) : (
         <div className="h-full overflow-y-auto scrollbar-hidden">
-          <motion.div className="space-y-0"
+          <motion.div
+            className="space-y-0"
             variants={listContainerVariants}
             initial="hidden"
             animate="visible"
           >
             <AnimatePresence>
               {todayTasks.map((task, index) => {
-                const project = projects.find(p => p.id === task.project_id);
+                const project = projects.find((p) => p.id === task.project_id);
                 const isLast = index === todayTasks.length - 1;
 
                 return (
@@ -141,49 +142,75 @@ export const TodoWidget: React.FC = () => {
                     whileHover="hover"
                     whileTap="tap"
                   >
+                    {/* 复选框 */}
                     <motion.button
                       onClick={(e) => handleCompleteTask(task.id!, e)}
-                      className="flex-shrink-0 mt-0.5 p-1 rounded-full theme-text-tertiary"
-                      title="标记完成"
-                      whileHover={{
-                        color: 'rgb(34 197 94)',
-                        backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                        scale: 1.1
-                      }}
+                      className="flex-shrink-0 p-1 rounded-full theme-text-tertiary hover:theme-text-accent transition-colors"
+                      title="标记为完成"
+                      whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.95 }}
-                      transition={{ duration: 0.15 }}
                     >
-                      <Circle size={16} className="group-hover:hidden" />
-                      <CheckCircle2 size={16} className="hidden group-hover:block" />
+                      {task.status === 'completed' ? (
+                        <CheckCircle2 size={16} className="theme-text-accent" />
+                      ) : (
+                        <Circle size={16} />
+                      )}
                     </motion.button>
+
+                    {/* 任务内容 - 中间部分 */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2 mb-1.5">
-                        <span className="theme-text-primary text-sm font-medium break-words leading-relaxed">
-                          {task.title}
-                        </span>
-                      </div>
+                      <h4
+                        className={`text-sm font-medium leading-tight ${
+                          task.status === 'completed'
+                            ? 'line-through theme-text-secondary'
+                            : 'theme-text-primary'
+                        }`}
+                      >
+                        {task.title}
+                      </h4>
 
-                      <div className="flex items-center justify-between gap-2 mt-1">
-                        <div className="flex items-center gap-1.5">
-                          {project && (
-                            <motion.span
-                              className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-600 dark:text-blue-400 font-medium"
-                              whileHover={{ scale: 1.05 }}
-                              transition={{ duration: 0.15 }}
-                            >
-                              {project.name}
-                            </motion.span>
-                          )}
-                        </div>
-
-                        <motion.span
-                          className={`text-[10px] px-1 py-0.5 rounded font-medium ${priorityColors[task.priority as TaskPriority] || 'priority-medium'}`}
-                          whileHover={{ scale: 1.05 }}
-                          transition={{ duration: 0.15 }}
+                      {task.description && (
+                        <p
+                          className={`text-xs mt-0.5 ${
+                            task.status === 'completed'
+                              ? 'line-through theme-text-tertiary'
+                              : 'theme-text-secondary'
+                          }`}
                         >
-                          {priorityLabels[task.priority as TaskPriority] || '中'}
-                        </motion.span>
-                      </div>
+                          {task.description}
+                        </p>
+                      )}
+
+                      {/* 项目标签 */}
+                      {project && (
+                        <span className="inline-block text-xs px-2 py-0.5 mt-1 rounded-full feather-glass-deco theme-text-secondary">
+                          {project.name}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* 右侧信息 - 截止日期和优先级 */}
+                    <div className="flex-shrink-0 flex flex-col items-end gap-1">
+                      {task.due_date && (
+                        <span
+                          className={`text-xs ${
+                            new Date(task.due_date) < new Date() && task.status !== 'completed'
+                              ? 'theme-text-error font-medium'
+                              : 'theme-text-tertiary'
+                          }`}
+                        >
+                          {new Date(task.due_date).toLocaleDateString('zh-CN', {
+                            month: 'numeric',
+                            day: 'numeric',
+                          })}
+                        </span>
+                      )}
+
+                      <span
+                        className={`text-xs px-1.5 py-0.5 rounded ${priorityColors[task.priority]} font-medium`}
+                      >
+                        {priorityLabels[task.priority]}
+                      </span>
                     </div>
                   </motion.div>
                 );

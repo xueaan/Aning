@@ -36,8 +36,8 @@ export interface Block {
 // 时光记条目
 export interface DBTimelineEntry {
   id?: number;
-  date: string;  // YYYY-MM-DD
-  time: string;  // HH:mm
+  date: string; // YYYY-MM-DD
+  time: string; // HH:mm
   content: string;
   weather?: string;
   mood?: string;
@@ -87,8 +87,3 @@ export interface PaginatedResult<T> {
   pageSize: number;
   totalPages: number;
 }
-
-
-
-
-

@@ -6,12 +6,42 @@ import { useMindBoardStore } from '@/stores/mindBoardStore';
 import { ConfirmDeleteModal } from '@/components/common/ConfirmDeleteModal';
 
 const colors = [
-  { name: 'yellow', bg: 'bg-yellow-200 dark:bg-yellow-700/50', border: 'border-yellow-400', text: 'text-yellow-800 dark:text-yellow-200' },
-  { name: 'pink', bg: 'bg-pink-200 dark:bg-pink-700/50', border: 'border-pink-400', text: 'text-pink-800 dark:text-pink-200' },
-  { name: 'blue', bg: 'bg-blue-200 dark:bg-blue-700/50', border: 'border-blue-400', text: 'text-blue-800 dark:text-blue-200' },
-  { name: 'green', bg: 'bg-green-200 dark:bg-green-700/50', border: 'border-green-400', text: 'text-green-800 dark:text-green-200' },
-  { name: 'purple', bg: 'bg-purple-200 dark:bg-purple-700/50', border: 'border-purple-400', text: 'text-purple-800 dark:text-purple-200' },
-  { name: 'orange', bg: 'bg-orange-200 dark:bg-orange-700/50', border: 'border-orange-400', text: 'text-orange-800 dark:text-orange-200' }
+  {
+    name: 'yellow',
+    bg: 'bg-yellow-200 dark:bg-yellow-700/50',
+    border: 'border-yellow-400',
+    text: 'text-yellow-800 dark:text-yellow-200',
+  },
+  {
+    name: 'pink',
+    bg: 'bg-pink-200 dark:bg-pink-700/50',
+    border: 'border-pink-400',
+    text: 'text-pink-800 dark:text-pink-200',
+  },
+  {
+    name: 'blue',
+    bg: 'bg-blue-200 dark:bg-blue-700/50',
+    border: 'border-blue-400',
+    text: 'text-blue-800 dark:text-blue-200',
+  },
+  {
+    name: 'green',
+    bg: 'bg-green-200 dark:bg-green-700/50',
+    border: 'border-green-400',
+    text: 'text-green-800 dark:text-green-200',
+  },
+  {
+    name: 'purple',
+    bg: 'bg-purple-200 dark:bg-purple-700/50',
+    border: 'border-purple-400',
+    text: 'text-purple-800 dark:text-purple-200',
+  },
+  {
+    name: 'orange',
+    bg: 'bg-orange-200 dark:bg-orange-700/50',
+    border: 'border-orange-400',
+    text: 'text-orange-800 dark:text-orange-200',
+  },
 ];
 
 export const StickyNote: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos }) => {
@@ -21,14 +51,14 @@ export const StickyNote: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [dimensions, setDimensions] = useState({
     width: data.width || 280,
-    height: data.height || 180
+    height: data.height || 180,
   });
   const [isResizing, setIsResizing] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
-  const startMousePosRef = useRef<{x: number, y: number} | null>(null);
-  const startDimensionsRef = useRef<{width: number, height: number} | null>(null);
+  const startMousePosRef = useRef<{ x: number; y: number } | null>(null);
+  const startDimensionsRef = useRef<{ width: number; height: number } | null>(null);
   const handleResizeRef = useRef<((e: MouseEvent) => void) | null>(null);
   const handleResizeEndRef = useRef<(() => void) | null>(null);
   const { currentBoard, updateBoard, deleteNode } = useMindBoardStore();
@@ -42,13 +72,19 @@ export const StickyNote: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos
 
   const updateNodeData = useCallback(() => {
     if (currentBoard) {
-      const updatedNodes = currentBoard.nodes.map(node =>
+      const updatedNodes = currentBoard.nodes.map((node) =>
         node.id === id
           ? {
-            ...node,
-            data: { ...node.data, text, colorIndex, width: dimensions.width, height: dimensions.height },
-            style: { ...node.style, width: dimensions.width, height: dimensions.height }
-          }
+              ...node,
+              data: {
+                ...node.data,
+                text,
+                colorIndex,
+                width: dimensions.width,
+                height: dimensions.height,
+              },
+              style: { ...node.style, width: dimensions.width, height: dimensions.height },
+            }
           : node
       );
       updateBoard(currentBoard.id, { nodes: updatedNodes });
@@ -83,7 +119,7 @@ export const StickyNote: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos
       // 允许换行
       return;
     }
-    
+
     if (e.key === 'Escape') {
       handleBlur();
     }
@@ -125,7 +161,8 @@ export const StickyNote: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos
     let tooltip = cardRef.current.querySelector('.resize-tooltip') as HTMLElement;
     if (!tooltip) {
       tooltip = document.createElement('div');
-      tooltip.className = 'resize-tooltip absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm z-50';
+      tooltip.className =
+        'resize-tooltip absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm z-50';
       cardRef.current.appendChild(tooltip);
     }
 
@@ -152,7 +189,7 @@ export const StickyNote: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos
       // 更新React状态
       setDimensions({
         width: finalWidth,
-        height: finalHeight
+        height: finalHeight,
       });
 
       // 隐藏尺寸提示
@@ -164,13 +201,13 @@ export const StickyNote: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos
 
       // 更新存储的数据
       if (currentBoard) {
-        const updatedNodes = currentBoard.nodes.map(node =>
+        const updatedNodes = currentBoard.nodes.map((node) =>
           node.id === id
             ? {
-              ...node,
-              data: { ...node.data, text, colorIndex, width: finalWidth, height: finalHeight },
-              style: { ...node.style, width: finalWidth, height: finalHeight }
-            }
+                ...node,
+                data: { ...node.data, text, colorIndex, width: finalWidth, height: finalHeight },
+                style: { ...node.style, width: finalWidth, height: finalHeight },
+              }
             : node
         );
         updateBoard(currentBoard.id, { nodes: updatedNodes });
@@ -207,7 +244,7 @@ export const StickyNote: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos
         x: (xPos || 0) - padding,
         y: (yPos || 0) - padding,
         width: dimensions.width + padding * 2,
-        height: dimensions.height + padding * 2
+        height: dimensions.height + padding * 2,
       },
       { duration: 800, padding: 0.1 }
     );
@@ -221,10 +258,8 @@ export const StickyNote: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos
     setColorIndex(index);
     setShowColorPicker(false);
     if (currentBoard) {
-      const updatedNodes = currentBoard.nodes.map(node =>
-        node.id === id
-          ? { ...node, data: { ...node.data, colorIndex: index } }
-          : node
+      const updatedNodes = currentBoard.nodes.map((node) =>
+        node.id === id ? { ...node, data: { ...node.data, colorIndex: index } } : node
       );
       updateBoard(currentBoard.id, { nodes: updatedNodes });
     }
@@ -244,27 +279,27 @@ export const StickyNote: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos
         id="sticky-target-left"
         className="!w-3 !h-3 !bg-white/90 !border-2 !border-gray-400 hover:!border-blue-500 hover:!scale-110 transition-all"
       />
-      
+
       {/* Floating operation buttons - only show when selected */}
       {selected && (
         <div className="absolute -top-9 left-1/2 transform -translate-x-1/2 z-50 nodrag">
           <div className="flex items-center justify-center gap-1">
             {/* Color picker */}
             <div className="relative">
-              <button 
+              <button
                 onClick={() => setShowColorPicker(!showColorPicker)}
                 className="w-6 h-6 rounded-lg flex items-center justify-center bg-black/70 dark:bg-white/10 hover:bg-black/60 dark:hover:bg-white/20 transition-all"
                 title="更改颜色"
               >
                 <Paintbrush2 className="w-3.5 h-3.5 theme-text-primary" />
               </button>
-              
+
               {showColorPicker && (
                 <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-30">
                   <div className="flex gap-1 p-2 backdrop-blur-sm bg-white/95 dark:bg-black/95 rounded-lg shadow-lg">
                     {colors.map((color, index) => (
-                      <button 
-                        key={color.name} 
+                      <button
+                        key={color.name}
                         onClick={() => handleColorPickerChange(index)}
                         className={`w-6 h-6 rounded-full border-2 hover:scale-110 transition-all ${color.bg} ${color.border} ${
                           index === colorIndex ? 'ring-2 ring-blue-400' : ''
@@ -276,24 +311,24 @@ export const StickyNote: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos
                 </div>
               )}
             </div>
-            
-            <button 
+
+            <button
               onClick={handleFocus}
               className="w-6 h-6 rounded-lg flex items-center justify-center bg-black/70 dark:bg-white/10 hover:bg-black/60 dark:hover:bg-white/20 transition-all"
               title="聚焦卡片"
             >
               <Target className="w-3.5 h-3.5 theme-text-primary" />
             </button>
-            
-            <button 
+
+            <button
               onClick={handleEdit}
               className="w-6 h-6 rounded-lg flex items-center justify-center bg-black/70 dark:bg-white/10 hover:bg-black/60 dark:hover:bg-white/20 transition-all"
               title="编辑便签"
             >
               <Edit className="w-3.5 h-3.5 theme-text-primary" />
             </button>
-            
-            <button 
+
+            <button
               onClick={handleDelete}
               className="w-6 h-6 rounded-lg flex items-center justify-center bg-black/70 dark:bg-white/10 hover:bg-black/60 dark:hover:bg-white/20 transition-all"
               title="删除卡片"
@@ -304,21 +339,22 @@ export const StickyNote: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos
         </div>
       )}
 
-      <div 
+      <div
         ref={cardRef}
         className={`${currentColor.bg} ${currentColor.border} ${currentColor.text} rounded-lg shadow-md border-2 relative transform hover:scale-105 transition-transform`}
-        onDoubleClick={handleDoubleClick} 
+        onDoubleClick={handleDoubleClick}
         style={{
           transform: 'rotate(-1deg)',
           width: `${dimensions.width}px`,
           height: `${dimensions.height}px`,
           minWidth: '150px',
-          minHeight: '100px'
+          minHeight: '100px',
         }}
       >
         {/* 简化的调整大小控制柄 */}
         {selected && (
-          <div className="absolute -bottom-1 -right-1 w-4 h-4 cursor-nw-resize nodrag"
+          <div
+            className="absolute -bottom-1 -right-1 w-4 h-4 cursor-nw-resize nodrag"
             onMouseDown={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -334,17 +370,17 @@ export const StickyNote: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos
 
         {/* 折角效果 */}
         <div className="absolute top-0 right-0 w-6 h-6">
-          <div className={`absolute top-0 right-0 w-0 h-0 border-t-[24px] border-r-[24px] border-t-theme-bg-primary/50 border-r-transparent`}
+          <div
+            className={`absolute top-0 right-0 w-0 h-0 border-t-[24px] border-r-[24px] border-t-theme-bg-primary/50 border-r-transparent`}
           />
         </div>
 
         <div className="p-3 h-full flex flex-col">
-
           {isEditing ? (
-            <textarea 
-              value={text} 
+            <textarea
+              value={text}
               onChange={(e) => setText(e.target.value)}
-              onBlur={handleBlur} 
+              onBlur={handleBlur}
               onKeyDown={handleKeyDown}
               className={`w-full h-full p-1 bg-transparent border-none outline-none resize-none ${currentColor.text}`}
               autoFocus
@@ -352,7 +388,8 @@ export const StickyNote: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos
               style={{ fontFamily: 'cursive, sans-serif' }}
             />
           ) : (
-            <div className={`flex-1 whitespace-pre-wrap ${currentColor.text} overflow-auto`}
+            <div
+              className={`flex-1 whitespace-pre-wrap ${currentColor.text} overflow-auto`}
               style={{ fontFamily: 'cursive, sans-serif' }}
             >
               {text || '双击添加便签...'}
@@ -386,14 +423,3 @@ export const StickyNote: React.FC<NodeProps> = ({ data, id, selected, xPos, yPos
     </div>
   );
 };
-
-
-
-
-
-
-
-
-
-
-

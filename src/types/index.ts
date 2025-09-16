@@ -79,17 +79,18 @@ export interface AppState {
   theme: 'light' | 'dark' | 'auto';
 }
 
-export type AppModule = 
+export type AppModule =
   | 'home'
   | 'editor'
-  | 'knowledge' 
+  | 'knowledge'
   | 'timeline'
   | 'cardbox'
   | 'mindboard'
   | 'taskbox'
   | 'habit'
   | 'password'
-  | 'dialogue';
+  | 'dialogue'
+  | 'bookshelf';
 
 // Tauri 命令返回类型
 export interface TauriResponse<T = any> {
@@ -176,7 +177,14 @@ export interface TaskFilters {
   search_query: string;
 }
 
-export type TaskViewType = 'inbox' | 'today' | 'upcoming' | 'overdue' | 'completed' | 'project' | 'dashboard';
+export type TaskViewType =
+  | 'inbox'
+  | 'today'
+  | 'upcoming'
+  | 'overdue'
+  | 'completed'
+  | 'project'
+  | 'dashboard';
 export type TaskDisplayMode = 'list' | 'kanban' | 'calendar';
 
 // Habit 习惯追踪类型定义

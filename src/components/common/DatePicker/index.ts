@@ -5,4 +5,3 @@ export { DateNavigation } from './DateNavigation';
 export { DateShortcuts } from './DateShortcuts';
 export * from './types';
 export * from './utils';
-

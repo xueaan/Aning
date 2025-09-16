@@ -10,7 +10,8 @@ import { ChevronDown } from 'lucide-react';
 import {
   DropdownMenuLabel,
   DropdownMenuRadioGroup,
-  DropdownMenuSeparator} from '@/components/ui/dropdown-menu';
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
 import { TooltipRoot, TooltipTrigger } from '@/components/ui/Tooltip';
 import { cn } from '@/lib/utils';
@@ -20,7 +21,9 @@ export const Toolbar = React.forwardRef<
   React.ComponentProps<typeof ToolbarPrimitive.Root>
 >(({ className, ...props }, ref) => {
   return (
-    <ToolbarPrimitive.Root ref={ref} className={cn('relative flex items-center select-none', className)}
+    <ToolbarPrimitive.Root
+      ref={ref}
+      className={cn('relative flex items-center select-none', className)}
       {...props}
     />
   );
@@ -33,7 +36,8 @@ export function ToolbarToggleGroup({
   ...props
 }: React.ComponentProps<typeof ToolbarPrimitive.ToolbarToggleGroup>) {
   return (
-    <ToolbarPrimitive.ToolbarToggleGroup className={cn('flex items-center', className)}
+    <ToolbarPrimitive.ToolbarToggleGroup
+      className={cn('flex items-center', className)}
       {...props}
     />
   );
@@ -44,7 +48,8 @@ export function ToolbarLink({
   ...props
 }: React.ComponentProps<typeof ToolbarPrimitive.Link>) {
   return (
-    <ToolbarPrimitive.Link className={cn('font-medium underline underline-offset-4', className)}
+    <ToolbarPrimitive.Link
+      className={cn('font-medium underline underline-offset-4', className)}
       {...props}
     />
   );
@@ -55,7 +60,8 @@ export function ToolbarSeparator({
   ...props
 }: React.ComponentProps<typeof ToolbarPrimitive.Separator>) {
   return (
-    <ToolbarPrimitive.Separator className={cn('mx-2 my-1 w-px shrink-0 bg-border', className)}
+    <ToolbarPrimitive.Separator
+      className={cn('mx-2 my-1 w-px shrink-0 bg-border', className)}
       {...props}
     />
   );
@@ -67,19 +73,20 @@ const toolbarButtonVariants = cva(
   {
     defaultVariants: {
       size: 'default',
-      variant: 'default'
+      variant: 'default',
     },
     variants: {
       size: {
         default: 'h-8 min-w-8 px-2',
         lg: 'h-9 min-w-9 px-2.5',
-        sm: 'h-7 min-w-7 px-1.5'
+        sm: 'h-7 min-w-7 px-1.5',
       },
       variant: {
         default: 'bg-transparent',
-        outline: 'border border-input bg-transparent shadow-xs hover:bg-accent hover:text-accent-foreground'
-      }
-    }
+        outline:
+          'border border-input bg-transparent shadow-xs hover:bg-accent hover:text-accent-foreground',
+      },
+    },
   }
 );
 
@@ -90,29 +97,28 @@ const dropdownArrowVariants = cva(
   {
     defaultVariants: {
       size: 'sm',
-      variant: 'default'
+      variant: 'default',
     },
     variants: {
       size: {
         default: 'h-7 w-5',
         lg: 'h-8 w-6',
-        sm: 'h-6 w-3'
+        sm: 'h-6 w-3',
       },
       variant: {
-        default: 'bg-transparent hover:bg-muted hover:text-muted-foreground aria-checked:bg-accent aria-checked:text-accent-foreground',
-        outline: 'border border-l-0 border-input bg-transparent hover:bg-accent hover:text-accent-foreground'
-      }
-    }
+        default:
+          'bg-transparent hover:bg-muted hover:text-muted-foreground aria-checked:bg-accent aria-checked:text-accent-foreground',
+        outline:
+          'border border-l-0 border-input bg-transparent hover:bg-accent hover:text-accent-foreground',
+      },
+    },
   }
 );
 
 type ToolbarButtonProps = {
   isDropdown?: boolean;
   pressed?: boolean;
-} & Omit<
-  React.ComponentPropsWithoutRef<typeof ToolbarToggleItem>,
-  'asChild' | 'value'
-> &
+} & Omit<React.ComponentPropsWithoutRef<typeof ToolbarToggleItem>, 'asChild' | 'value'> &
   VariantProps<typeof toolbarButtonVariants>;
 
 export const ToolbarButton = withTooltip(function ToolbarButton({
@@ -126,36 +132,36 @@ export const ToolbarButton = withTooltip(function ToolbarButton({
 }: ToolbarButtonProps) {
   return typeof pressed === 'boolean' ? (
     <ToolbarToggleGroup disabled={props.disabled} value="single" type="single">
-      <ToolbarToggleItem className={cn(
+      <ToolbarToggleItem
+        className={cn(
           toolbarButtonVariants({
             size,
-            variant
+            variant,
           }),
           isDropdown && 'justify-between gap-1 pr-1',
           className
-        )} value={pressed ? 'single' : ''}
+        )}
+        value={pressed ? 'single' : ''}
         {...props}
       >
-      {isDropdown ? (
-        <>
-          <div className="flex flex-1 items-center gap-2 whitespace-nowrap">
-            {children}
-          </div>
-          <div>
-            <ChevronDown className="size-3.5 text-muted-foreground"
-              data-icon />
-          </div>
-        </>
-      ) : (
-        children
-      )}
-    </ToolbarToggleItem>
+        {isDropdown ? (
+          <>
+            <div className="flex flex-1 items-center gap-2 whitespace-nowrap">{children}</div>
+            <div>
+              <ChevronDown className="size-3.5 text-muted-foreground" data-icon />
+            </div>
+          </>
+        ) : (
+          children
+        )}
+      </ToolbarToggleItem>
     </ToolbarToggleGroup>
   ) : (
-    <ToolbarPrimitive.Button className={cn(
+    <ToolbarPrimitive.Button
+      className={cn(
         toolbarButtonVariants({
           size,
-          variant
+          variant,
         }),
         isDropdown && 'pr-1',
         className
@@ -172,7 +178,8 @@ export function ToolbarSplitButton({
   ...props
 }: React.ComponentPropsWithoutRef<typeof ToolbarButton>) {
   return (
-    <ToolbarButton className={cn('group flex gap-0 px-0 hover:bg-transparent', className)}
+    <ToolbarButton
+      className={cn('group flex gap-0 px-0 hover:bg-transparent', className)}
       {...props}
     />
   );
@@ -192,10 +199,11 @@ export function ToolbarSplitButtonPrimary({
   ...props
 }: ToolbarSplitButtonPrimaryProps) {
   return (
-    <span className={cn(
+    <span
+      className={cn(
         toolbarButtonVariants({
           size,
-          variant
+          variant,
         }),
         'rounded-r-none',
         'group-data-[pressed=true]:bg-accent group-data-[pressed=true]:text-accent-foreground',
@@ -213,18 +221,19 @@ export function ToolbarSplitButtonSecondary({
   size,
   variant,
   ...props
-}: React.ComponentPropsWithoutRef<'span'> &
-  VariantProps<typeof dropdownArrowVariants>) {
+}: React.ComponentPropsWithoutRef<'span'> & VariantProps<typeof dropdownArrowVariants>) {
   return (
-    <span className={cn(
+    <span
+      className={cn(
         dropdownArrowVariants({
           size,
-          variant
+          variant,
         }),
         'group-data-[pressed=true]:bg-accent group-data-[pressed=true]:text-accent-foreground',
         className
       )}
-      onClick={(e) => e.stopPropagation()} role="button"
+      onClick={(e) => e.stopPropagation()}
+      role="button"
       {...props}
     >
       <ChevronDown className="size-3.5 text-muted-foreground" data-icon />
@@ -240,22 +249,16 @@ export function ToolbarToggleItem({
 }: React.ComponentProps<typeof ToolbarPrimitive.ToggleItem> &
   VariantProps<typeof toolbarButtonVariants>) {
   return (
-    <ToolbarPrimitive.ToggleItem className={cn(toolbarButtonVariants({ size, variant }), className)}
+    <ToolbarPrimitive.ToggleItem
+      className={cn(toolbarButtonVariants({ size, variant }), className)}
       {...props}
     />
   );
 }
 
-export function ToolbarGroup({
-  children,
-  className
-}: React.ComponentProps<'div'>) {
+export function ToolbarGroup({ children, className }: React.ComponentProps<'div'>) {
   return (
-    <div className={cn(
-        'group/toolbar-group',
-        'relative hidden has-[button]:flex',
-        className
-      )}>
+    <div className={cn('group/toolbar-group', 'relative hidden has-[button]:flex', className)}>
       <div className="flex items-center">{children}</div>
 
       <div className="mx-1.5 py-0.5 group-last/toolbar-group:!hidden">
@@ -267,14 +270,8 @@ export function ToolbarGroup({
 
 type TooltipProps<T extends React.ElementType> = {
   tooltip?: React.ReactNode;
-  tooltipContentProps?: Omit<
-    React.ComponentPropsWithoutRef<typeof TooltipContent>,
-    'children'
-  >;
-  tooltipProps?: Omit<
-    React.ComponentPropsWithoutRef<typeof TooltipRoot>,
-    'children'
-  >;
+  tooltipContentProps?: Omit<React.ComponentPropsWithoutRef<typeof TooltipContent>, 'children'>;
+  tooltipProps?: Omit<React.ComponentPropsWithoutRef<typeof TooltipRoot>, 'children'>;
   tooltipTriggerProps?: React.ComponentPropsWithoutRef<typeof TooltipTrigger>;
 } & React.ComponentProps<T>;
 
@@ -318,16 +315,19 @@ function TooltipContent({
 }: React.ComponentProps<typeof TooltipPrimitive.Content>) {
   return (
     <TooltipPrimitive.Portal>
-      <TooltipPrimitive.Content className={cn('z-50 w-fit origin-[--radix-tooltip-content-transform-origin] rounded-md bg-primary px-3 py-1.5 text-xs text-balance text-primary-foreground',
-        className
-      )} data-slot="tooltip-content"
-      sideOffset={4}
-      {...props}
+      <TooltipPrimitive.Content
+        className={cn(
+          'z-50 w-fit origin-[--radix-tooltip-content-transform-origin] rounded-md bg-primary px-3 py-1.5 text-xs text-balance text-primary-foreground',
+          className
+        )}
+        data-slot="tooltip-content"
+        sideOffset={4}
+        {...props}
       >
-      {children}
-      {/* CHANGE */}
-      {/* <TooltipPrimitive.Arrow: className ="z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45 rounded-[2px] bg-primary fill-primary" /> */}
-    </TooltipPrimitive.Content>
+        {children}
+        {/* CHANGE */}
+        {/* <TooltipPrimitive.Arrow: className ="z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45 rounded-[2px] bg-primary fill-primary" /> */}
+      </TooltipPrimitive.Content>
     </TooltipPrimitive.Portal>
   );
 }
@@ -340,16 +340,19 @@ export function ToolbarMenuGroup({
 }: React.ComponentProps<typeof DropdownMenuRadioGroup> & { label?: string }) {
   return (
     <>
-      <DropdownMenuSeparator className={cn('hidden',
+      <DropdownMenuSeparator
+        className={cn(
+          'hidden',
           'mb-0 shrink-0 peer-has-[[role=menuitem]]/menu-group:block peer-has-[[role=menuitemradio]]/menu-group:block peer-has-[[role=option]]/menu-group:block'
-      )}
+        )}
       />
 
       <DropdownMenuRadioGroup
         {...props}
-        className={cn('hidden',
-        'peer/menu-group group/menu-group my-1.5 has-[[role=menuitem]]:block has-[[role=menuitemradio]]:block has-[[role=option]]:block',
-        className
+        className={cn(
+          'hidden',
+          'peer/menu-group group/menu-group my-1.5 has-[[role=menuitem]]:block has-[[role=menuitemradio]]:block has-[[role=option]]:block',
+          className
         )}
       >
         {label && (
@@ -362,14 +365,3 @@ export function ToolbarMenuGroup({
     </>
   );
 }
-
-
-
-
-
-
-
-
-
-
-

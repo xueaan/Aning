@@ -38,14 +38,14 @@ export function useTypewriter(
     speed = 30, // 30ms per character
     autoStart = true,
     onComplete,
-    enabled = true
+    enabled = true,
   } = options;
 
   const [displayedText, setDisplayedText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
-  
-  const timeoutRef = useRef<NodeJS.Timeout>();
+
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
   const currentIndexRef = useRef(0);
 
   // 清理定时器
@@ -80,7 +80,7 @@ export function useTypewriter(
   // 打字逻辑
   const typeNextCharacter = useCallback(() => {
     const currentIndex = currentIndexRef.current;
-    
+
     if (currentIndex >= text.length) {
       setIsTyping(false);
       setIsComplete(true);
@@ -151,7 +151,7 @@ export function useTypewriter(
       isComplete: true,
       startTyping: () => {},
       skipTyping: () => {},
-      reset: () => {}
+      reset: () => {},
     };
   }
 
@@ -161,6 +161,6 @@ export function useTypewriter(
     isComplete,
     startTyping,
     skipTyping,
-    reset
+    reset,
   };
 }

@@ -16,11 +16,11 @@ interface TaskQuickAddProps {
 }
 
 export const TaskQuickAdd: React.FC<TaskQuickAddProps> = ({
-  placeholder = "快速添加任务...",
+  placeholder = '快速添加任务...',
   defaultProjectId = null,
   defaultDueDate,
   onTaskAdded,
-  className = ""
+  className = '',
 }) => {
   const { createTask, projects, currentView } = useTaskBoxStore();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -113,7 +113,7 @@ export const TaskQuickAdd: React.FC<TaskQuickAddProps> = ({
         priority,
         due_date: finalDueDate && finalDueDate.trim() ? finalDueDate.trim() : undefined,
         project_id: finalProjectId,
-        tags: []
+        tags: [],
       };
 
       await createTask(newTask);
@@ -153,15 +153,15 @@ export const TaskQuickAdd: React.FC<TaskQuickAddProps> = ({
   };
 
   // getPriorityColor removed - was not used
-  const priorityOptions: { value: TaskPriority; label: string; color: string; }[] = [
+  const priorityOptions: { value: TaskPriority; label: string; color: string }[] = [
     { value: 'urgent', label: '紧急', color: 'text-red-500' },
     { value: 'high', label: '高', color: 'text-orange-500' },
     { value: 'medium', label: '中', color: 'text-blue-500' },
-    { value: 'low', label: '低', color: 'text-green-500' }
+    { value: 'low', label: '低', color: 'text-green-500' },
   ];
 
   // 获取选中的项目
-  const selectedProject = projects.find(p => p.id === projectId);
+  const selectedProject = projects.find((p) => p.id === projectId);
 
   // 处理项目选择
   const handleProjectSelect = (project: any) => {
@@ -190,8 +190,8 @@ export const TaskQuickAdd: React.FC<TaskQuickAddProps> = ({
     // 简化状态
     return (
       <div className={`${className}`} ref={containerRef}>
-        <button 
-          onClick={handleExpand} 
+        <button
+          onClick={handleExpand}
           className="w-full flex items-center gap-2 p-3 text-left rounded-lg transition-all duration-200 hover:shadow-sm theme-text-primary feather-glass-deco"
         >
           <Plus size={16} className="theme-text-secondary" />
@@ -204,173 +204,179 @@ export const TaskQuickAdd: React.FC<TaskQuickAddProps> = ({
   // 展开状态 - 毛玻璃风格
   return (
     <div className={`${className} relative`} ref={containerRef}>
-      <motion.div 
+      <motion.div
         className="rounded-lg p-4 shadow-lg feather-glass-deco"
-        initial={{ opacity: 0, scale: 0.95 }} 
+        initial={{ opacity: 0, scale: 0.95 }}
         animate={{
           opacity: 1,
-          scale: 1
+          scale: 1,
         }}
         transition={{ duration: 0.2 }}
       >
-    {/* 任务标题输入 */}
-    <div className="relative">
-        <motion.input 
-          ref={inputRef} 
-          type="text"
-          value={title} 
-          onChange={(e) => {
-            setTitle(e.target.value);
-            if (validationError && e.target.value.trim()) {
-              setValidationError('');
-            }
-          }}
-          onKeyDown={handleKeyDown} 
-          placeholder="任务标题..."
-          className={`w-full px-0 py-2 text-base bg-transparent border-none outline-none transition-colors ${validationError ? 'text-red-500' : 'theme-text-primary'} theme-placeholder`}
-          animate={{
-            x: validationError ? [0, -10, 10, -5, 5, 0] : 0
-          }}
-          transition={{ duration: 0.5 }}
-        />
-      </div>
-      <AnimatePresence>
-      {validationError && (
-        <motion.div 
-          initial={{ opacity: 0, y: -10, height: 0 }} 
-          animate={{ opacity: 1, y: 0, height: 'auto' }}
-          exit={{ opacity: 0, y: -10, height: 0 }} 
-          transition={{ duration: 0.2 }}
-          className="text-red-500 text-sm mt-1 font-medium"
-        >
-          {validationError}
-        </motion.div>
-      )}
-      </AnimatePresence>
-      
-      {/* 任务描述输入 */}
-      <div className="relative mt-3">
-        <textarea 
-          value={description} 
-          onChange={(e) => setDescription(e.target.value)}
-          onKeyDown={handleKeyDown} 
-          placeholder="任务描述 (可选)"
-          rows={2} 
-          className="w-full px-0 py-1 text-sm bg-transparent border-none outline-none resize-none theme-text-secondary theme-placeholder"
-        />
-      </div>
-      
-      {/* 任务属性设置 */}
-      <div className="flex flex-col gap-3 mt-4 pt-3 border-t border-white/10">
-
-        {/* 截止日期选择器 */}
-        <div className="flex items-center gap-2">
-          <DatePicker 
-            value={dueDate} 
-            onChange={setDueDate} 
-            placeholder="选择截止日期"
-            size="md"
-            showShortcuts={true} 
-            className="flex-1"
+        {/* 任务标题输入 */}
+        <div className="relative">
+          <motion.input
+            ref={inputRef}
+            type="text"
+            value={title}
+            onChange={(e) => {
+              setTitle(e.target.value);
+              if (validationError && e.target.value.trim()) {
+                setValidationError('');
+              }
+            }}
+            onKeyDown={handleKeyDown}
+            placeholder="任务标题..."
+            className={`w-full px-0 py-2 text-base bg-transparent border-none outline-none transition-colors ${validationError ? 'text-red-500' : 'theme-text-primary'} theme-placeholder`}
+            animate={{
+              x: validationError ? [0, -10, 10, -5, 5, 0] : 0,
+            }}
+            transition={{ duration: 0.5 }}
           />
         </div>
-        <div className="flex items-center gap-2">
-          <Flag size={16} className="theme-text-secondary" />
-          <div className="flex gap-1">
-            {priorityOptions.map(option => (
-              <button 
-                key={option.value} 
-                type="button"
-                onClick={() => setPriority(option.value)}
-                className={`px-3 py-1.5 text-xs rounded-full transition-all duration-200 font-medium ${priority === option.value
-                  ? 'theme-bg-accent theme-text-on-accent shadow-sm'
-                  : 'bg-white/10 hover:bg-white/20 theme-text-secondary'
-                }`}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
+        <AnimatePresence>
+          {validationError && (
+            <motion.div
+              initial={{ opacity: 0, y: -10, height: 0 }}
+              animate={{ opacity: 1, y: 0, height: 'auto' }}
+              exit={{ opacity: 0, y: -10, height: 0 }}
+              transition={{ duration: 0.2 }}
+              className="text-red-500 text-sm mt-1 font-medium"
+            >
+              {validationError}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* 任务描述输入 */}
+        <div className="relative mt-3">
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="任务描述 (可选)"
+            rows={2}
+            className="w-full px-0 py-1 text-sm bg-transparent border-none outline-none resize-none theme-text-secondary theme-placeholder"
+          />
         </div>
-        
-        {/* 项目选择器 */}
-        {projects.length > 0 && (
+
+        {/* 任务属性设置 */}
+        <div className="flex flex-col gap-3 mt-4 pt-3 border-t border-white/10">
+          {/* 截止日期选择器 */}
           <div className="flex items-center gap-2">
-            <span className="text-sm theme-text-secondary">项目:</span>
-            <div className="relative">
-              <button 
-                type="button"
-                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-200 min-w-32"
-                onClick={() => setShowProjectPicker(!showProjectPicker)}
-              >
-                {selectedProject ? (
-                  <>
-                    <span className="flex items-center justify-center w-4 h-4">
-                      {selectedProject.icon?.length === 1 ? (
-                        <span className="text-sm">{selectedProject.icon}</span>
-                      ) : (
-                        React.createElement(getIconComponent(selectedProject.icon || 'Folder'), {
-                          theme: 'outline',
-                          size: 14,
-                          fill: 'currentColor',
-                          strokeWidth: 2,
-                          className: 'theme-text-secondary'
-                        })
-                      )}
-                    </span>
-                    <span className="theme-text-primary text-sm">{selectedProject.name}</span>
-                  </>
-                ) : (
-                  <span className="theme-text-tertiary text-sm">选择项目</span>
-                )}
-                <ChevronDown size={12} className="theme-text-secondary" />
-              </button>
-              {showProjectPicker && (
-                <div className="absolute bottom-full left-0 mb-2 w-full max-h-40 overflow-y-auto rounded-lg shadow-xl z-50 feather-glass-deco">
-                  <button 
-                    type="button"
-                    onClick={() => handleProjectSelect({ id: null })}
-                    className="w-full flex items-center gap-2 px-3 py-2 hover:bg-white/10 transition-all duration-200 text-left"
-                  >
-                    <span className="theme-text-tertiary text-sm">无项目</span>
-                  </button>
-                  {projects.map(project => (
-                    <button 
-                      key={project.id} 
-                      type="button"
-                      onClick={() => handleProjectSelect(project)}
-                      className="w-full flex items-center gap-2 px-3 py-2 hover:bg-white/10 transition-all duration-200 text-left"
-                    >
+            <DatePicker
+              value={dueDate}
+              onChange={setDueDate}
+              placeholder="选择截止日期"
+              size="md"
+              showShortcuts={true}
+              className="flex-1"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <Flag size={16} className="theme-text-secondary" />
+            <div className="flex gap-1">
+              {priorityOptions.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => setPriority(option.value)}
+                  className={`px-3 py-1.5 text-xs rounded-full transition-all duration-200 font-medium ${
+                    priority === option.value
+                      ? 'theme-bg-accent theme-text-on-accent shadow-sm'
+                      : 'bg-white/10 hover:bg-white/20 theme-text-secondary'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 项目选择器 */}
+          {projects.length > 0 && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm theme-text-secondary">项目:</span>
+              <div className="relative">
+                <button
+                  type="button"
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-200 min-w-32"
+                  onClick={() => setShowProjectPicker(!showProjectPicker)}
+                >
+                  {selectedProject ? (
+                    <>
                       <span className="flex items-center justify-center w-4 h-4">
-                        {project.icon?.length === 1 ? (
-                          <span className="text-sm">{project.icon}</span>
+                        {selectedProject.icon?.length === 1 ? (
+                          <span className="text-sm">{selectedProject.icon}</span>
                         ) : (
-                          React.createElement(getIconComponent(project.icon || 'Folder'), {
+                          React.createElement(getIconComponent(selectedProject.icon || 'Folder'), {
                             theme: 'outline',
                             size: 14,
                             fill: 'currentColor',
                             strokeWidth: 2,
-                            className: 'theme-text-secondary'
+                            className: 'theme-text-secondary',
                           })
                         )}
                       </span>
-                      <span className="theme-text-primary text-sm">{project.name}</span>
+                      <span className="theme-text-primary text-sm">{selectedProject.name}</span>
+                    </>
+                  ) : (
+                    <span className="theme-text-tertiary text-sm">选择项目</span>
+                  )}
+                  <ChevronDown size={12} className="theme-text-secondary" />
+                </button>
+                {showProjectPicker && (
+                  <div className="absolute bottom-full left-0 mb-2 w-full max-h-40 overflow-y-auto rounded-lg shadow-xl z-50 feather-glass-deco">
+                    <button
+                      type="button"
+                      onClick={() => handleProjectSelect({ id: null })}
+                      className="w-full flex items-center gap-2 px-3 py-2 hover:bg-white/10 transition-all duration-200 text-left"
+                    >
+                      <span className="theme-text-tertiary text-sm">无项目</span>
                     </button>
-                  ))}
-                </div>
-              )}
+                    {projects.map((project) => (
+                      <button
+                        key={project.id}
+                        type="button"
+                        onClick={() => handleProjectSelect(project)}
+                        className="w-full flex items-center gap-2 px-3 py-2 hover:bg-white/10 transition-all duration-200 text-left"
+                      >
+                        <span className="flex items-center justify-center w-4 h-4">
+                          {project.icon?.length === 1 ? (
+                            <span className="text-sm">{project.icon}</span>
+                          ) : (
+                            React.createElement(getIconComponent(project.icon || 'Folder'), {
+                              theme: 'outline',
+                              size: 14,
+                              fill: 'currentColor',
+                              strokeWidth: 2,
+                              className: 'theme-text-secondary',
+                            })
+                          )}
+                        </span>
+                        <span className="theme-text-primary text-sm">{project.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        )}
-      </div>
-        
+          )}
+        </div>
+
         {/* 操作按钮 */}
         <div className="flex items-center justify-between mt-4">
           <div className="text-xs theme-text-muted">
-            按 <kbd className="px-1 py-0.5 text-[10px] font-mono theme-bg-secondary border theme-border rounded">CtrlEnter</kbd> 快速添加
+            按{' '}
+            <kbd className="px-1 py-0.5 text-[10px] font-mono theme-bg-secondary border theme-border rounded">
+              CtrlEnter
+            </kbd>{' '}
+            快速添加
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={handleCancel} className="px-3 py-1.5 text-xs border theme-border rounded hover:theme-border-hover theme-text-secondary transition-colors"
+            <button
+              onClick={handleCancel}
+              className="px-3 py-1.5 text-xs border theme-border rounded hover:theme-border-hover theme-text-secondary transition-colors"
               disabled={isLoading}
             >
               取消
@@ -387,7 +393,7 @@ export const TaskQuickAdd: React.FC<TaskQuickAddProps> = ({
               whileTap={{ scale: 0.98 }}
               animate={{
                 scale: showSuccess ? [1, 1.05, 1] : 1,
-                backgroundColor: showSuccess ? '#22c55e' : undefined
+                backgroundColor: showSuccess ? '#22c55e' : undefined,
               }}
               transition={{ duration: 0.3 }}
             >
@@ -400,7 +406,7 @@ export const TaskQuickAdd: React.FC<TaskQuickAddProps> = ({
                     exit={{ opacity: 0 }}
                     transition={{
                       duration: 0.2,
-                      rotate: { duration: 1, repeat: Infinity, ease: 'linear' }
+                      rotate: { duration: 1, repeat: Infinity, ease: 'linear' },
                     }}
                     className="w-3 h-3 border border-white/30 border-t-white rounded-full"
                   />
@@ -426,7 +432,7 @@ export const TaskQuickAdd: React.FC<TaskQuickAddProps> = ({
                   </motion.div>
                 )}
               </AnimatePresence>
-              <motion.span 
+              <motion.span
                 animate={{ color: showSuccess ? '#ffffff' : undefined }}
                 transition={{ duration: 0.3 }}
               >
@@ -439,15 +445,3 @@ export const TaskQuickAdd: React.FC<TaskQuickAddProps> = ({
     </div>
   );
 };
-
-
-
-
-
-
-
-
-
-
-
-

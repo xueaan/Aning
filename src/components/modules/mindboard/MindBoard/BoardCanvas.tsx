@@ -14,10 +14,20 @@ import ReactFlow, {
   ReactFlowProvider,
   useReactFlow,
   Panel,
-  Controls
+  Controls,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { ArrowLeft, Plus, Trash2, Image, StickyNote as StickyNoteIcon, Download, Users, Search, Brain } from 'lucide-react';
+import {
+  ArrowLeft,
+  Plus,
+  Trash2,
+  Image,
+  StickyNote as StickyNoteIcon,
+  Download,
+  Users,
+  Search,
+  Brain,
+} from 'lucide-react';
 import { useMindBoardStore } from '@/stores/mindBoardStore';
 import { TextCard } from './nodes/TextCard';
 import { NoteCard } from './nodes/NoteCard';
@@ -41,11 +51,11 @@ const nodeTypes = {
   todoCard: TodoCard,
   stickyNote: StickyNote,
   groupNode: GroupNode,
-  mindMapNode: MindMapNode
+  mindMapNode: MindMapNode,
 };
 
 const edgeTypes = {
-  mindMapEdge: MindMapEdge
+  mindMapEdge: MindMapEdge,
 };
 
 const BoardCanvasInner: React.FC = () => {
@@ -58,13 +68,7 @@ const BoardCanvasInner: React.FC = () => {
 
   const { project, fitBounds: _fitBounds } = useReactFlow();
 
-
-  const {
-    currentBoard,
-    updateBoard,
-    exitCanvas,
-    deleteBoard
-  } = useMindBoardStore();
+  const { currentBoard, updateBoard, exitCanvas, deleteBoard } = useMindBoardStore();
 
   const handleTitleDoubleClick = () => {
     if (currentBoard) {
@@ -106,7 +110,7 @@ const BoardCanvasInner: React.FC = () => {
       const newNodes = applyNodeChanges(changes, currentBoard.nodes);
       updateBoard(currentBoard.id, { nodes: newNodes });
       // 更新选中节点数量
-      const selected = newNodes.filter(n => n.selected && n.type !== 'groupNode');
+      const selected = newNodes.filter((n) => n.selected && n.type !== 'groupNode');
       setSelectedCount(selected.length);
     },
     [currentBoard, updateBoard]
@@ -128,8 +132,6 @@ const BoardCanvasInner: React.FC = () => {
     [currentBoard, updateBoard]
   );
 
-
-
   const onDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
@@ -148,7 +150,7 @@ const BoardCanvasInner: React.FC = () => {
 
       const position = project({
         x: event.clientX - reactFlowBounds.left,
-        y: event.clientY - reactFlowBounds.top
+        y: event.clientY - reactFlowBounds.top,
       });
 
       // 根据不同类型创建对应的数据结构
@@ -161,10 +163,20 @@ const BoardCanvasInner: React.FC = () => {
           nodeData = { imageUrl: '', colorIndex: 0, width: 280, height: 180 };
           break;
         case 'stickyNote':
-          nodeData = { text: '', colorIndex: Math.floor(Math.random() * 6), width: 280, height: 180 };
+          nodeData = {
+            text: '',
+            colorIndex: Math.floor(Math.random() * 6),
+            width: 280,
+            height: 180,
+          };
           break;
         case 'noteCard':
-          nodeData = { content: '# 新笔记卡片\n\n在这里输入内容...', colorIndex: 0, width: 280, height: 180 };
+          nodeData = {
+            content: '# 新笔记卡片\n\n在这里输入内容...',
+            colorIndex: 0,
+            width: 280,
+            height: 180,
+          };
           break;
         default:
           nodeData = { text: '', colorIndex: 0 };
@@ -175,7 +187,7 @@ const BoardCanvasInner: React.FC = () => {
         type,
         position,
         data: nodeData,
-        selected: true // 创建后自动选中
+        selected: true, // 创建后自动选中
       };
 
       const newNodes = [...currentBoard.nodes, newNode];
@@ -184,13 +196,12 @@ const BoardCanvasInner: React.FC = () => {
     [currentBoard, updateBoard, project]
   );
 
-
   const handleAddTextCard = () => {
     const newNode: Node = {
       id: `${Date.now()}`,
       type: 'textCard',
       position: { x: 100 + Math.random() * 300, y: 100 + Math.random() * 200 },
-      data: { text: '新文字卡片' }
+      data: { text: '新文字卡片' },
     };
 
     const newNodes = [...currentBoard.nodes, newNode];
@@ -204,18 +215,17 @@ const BoardCanvasInner: React.FC = () => {
       centerX: 400 + Math.random() * 200,
       centerY: 300 + Math.random() * 200,
       topic: '新思维导图',
-      subtopics: [] // 不创建子节点
+      subtopics: [], // 不创建子节点
     };
 
     const { nodes: mindMapNodes, edges: mindMapEdges } = createMindMap(centerPosition);
-
 
     const newNodes = [...currentBoard.nodes, ...mindMapNodes];
     const newEdges = [...currentBoard.edges, ...mindMapEdges];
 
     updateBoard(currentBoard.id, {
       nodes: newNodes,
-      edges: newEdges
+      edges: newEdges,
     });
   };
 
@@ -230,10 +240,9 @@ const BoardCanvasInner: React.FC = () => {
         content: card.content || '空笔记',
         sourceCardId: card.id,
         sourceCardTitle: card.title,
-        colorIndex: Math.floor(Math.random() * 6)
-      }
+        colorIndex: Math.floor(Math.random() * 6),
+      },
     };
-
 
     const newNodes = [...currentBoard.nodes, newNode];
     updateBoard(currentBoard.id, { nodes: newNodes });
@@ -244,9 +253,8 @@ const BoardCanvasInner: React.FC = () => {
       id: `${Date.now()}`,
       type,
       position: { x: 100 + Math.random() * 300, y: 100 + Math.random() * 200 },
-      data
+      data,
     };
-
 
     const newNodes = [...currentBoard.nodes, newNode];
     updateBoard(currentBoard.id, { nodes: newNodes });
@@ -260,25 +268,29 @@ const BoardCanvasInner: React.FC = () => {
   };
 
   const handleGroupSelected = () => {
-    const selectedNodes = currentBoard.nodes.filter(node => node.selected && node.type !== 'groupNode');
+    const selectedNodes = currentBoard.nodes.filter(
+      (node) => node.selected && node.type !== 'groupNode'
+    );
     if (selectedNodes.length < 2) {
       return; // 不显示 alert，更友好
     }
 
     // 获取节点实际尺寸，如果没有则使用默认值
-    const nodeWithSizes = selectedNodes.map(node => ({
+    const nodeWithSizes = selectedNodes.map((node) => ({
       ...node,
-      width: node.width || (node.type === 'stickyNote' ? 250 : node.type === 'noteCard' ? 400 : 300),
-      height: node.height || (node.type === 'stickyNote' ? 150 : node.type === 'noteCard' ? 250 : 150)
+      width:
+        node.width || (node.type === 'stickyNote' ? 250 : node.type === 'noteCard' ? 400 : 300),
+      height:
+        node.height || (node.type === 'stickyNote' ? 150 : node.type === 'noteCard' ? 250 : 150),
     }));
 
     // 计算分组范围，添加更多 padding
     const padding = 30;
     const bounds = {
-      minX: Math.min(...nodeWithSizes.map(n => n.position.x)) - padding,
-      minY: Math.min(...nodeWithSizes.map(n => n.position.y)) - padding,
-      maxX: Math.max(...nodeWithSizes.map(n => n.position.x + n.width)) + padding,
-      maxY: Math.max(...nodeWithSizes.map(n => n.position.y + n.height)) + padding
+      minX: Math.min(...nodeWithSizes.map((n) => n.position.x)) - padding,
+      minY: Math.min(...nodeWithSizes.map((n) => n.position.y)) - padding,
+      maxX: Math.max(...nodeWithSizes.map((n) => n.position.x + n.width)) + padding,
+      maxY: Math.max(...nodeWithSizes.map((n) => n.position.y + n.height)) + padding,
     };
 
     const groupNode: Node = {
@@ -286,42 +298,42 @@ const BoardCanvasInner: React.FC = () => {
       type: 'groupNode',
       position: { x: bounds.minX, y: bounds.minY },
       data: {
-        title: `分组 ${currentBoard.nodes.filter(n => n.type === 'groupNode').length + 1}`,
-        nodeIds: selectedNodes.map(n => n.id),
+        title: `分组 ${currentBoard.nodes.filter((n) => n.type === 'groupNode').length + 1}`,
+        nodeIds: selectedNodes.map((n) => n.id),
         width: bounds.maxX - bounds.minX,
         height: bounds.maxY - bounds.minY,
         colorIndex: Math.floor(Math.random() * 6),
-        isCollapsed: false
+        isCollapsed: false,
       },
       style: {
         zIndex: -1,
         width: bounds.maxX - bounds.minX,
-        height: bounds.maxY - bounds.minY
+        height: bounds.maxY - bounds.minY,
       },
       draggable: true,
-      selectable: true
+      selectable: true,
     };
 
     // 将节点的绝对坐标转换为相对于分组的坐标
-    const updatedNodes = currentBoard.nodes.map(node => {
-      if (selectedNodes.find(n => n.id === node.id)) {
+    const updatedNodes = currentBoard.nodes.map((node) => {
+      if (selectedNodes.find((n) => n.id === node.id)) {
         return {
           ...node,
           // 转换为相对坐标：子节点位置 = 绝对位置 - 父节点位置
           position: {
             x: node.position.x - bounds.minX,
-            y: node.position.y - bounds.minY
+            y: node.position.y - bounds.minY,
           },
           parentNode: groupNode.id,
           extent: 'parent' as const, // 限制在父节点内
-          selected: false
+          selected: false,
         };
       }
       return node;
     });
 
     updateBoard(currentBoard.id, {
-      nodes: [...updatedNodes, groupNode]
+      nodes: [...updatedNodes, groupNode],
     });
   };
 
@@ -329,7 +341,9 @@ const BoardCanvasInner: React.FC = () => {
     if (reactFlowWrapper.current) {
       setIsExporting(true);
       try {
-        const element = reactFlowWrapper.current.querySelector('.react-flow__viewport') as HTMLElement;
+        const element = reactFlowWrapper.current.querySelector(
+          '.react-flow__viewport'
+        ) as HTMLElement;
         if (element) {
           await exportToPNG(element, `${currentBoard.title}.png`);
         }
@@ -361,22 +375,71 @@ const BoardCanvasInner: React.FC = () => {
         selectNodesOnDrag={true}
         multiSelectionKeyCode={null}
         deleteKeyCode="Delete"
-        connectionLineStyle={{ stroke: '#3b82f6', strokeWidth: 2 }}
-        connectionLineType={ConnectionLineType.SmoothStep}
+        connectionLineStyle={{
+          stroke: 'url(#edge-gradient)',
+          strokeWidth: 3,
+          filter: 'drop-shadow(0 2px 4px rgba(59, 130, 246, 0.2))',
+        }}
+        connectionLineType={ConnectionLineType.Bezier}
         connectionMode={'loose' as any}
         elevateEdgesOnSelect={false}
         snapToGrid={false}
         snapGrid={[15, 15]}
       >
+        {/* SVG 渐变定义 */}
+        <defs>
+          <svg>
+            {/* 基础渐变 - 蓝色到紫色 */}
+            <linearGradient id="edge-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#3b82f6" stopOpacity="1" />
+              <stop offset="50%" stopColor="#6366f1" stopOpacity="1" />
+              <stop offset="100%" stopColor="#8b5cf6" stopOpacity="1" />
+            </linearGradient>
+
+            {/* 悬停渐变 - 更鲜艳的颜色 */}
+            <linearGradient id="edge-gradient-hover" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#2563eb" stopOpacity="1" />
+              <stop offset="50%" stopColor="#4f46e5" stopOpacity="1" />
+              <stop offset="100%" stopColor="#7c3aed" stopOpacity="1" />
+            </linearGradient>
+
+            {/* 选中渐变 - 金色强调 */}
+            <linearGradient id="edge-gradient-selected" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#f59e0b" stopOpacity="1" />
+              <stop offset="50%" stopColor="#d97706" stopOpacity="1" />
+              <stop offset="100%" stopColor="#b45309" stopOpacity="1" />
+            </linearGradient>
+
+            {/* 深色主题渐变 - 更亮的颜色 */}
+            <linearGradient id="edge-gradient-dark" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#60a5fa" stopOpacity="1" />
+              <stop offset="50%" stopColor="#818cf8" stopOpacity="1" />
+              <stop offset="100%" stopColor="#a78bfa" stopOpacity="1" />
+            </linearGradient>
+
+            <linearGradient id="edge-gradient-dark-hover" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#3b82f6" stopOpacity="1" />
+              <stop offset="50%" stopColor="#6366f1" stopOpacity="1" />
+              <stop offset="100%" stopColor="#8b5cf6" stopOpacity="1" />
+            </linearGradient>
+
+            <linearGradient id="edge-gradient-dark-selected" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#fbbf24" stopOpacity="1" />
+              <stop offset="50%" stopColor="#f59e0b" stopOpacity="1" />
+              <stop offset="100%" stopColor="#d97706" stopOpacity="1" />
+            </linearGradient>
+          </svg>
+        </defs>
+
         <Panel position="top-left" className="flex gap-2">
-          <button 
+          <button
             onClick={exitCanvas}
             className="flex items-center gap-2 px-3 py-2 rounded-lg transition-all backdrop-blur-md bg-white/10 dark:bg-white/10 border border-black/20 dark:border-white/20 hover:bg-white/20 dark:hover:bg-white/20 text-black dark:text-white shadow-lg"
           >
             <ArrowLeft className="w-4 h-4" />
             返回列表
           </button>
-          
+
           <div className="flex items-center px-3 py-2 rounded-lg backdrop-blur-md bg-white/10 dark:bg-white/10 border border-black/20 dark:border-white/20 text-black dark:text-white shadow-lg">
             {isEditingTitle ? (
               <input
@@ -471,7 +534,9 @@ const BoardCanvasInner: React.FC = () => {
 
           <button
             draggable
-            onClick={() => handleAddNode('stickyNote', { text: '', colorIndex: Math.floor(Math.random() * 6) })}
+            onClick={() =>
+              handleAddNode('stickyNote', { text: '', colorIndex: Math.floor(Math.random() * 6) })
+            }
             onDragStart={(e) => {
               e.dataTransfer.setData('application/reactflow', 'stickyNote');
               e.dataTransfer.effectAllowed = 'move';
@@ -482,7 +547,7 @@ const BoardCanvasInner: React.FC = () => {
             <StickyNoteIcon className="w-5 h-5" />
           </button>
 
-          <button 
+          <button
             onClick={() => setSearchModalOpen(true)}
             className="p-3 backdrop-blur-sm bg-white/10 dark:bg-white/10 border border-black/20 dark:border-white/20 hover:bg-white/20 dark:hover:bg-white/20 hover:scale-105 transition-all rounded-xl text-black dark:text-white shadow-lg"
             title="搜索笔记卡片"
@@ -490,7 +555,7 @@ const BoardCanvasInner: React.FC = () => {
             <Search className="w-5 h-5" />
           </button>
 
-          <button 
+          <button
             onClick={handleCreateMindMap}
             className="p-3 backdrop-blur-sm bg-white/10 dark:bg-white/10 border border-black/20 dark:border-white/20 hover:bg-white/20 dark:hover:bg-white/20 hover:scale-105 transition-all rounded-xl text-black dark:text-white shadow-lg"
             title="创建思维导图"
@@ -502,15 +567,17 @@ const BoardCanvasInner: React.FC = () => {
           <div className="h-8 w-px bg-black/20 dark:bg-white/20 mx-2"></div>
 
           {/* 操作按钮组 */}
-          <button 
-            onClick={handleGroupSelected} 
+          <button
+            onClick={handleGroupSelected}
             disabled={selectedCount < 2}
             className={`relative p-3 rounded-xl transition-all shadow-lg ${
-              selectedCount >= 2 
-                ? 'backdrop-blur-sm bg-white/10 dark:bg-white/10 border border-black/20 dark:border-white/20 hover:bg-white/20 dark:hover:bg-white/20 hover:scale-105 text-black dark:text-white' 
+              selectedCount >= 2
+                ? 'backdrop-blur-sm bg-white/10 dark:bg-white/10 border border-black/20 dark:border-white/20 hover:bg-white/20 dark:hover:bg-white/20 hover:scale-105 text-black dark:text-white'
                 : 'bg-white/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-black/40 dark:text-white/40 cursor-not-allowed opacity-50'
             }`}
-            title={selectedCount >= 2 ? `分组 ${selectedCount} 个节点 (CtrlG)` : '请选择至少2个节点'}
+            title={
+              selectedCount >= 2 ? `分组 ${selectedCount} 个节点 (CtrlG)` : '请选择至少2个节点'
+            }
           >
             <Users className="w-5 h-5" />
             {selectedCount >= 2 && (
@@ -520,8 +587,8 @@ const BoardCanvasInner: React.FC = () => {
             )}
           </button>
 
-          <button 
-            onClick={handleExportPNG} 
+          <button
+            onClick={handleExportPNG}
             disabled={isExporting}
             className="p-3 backdrop-blur-sm bg-white/10 dark:bg-white/10 border border-black/20 dark:border-white/20 hover:bg-white/20 dark:hover:bg-white/20 rounded-xl transition-all hover:scale-105 disabled:opacity-50 text-black dark:text-white shadow-lg"
             title="导出为图片"
@@ -533,7 +600,7 @@ const BoardCanvasInner: React.FC = () => {
             )}
           </button>
 
-          <button 
+          <button
             onClick={handleDeleteBoard}
             className="p-3 backdrop-blur-sm bg-white/10 dark:bg-white/10 border border-black/20 dark:border-white/20 hover:bg-red-500/20 dark:hover:bg-red-500/20 rounded-xl transition-all hover:scale-105 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 shadow-lg"
             title="删除思维板"
@@ -549,7 +616,6 @@ const BoardCanvasInner: React.FC = () => {
         onClose={() => setSearchModalOpen(false)}
         onSelectCard={handleAddCardFromSearch}
       />
-
     </div>
   );
 };

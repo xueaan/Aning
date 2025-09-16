@@ -1,7 +1,7 @@
-﻿import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { useAppStore } from "@/stores";
-import { AppModule } from "@/types";
+﻿import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import { useAppStore } from '@/stores';
+import { AppModule } from '@/types';
 import {
   Clock,
   SquareLibrary,
@@ -17,24 +17,26 @@ import {
   BotMessageSquare,
   Compass,
   Settings,
-} from "lucide-react";
-import { ThemePicker } from "../common/ThemePicker";
-import { AnningLogo } from "../common/AnningLogo";
-import { CollapsedAnningLogo } from "../common/CollapsedAnningLogo";
-import { SettingsModal } from "../modals/SettingsModal";
-import { TodoWidget } from "@/components/widgets/TodoWidget";
-import { sidebarVariants, listContainerVariants } from "@/config/animation";
+  BookOpenCheck,
+} from 'lucide-react';
+import { ThemePicker } from '../common/ThemePicker';
+import { AnningLogo } from '../common/AnningLogo';
+import { CollapsedAnningLogo } from '../common/CollapsedAnningLogo';
+import { SettingsModal } from '../modals/SettingsModal';
+import { TodoWidget } from '@/components/widgets/TodoWidget';
+import { sidebarVariants, listContainerVariants } from '@/config/animation';
 
 const modules = [
-  { id: "home", name: "标签页", icon: Compass },
-  { id: "timeline", name: "时光记", icon: Clock },
-  { id: "knowledge", name: "知识库", icon: SquareLibrary },
-  { id: "cardbox", name: "笔记盒", icon: Package },
-  { id: "mindboard", name: "思维板", icon: Map },
-  { id: "taskbox", name: "待办箱", icon: ListTodo },
-  { id: "habit", name: "习惯圈", icon: CircleFadingPlus },
-  { id: "password", name: "密钥本", icon: Key },
-  { id: "dialogue", name: "对话屋", icon: BotMessageSquare },
+  { id: 'home', name: '标签页', icon: Compass },
+  { id: 'timeline', name: '时光记', icon: Clock },
+  { id: 'knowledge', name: '知识库', icon: SquareLibrary },
+  { id: 'cardbox', name: '笔记盒', icon: Package },
+  { id: 'bookshelf', name: '阅读志', icon: BookOpenCheck },
+  { id: 'mindboard', name: '思维板', icon: Map },
+  { id: 'taskbox', name: '待办箱', icon: ListTodo },
+  { id: 'habit', name: '习惯圈', icon: CircleFadingPlus },
+  { id: 'password', name: '密钥本', icon: Key },
+  { id: 'dialogue', name: '对话屋', icon: BotMessageSquare },
 ];
 
 export const Sidebar: React.FC = () => {
@@ -61,7 +63,7 @@ export const Sidebar: React.FC = () => {
     x: 0,
     y: 0,
     folderId: null,
-    folderName: "",
+    folderName: '',
   });
 
   // 左侧栏拖动状态
@@ -74,8 +76,8 @@ export const Sidebar: React.FC = () => {
         setContextMenu({ ...contextMenu, visible: false });
       }
     };
-    document.addEventListener("click", handleClick);
-    return () => document.removeEventListener("click", handleClick);
+    document.addEventListener('click', handleClick);
+    return () => document.removeEventListener('click', handleClick);
   }, [contextMenu.visible]);
 
   // 左侧栏拖动处理函数
@@ -96,38 +98,38 @@ export const Sidebar: React.FC = () => {
 
     const handleMouseUp = () => {
       setIsResizing(false);
-      document.body.style.cursor = "";
-      document.body.style.userSelect = "";
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
     };
 
     if (isResizing) {
-      document.body.style.cursor = "ew-resize";
-      document.body.style.userSelect = "none";
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
+      document.body.style.cursor = 'ew-resize';
+      document.body.style.userSelect = 'none';
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
     }
 
     return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-      document.body.style.cursor = "";
-      document.body.style.userSelect = "";
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
     };
   }, [isResizing, setLeftSidebarWidth]);
 
   return (
     <motion.div
-      className={`h-full flex flex-col ${!isResizing ? "transition-all duration-300" : ""} relative feather-glass-sidebar`}
+      className={`h-full flex flex-col ${!isResizing ? 'transition-all duration-300' : ''} relative feather-glass-sidebar`}
       variants={sidebarVariants}
       custom={leftSidebarWidth}
-      animate={sidebarOpen ? "expanded" : "collapsed"}
-      initial={sidebarOpen ? "expanded" : "collapsed"}
+      animate={sidebarOpen ? 'expanded' : 'collapsed'}
+      initial={sidebarOpen ? 'expanded' : 'collapsed'}
     >
       {/* 拖动手柄 */}
       {sidebarOpen && (
         <div
           className="absolute right-0 top-0 bottom-0 w-1 cursor-ew-resize hover:bg-accent/30 bg-border-primary/20 transition-colors z-50"
-          style={{ width: "4px" }}
+          style={{ width: '4px' }}
           onMouseDown={handleMouseDown}
         />
       )}
@@ -139,7 +141,7 @@ export const Sidebar: React.FC = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
               className="flex-1 flex items-center justify-center h-full"
             >
               <div className="group">
@@ -176,24 +178,22 @@ export const Sidebar: React.FC = () => {
                       setCurrentModule(module.id as AppModule);
                     }}
                     className={`flex-1 flex items-center ${
-                      sidebarOpen
-                        ? "gap-3 px-3 py-2"
-                        : "px-2 py-2 justify-center"
+                      sidebarOpen ? 'gap-3 px-3 py-2' : 'px-2 py-2 justify-center'
                     } transition-all duration-300 ease-out relative rounded-xl ${
                       isActive
-                        ? "theme-text-primary font-medium shadow-sm feather-glass-panel"
-                        : "theme-text-secondary hover:theme-text-primary hover:scale-[1.02]"
+                        ? 'theme-text-primary font-medium shadow-sm feather-glass-panel'
+                        : 'theme-text-secondary hover:theme-text-primary hover:scale-[1.02]'
                     }`}
                     title={!sidebarOpen ? module.name : undefined}
                     style={{
-                      transform: "translateZ(0)",
+                      transform: 'translateZ(0)',
                     }}
                   >
                     <div
                       className={`transition-all duration-200 ${
                         isActive
-                          ? "theme-text-primary"
-                          : "group-hover:scale-105 group-hover:rotate-1"
+                          ? 'theme-text-primary'
+                          : 'group-hover:scale-105 group-hover:rotate-1'
                       }`}
                     >
                       <Icon size={16} />
@@ -201,7 +201,7 @@ export const Sidebar: React.FC = () => {
                     {sidebarOpen && (
                       <span
                         className={`text-sm transition-all duration-200 ${
-                          isActive ? "theme-text-primary font-medium" : ""
+                          isActive ? 'theme-text-primary font-medium' : ''
                         }`}
                       >
                         {module.name}
@@ -230,7 +230,7 @@ export const Sidebar: React.FC = () => {
       <div>
         <div
           className={`flex items-center gap-1 h-10 px-2 ${
-            sidebarOpen ? "justify-end" : "justify-center"
+            sidebarOpen ? 'justify-end' : 'justify-center'
           }`}
         >
           {/* 主题选择器 - 展开时显示 */}
@@ -240,9 +240,9 @@ export const Sidebar: React.FC = () => {
           <button
             onClick={toggleTheme}
             className="btn-toolbar w-8 h-8 flex items-center justify-center tooltip-up"
-            title={theme === "dark" ? "切换到浅色模式" : "切换到深色模式"}
+            title={theme === 'dark' ? '切换到浅色模式' : '切换到深色模式'}
           >
-            {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+            {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
           </button>
           {sidebarOpen && (
             <button
@@ -290,10 +290,7 @@ export const Sidebar: React.FC = () => {
       )}
 
       {/* 设置弹窗 */}
-      <SettingsModal
-        isOpen={settingsModalOpen}
-        onClose={() => toggleSettingsModal()}
-      />
+      <SettingsModal isOpen={settingsModalOpen} onClose={() => toggleSettingsModal()} />
     </motion.div>
   );
 };

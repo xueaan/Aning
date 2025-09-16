@@ -110,7 +110,8 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.3;
     transform: scale(1);
   }
@@ -121,7 +122,8 @@
 }
 
 @keyframes shake {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(0);
   }
   25% {
@@ -133,7 +135,8 @@
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -155,16 +158,20 @@
    ================= */
 
 @keyframes typing-cursor {
-  0%, 50% {
+  0%,
+  50% {
     opacity: 1;
   }
-  51%, 100% {
+  51%,
+  100% {
     opacity: 0;
   }
 }
 
 @keyframes typing-dots {
-  0%, 80%, 100% {
+  0%,
+  80%,
+  100% {
     opacity: 0.3;
     transform: scale(0.8);
   }
@@ -179,7 +186,8 @@
    ================= */
 
 @keyframes theme-fade {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0;
   }
   50% {
@@ -201,7 +209,9 @@
 }
 
 @keyframes loading-dots {
-  0%, 80%, 100% {
+  0%,
+  80%,
+  100% {
     transform: scale(0);
     opacity: 0.5;
   }
@@ -225,7 +235,8 @@
    ================= */
 
 @keyframes glow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 5px rgba(var(--color-accent), 0.5);
   }
   50% {
@@ -322,9 +333,10 @@
 }
 
 .animate-gradient {
-  background: linear-gradient(-45deg, 
-    rgba(var(--color-primary), 0.8), 
-    rgba(var(--color-secondary), 0.8), 
+  background: linear-gradient(
+    -45deg,
+    rgba(var(--color-primary), 0.8),
+    rgba(var(--color-secondary), 0.8),
     rgba(var(--color-accent), 0.8)
   );
   background-size: 400% 400%;
@@ -335,46 +347,86 @@
    动画延迟
    ================= */
 
-.animation-delay-100 { animation-delay: 0.1s; }
-.animation-delay-200 { animation-delay: 0.2s; }
-.animation-delay-300 { animation-delay: 0.3s; }
-.animation-delay-500 { animation-delay: 0.5s; }
-.animation-delay-700 { animation-delay: 0.7s; }
-.animation-delay-1000 { animation-delay: 1s; }
-.animation-delay-2000 { animation-delay: 2s; }
+.animation-delay-100 {
+  animation-delay: 0.1s;
+}
+.animation-delay-200 {
+  animation-delay: 0.2s;
+}
+.animation-delay-300 {
+  animation-delay: 0.3s;
+}
+.animation-delay-500 {
+  animation-delay: 0.5s;
+}
+.animation-delay-700 {
+  animation-delay: 0.7s;
+}
+.animation-delay-1000 {
+  animation-delay: 1s;
+}
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
 
 /* =================
    动画持续时间
    ================= */
 
-.animation-duration-fast { animation-duration: var(--duration-fast); }
-.animation-duration-normal { animation-duration: var(--duration-normal); }
-.animation-duration-slow { animation-duration: var(--duration-slow); }
+.animation-duration-fast {
+  animation-duration: var(--duration-fast);
+}
+.animation-duration-normal {
+  animation-duration: var(--duration-normal);
+}
+.animation-duration-slow {
+  animation-duration: var(--duration-slow);
+}
 
 /* =================
    动画缓动函数
    ================= */
 
-.animation-ease-linear { animation-timing-function: linear; }
-.animation-ease-in { animation-timing-function: ease-in; }
-.animation-ease-out { animation-timing-function: ease-out; }
-.animation-ease-in-out { animation-timing-function: ease-in-out; }
+.animation-ease-linear {
+  animation-timing-function: linear;
+}
+.animation-ease-in {
+  animation-timing-function: ease-in;
+}
+.animation-ease-out {
+  animation-timing-function: ease-out;
+}
+.animation-ease-in-out {
+  animation-timing-function: ease-in-out;
+}
 
 /* =================
    动画填充模式
    ================= */
 
-.animation-fill-none { animation-fill-mode: none; }
-.animation-fill-forwards { animation-fill-mode: forwards; }
-.animation-fill-backwards { animation-fill-mode: backwards; }
-.animation-fill-both { animation-fill-mode: both; }
+.animation-fill-none {
+  animation-fill-mode: none;
+}
+.animation-fill-forwards {
+  animation-fill-mode: forwards;
+}
+.animation-fill-backwards {
+  animation-fill-mode: backwards;
+}
+.animation-fill-both {
+  animation-fill-mode: both;
+}
 
 /* =================
    动画播放状态
    ================= */
 
-.animation-play { animation-play-state: running; }
-.animation-pause { animation-play-state: paused; }
+.animation-play {
+  animation-play-state: running;
+}
+.animation-pause {
+  animation-play-state: paused;
+}
 
 /* =================
    组合动画类
@@ -422,8 +474,12 @@
   animation: loading-dots 1.4s ease-in-out infinite both;
 }
 
-.loading-dots span:nth-child(1) { animation-delay: -0.32s; }
-.loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+.loading-dots span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+.loading-dots span:nth-child(2) {
+  animation-delay: -0.16s;
+}
 
 /* =================
    响应式动画控制
@@ -438,15 +494,15 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  
+
   /* 保持重要的状态指示动画 */
   .loading-spinner,
   .loading-dots span {
     animation: none;
   }
-  
+
   .loading-spinner::after {
-    content: "...";
+    content: '...';
   }
 }
 

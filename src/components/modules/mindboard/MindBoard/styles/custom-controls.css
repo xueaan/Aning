@@ -70,18 +70,18 @@
 }
 
 /* 自定义图标样式 */
-.react-flow__controls-button[title*="放大"] svg {
+.react-flow__controls-button[title*='放大'] svg {
   stroke-width: 2.5;
 }
 
-.react-flow__controls-button[title*="缩小"] svg {
+.react-flow__controls-button[title*='缩小'] svg {
   stroke-width: 2.5;
 }
 
-.react-flow__controls-button[title*="适应画布"] svg {
+.react-flow__controls-button[title*='适应画布'] svg {
   stroke-width: 2;
 }
 
-.react-flow__controls-button[title*="切换交互"] svg {
+.react-flow__controls-button[title*='切换交互'] svg {
   stroke-width: 2;
 }

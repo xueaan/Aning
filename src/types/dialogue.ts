@@ -41,14 +41,14 @@ export interface ContextMetadata {
   due_date?: string;
   project_id?: number;
   project_name?: string;
-  
+
   // 知识库相关
   kb_name?: string;
-  
+
   // 搜索相关
   source?: string;
   resultCount?: number;
-  
+
   // 通用
   created_at?: string;
   updated_at?: string;
@@ -76,13 +76,13 @@ export interface MentionSuggestion {
     // 知识库页面
     kb_name?: string;
     parent_title?: string;
-    
+
     // 任务
     status?: string;
     priority?: string;
     project?: string;
     due_date?: string;
-    
+
     // 通用
     score?: number; // 搜索相关性分数
     tokens?: number; // 预估token数
@@ -183,7 +183,7 @@ export const SHORTCUT_MENTIONS: ShortcutMention[] = [
     label: '今日任务',
     icon: '📅',
     description: '显示今天到期的所有任务',
-    aliases: ['@today', '@今天']
+    aliases: ['@today', '@今天'],
   },
   {
     trigger: '@本周任务',
@@ -191,7 +191,7 @@ export const SHORTCUT_MENTIONS: ShortcutMention[] = [
     label: '本周任务',
     icon: '📆',
     description: '显示本周内的任务',
-    aliases: ['@week', '@本周']
+    aliases: ['@week', '@本周'],
   },
   {
     trigger: '@待办任务',
@@ -199,7 +199,7 @@ export const SHORTCUT_MENTIONS: ShortcutMention[] = [
     label: '待办任务',
     icon: '⏳',
     description: '显示所有未完成的任务',
-    aliases: ['@pending', '@待办']
+    aliases: ['@pending', '@待办'],
   },
   {
     trigger: '@高优先级',
@@ -207,7 +207,7 @@ export const SHORTCUT_MENTIONS: ShortcutMention[] = [
     label: '高优先级任务',
     icon: '⚡',
     description: '显示高优先级和紧急任务',
-    aliases: ['@high', '@urgent']
+    aliases: ['@high', '@urgent'],
   },
   {
     trigger: '@已完成',
@@ -215,8 +215,8 @@ export const SHORTCUT_MENTIONS: ShortcutMention[] = [
     label: '已完成任务',
     icon: '✅',
     description: '显示最近完成的任务',
-    aliases: ['@completed', '@done']
-  }
+    aliases: ['@completed', '@done'],
+  },
 ];
 
 // 正则表达式模式
@@ -226,7 +226,7 @@ export const MENTION_PATTERNS = {
   // 完整的提及格式：@type:id 或 @快捷方式
   FULL_MENTION: /@(tasks?):([\w\-]+)|@([\u4e00-\u9fa5]+)/g,
   // 任务提及：@task:id 或 @tasks:filter
-  TASK_MENTION: /@tasks?:([a-zA-Z0-9\-_]+)/
+  TASK_MENTION: /@tasks?:([a-zA-Z0-9\-_]+)/,
 };
 
 // Token估算常量

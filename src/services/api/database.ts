@@ -1,4 +1,4 @@
-import { invoke } from '@tauri-apps/api/core';
+import { invokeTauri } from '@/utils/tauriWrapper';
 import type { KnowledgeBase, Page, Block } from '@/types';
 import { safeDbInvoke } from '@/utils/tauriWrapper';
 
@@ -81,13 +81,13 @@ export interface DBStats {
 // Main Database API class - delegates knowledge operations to specialized APIs
 export class DatabaseAPI {
   // ===== Database Core Operations =====
-  
+
   static async init(): Promise<DBStats> {
     const defaultStats: DBStats = {
       tables_count: 0,
       total_records: 0,
       db_size: '0 B',
-      last_backup: null
+      last_backup: null,
     };
 
     const result = await safeDbInvoke<DBStats>('db_init', undefined, defaultStats);
@@ -95,7 +95,11 @@ export class DatabaseAPI {
   }
 
   static async getPath(): Promise<string> {
-    const result = await safeDbInvoke<string>('get_db_path', undefined, '浏览器环境 - 数据库路径不可用');
+    const result = await safeDbInvoke<string>(
+      'get_db_path',
+      undefined,
+      '浏览器环境 - 数据库路径不可用'
+    );
     return result || '浏览器环境 - 数据库路径不可用';
   }
 
@@ -104,7 +108,7 @@ export class DatabaseAPI {
       tables_count: 0,
       total_records: 0,
       db_size: '0 B',
-      last_backup: null
+      last_backup: null,
     };
 
     const result = await safeDbInvoke<DBStats>('get_db_stats', undefined, defaultStats);
@@ -112,8 +116,12 @@ export class DatabaseAPI {
   }
 
   // ===== Knowledge Base Operations (Delegated) =====
-  
-  static async createKnowledgeBase(name: string, icon?: string, description?: string): Promise<string> {
+
+  static async createKnowledgeBase(
+    name: string,
+    icon?: string,
+    description?: string
+  ): Promise<string> {
     return KnowledgeBaseAPI.createKnowledgeBase(name, icon, description);
   }
 
@@ -125,7 +133,12 @@ export class DatabaseAPI {
     return KnowledgeBaseAPI.getAllKnowledgeBases();
   }
 
-  static async updateKnowledgeBase(id: string, name?: string, icon?: string, description?: string): Promise<void> {
+  static async updateKnowledgeBase(
+    id: string,
+    name?: string,
+    icon?: string,
+    description?: string
+  ): Promise<void> {
     return KnowledgeBaseAPI.updateKnowledgeBase(id, name, icon, description);
   }
 
@@ -138,8 +151,13 @@ export class DatabaseAPI {
   }
 
   // ===== Page Operations (Delegated) =====
-  
-  static async createPage(knowledgeBaseId: string, title: string, parentId?: string, orderIndex?: number): Promise<string> {
+
+  static async createPage(
+    knowledgeBaseId: string,
+    title: string,
+    parentId?: string,
+    orderIndex?: number
+  ): Promise<string> {
     return PageAPI.createPage(knowledgeBaseId, title, parentId, orderIndex);
   }
 
@@ -155,7 +173,12 @@ export class DatabaseAPI {
     return PageAPI.getPageById(id);
   }
 
-  static async updatePage(id: string, title?: string, parentId?: string, orderIndex?: number): Promise<void> {
+  static async updatePage(
+    id: string,
+    title?: string,
+    parentId?: string,
+    orderIndex?: number
+  ): Promise<void> {
     return PageAPI.updatePage(id, title, parentId, orderIndex);
   }
 
@@ -165,7 +188,10 @@ export class DatabaseAPI {
 
   static async searchPages(knowledgeBaseId: string, query: string): Promise<Page[]>;
   static async searchPages(query: string, knowledgeBaseId?: string): Promise<Page[]>;
-  static async searchPages(queryOrKnowledgeBaseId: string, queryOrUndefined?: string): Promise<Page[]> {
+  static async searchPages(
+    queryOrKnowledgeBaseId: string,
+    queryOrUndefined?: string
+  ): Promise<Page[]> {
     if (queryOrUndefined === undefined) {
       // Single parameter case - assume it's a global query
       throw new Error('Global page search not implemented. Please provide knowledgeBaseId.');
@@ -173,7 +199,11 @@ export class DatabaseAPI {
     return PageAPI.searchPages(queryOrKnowledgeBaseId, queryOrUndefined);
   }
 
-  static async movePage(pageId: string, newParentId?: string, newOrderIndex: number = 0): Promise<void> {
+  static async movePage(
+    pageId: string,
+    newParentId?: string,
+    newOrderIndex: number = 0
+  ): Promise<void> {
     return PageAPI.movePage(pageId, newParentId, newOrderIndex);
   }
 
@@ -190,8 +220,14 @@ export class DatabaseAPI {
   }
 
   // ===== Block Operations (Delegated) =====
-  
-  static async createBlock(pageId: string, blockType: string, content: string, parentId?: string, orderIndex?: number): Promise<string> {
+
+  static async createBlock(
+    pageId: string,
+    blockType: string,
+    content: string,
+    parentId?: string,
+    orderIndex?: number
+  ): Promise<string> {
     return BlockAPI.createBlock(pageId, blockType, content, parentId, orderIndex);
   }
 
@@ -203,7 +239,12 @@ export class DatabaseAPI {
     return BlockAPI.getBlockById(id);
   }
 
-  static async updateBlock(id: string, content?: string, parentId?: string, orderIndex?: number): Promise<void> {
+  static async updateBlock(
+    id: string,
+    content?: string,
+    parentId?: string,
+    orderIndex?: number
+  ): Promise<void> {
     return BlockAPI.updateBlock(id, content, parentId, orderIndex);
   }
 
@@ -215,24 +256,37 @@ export class DatabaseAPI {
     return BlockAPI.searchBlocks(query, knowledgeBaseId);
   }
 
-  static async moveBlock(blockId: string, newParentId?: string, newOrderIndex: number = 0): Promise<void> {
+  static async moveBlock(
+    blockId: string,
+    newParentId?: string,
+    newOrderIndex: number = 0
+  ): Promise<void> {
     return BlockAPI.moveBlock(blockId, newParentId, newOrderIndex);
   }
 
   // ===== Timeline Operations =====
-  
-  static async createTimelineEntry(date: string, time: string, content: string, weather?: string, mood?: string): Promise<number> {
+
+  static async createTimelineEntry(
+    date: string,
+    time: string,
+    content: string,
+    weather?: string,
+    mood?: string
+  ): Promise<number> {
     try {
-      return await invoke('create_timeline_entry', { date, time, content, weather, mood });
+      return await invokeTauri('create_timeline_entry', { date, time, content, weather, mood });
     } catch (error) {
       console.error('[DatabaseAPI] createTimelineEntry failed:', error);
       throw error;
     }
   }
 
-  static async getTimelineEntries(page: number = 1, limit: number = 10): Promise<{ entries: DBTimelineEntry[]; total: number }> {
+  static async getTimelineEntries(
+    page: number = 1,
+    limit: number = 10
+  ): Promise<{ entries: DBTimelineEntry[]; total: number }> {
     try {
-      return await invoke('get_timeline_entries', { page, limit });
+      return await invokeTauri('get_timeline_entries', { page, limit });
     } catch (error) {
       console.error('[DatabaseAPI] getTimelineEntries failed:', error);
       throw error;
@@ -241,16 +295,21 @@ export class DatabaseAPI {
 
   static async getTimelineByDate(date: string): Promise<DBTimelineEntry[]> {
     try {
-      return await invoke('get_timeline_by_date', { date });
+      return await invokeTauri('get_timeline_by_date', { date });
     } catch (error) {
       console.error('[DatabaseAPI] getTimelineByDate failed:', error);
       throw error;
     }
   }
 
-  static async updateTimelineEntry(id: number, content?: string, weather?: string, mood?: string): Promise<void> {
+  static async updateTimelineEntry(
+    id: number,
+    content?: string,
+    weather?: string,
+    mood?: string
+  ): Promise<void> {
     try {
-      await invoke('update_timeline_entry', { id, content, weather, mood });
+      await invokeTauri('update_timeline_entry', { id, content, weather, mood });
     } catch (error) {
       console.error('[DatabaseAPI] updateTimelineEntry failed:', error);
       throw error;
@@ -259,7 +318,7 @@ export class DatabaseAPI {
 
   static async deleteTimelineEntry(id: number): Promise<void> {
     try {
-      await invoke('db_delete_timeline_entry', { id });
+      await invokeTauri('db_delete_timeline_entry', { id });
     } catch (error) {
       console.error('[DatabaseAPI] deleteTimelineEntry failed:', error);
       throw error;
@@ -267,10 +326,10 @@ export class DatabaseAPI {
   }
 
   // ===== Data Migration =====
-  
+
   static async migrateData(): Promise<void> {
     try {
-      await invoke('migrate_database');
+      await invokeTauri('migrate_database');
     } catch (error) {
       console.error('[DatabaseAPI] migrateData failed:', error);
       throw error;
@@ -278,32 +337,39 @@ export class DatabaseAPI {
   }
 
   // ===== Task Operations =====
-  
+
   static async createTask(task: Omit<DBTask, 'id' | 'created_at' | 'updated_at'>): Promise<number>;
-  static async createTask(title: string, description?: string, status?: string, priority?: string, due_date?: string, project_id?: number): Promise<number>;
+  static async createTask(
+    title: string,
+    description?: string,
+    status?: string,
+    priority?: string,
+    due_date?: string,
+    project_id?: number
+  ): Promise<number>;
   static async createTask(...args: any[]): Promise<number> {
     try {
       if (args.length === 1 && typeof args[0] === 'object') {
         // New API format - convert to Tauri command format
         const task = args[0];
-        return await invoke('create_task', {
+        return await invokeTauri('create_task', {
           title: task.title,
           description: task.description,
           status: task.status || 'todo',
           priority: task.priority || 'medium',
-          deadline: task.due_date,    // 后端参数名是 deadline
-          project: task.project_id    // 后端参数名是 project
+          deadline: task.due_date, // 后端参数名是 deadline
+          project: task.project_id, // 后端参数名是 project
         });
       } else {
         // Old API format - convert to Tauri command format
         const [title, description, status, priority, due_date, project_id] = args;
-        return await invoke('create_task', {
+        return await invokeTauri('create_task', {
           title,
           description,
           status: status || 'todo',
           priority: priority || 'medium',
-          deadline: due_date,  // 后端参数名是 deadline
-          project: project_id  // 后端参数名是 project
+          deadline: due_date, // 后端参数名是 deadline
+          project: project_id, // 后端参数名是 project
         });
       }
     } catch (error) {
@@ -312,15 +378,19 @@ export class DatabaseAPI {
     }
   }
 
-  static async getTasks(filters?: { status?: string; priority?: string; projectId?: number }): Promise<DBTask[]> {
+  static async getTasks(filters?: {
+    status?: string;
+    priority?: string;
+    projectId?: number;
+  }): Promise<DBTask[]> {
     try {
       // 智能路由到对应的后端命令
       if (filters?.status) {
-        return await invoke('get_tasks_by_status', { status: filters.status });
+        return await invokeTauri('get_tasks_by_status', { status: filters.status });
       } else if (filters?.projectId) {
-        return await invoke('get_tasks_by_project', { project_id: filters.projectId });
+        return await invokeTauri('get_tasks_by_project', { project_id: filters.projectId });
       } else {
-        return await invoke('get_all_tasks');
+        return await invokeTauri('get_all_tasks');
       }
     } catch (error) {
       console.error('[DatabaseAPI] getTasks failed:', error);
@@ -333,10 +403,13 @@ export class DatabaseAPI {
     return this.getTasks();
   }
 
-  static async updateTask(id: number, updates: Partial<Omit<DBTask, 'id' | 'created_at'>>): Promise<void> {
+  static async updateTask(
+    id: number,
+    updates: Partial<Omit<DBTask, 'id' | 'created_at'>>
+  ): Promise<void> {
     try {
       // 修复参数结构：将嵌套的 updates 对象展开为扁平参数
-      await invoke('update_task', {
+      await invokeTauri('update_task', {
         id,
         title: updates.title,
         description: updates.description,
@@ -344,7 +417,7 @@ export class DatabaseAPI {
         priority: updates.priority,
         deadline: updates.due_date,
         completed_at: updates.completed_at,
-        project: updates.project_id
+        project: updates.project_id,
       });
     } catch (error) {
       console.error('Failed to update task:', error);
@@ -354,7 +427,7 @@ export class DatabaseAPI {
 
   static async deleteTask(id: number): Promise<void> {
     try {
-      await invoke('delete_task', { id });
+      await invokeTauri('delete_task', { id });
     } catch (error) {
       console.error('[DatabaseAPI] deleteTask failed:', error);
       throw error;
@@ -362,10 +435,17 @@ export class DatabaseAPI {
   }
 
   // ===== Project Operations =====
-  
-  static async createProject(project: Omit<DBTaskProject, 'id' | 'created_at' | 'updated_at'>): Promise<number> {
+
+  static async createProject(
+    project: Omit<DBTaskProject, 'id' | 'created_at' | 'updated_at'>
+  ): Promise<number> {
     try {
-      return await invoke('create_task_project', { name: project.name, icon: project.icon, color: project.color, description: project.description });
+      return await invokeTauri('create_task_project', {
+        name: project.name,
+        icon: project.icon,
+        color: project.color,
+        description: project.description,
+      });
     } catch (error) {
       console.error('[DatabaseAPI] createProject failed:', error);
       throw error;
@@ -374,16 +454,19 @@ export class DatabaseAPI {
 
   static async getProjects(): Promise<DBTaskProject[]> {
     try {
-      return await invoke('get_all_task_projects');
+      return await invokeTauri('get_all_task_projects');
     } catch (error) {
       console.error('[DatabaseAPI] getProjects failed:', error);
       throw error;
     }
   }
 
-  static async updateProject(id: number, updates: Partial<Omit<DBTaskProject, 'id' | 'created_at'>>): Promise<void> {
+  static async updateProject(
+    id: number,
+    updates: Partial<Omit<DBTaskProject, 'id' | 'created_at'>>
+  ): Promise<void> {
     try {
-      await invoke('update_task_project', { id, updates });
+      await invokeTauri('update_task_project', { id, updates });
     } catch (error) {
       console.error('[DatabaseAPI] updateProject failed:', error);
       throw error;
@@ -392,7 +475,7 @@ export class DatabaseAPI {
 
   static async deleteProject(id: number): Promise<void> {
     try {
-      await invoke('delete_task_project', { id });
+      await invokeTauri('delete_task_project', { id });
     } catch (error) {
       console.error('[DatabaseAPI] deleteProject failed:', error);
       throw error;
@@ -400,7 +483,9 @@ export class DatabaseAPI {
   }
 
   // Compatibility aliases for task projects
-  static async createTaskProject(project: Omit<DBTaskProject, 'id' | 'created_at' | 'updated_at'>): Promise<number> {
+  static async createTaskProject(
+    project: Omit<DBTaskProject, 'id' | 'created_at' | 'updated_at'>
+  ): Promise<number> {
     return this.createProject(project);
   }
 
@@ -408,7 +493,10 @@ export class DatabaseAPI {
     return this.getProjects();
   }
 
-  static async updateTaskProject(id: number, updates: Partial<Omit<DBTaskProject, 'id' | 'created_at'>>): Promise<void> {
+  static async updateTaskProject(
+    id: number,
+    updates: Partial<Omit<DBTaskProject, 'id' | 'created_at'>>
+  ): Promise<void> {
     return this.updateProject(id, updates);
   }
 
@@ -419,7 +507,7 @@ export class DatabaseAPI {
   static async getTaskProjectStats(id: number): Promise<any> {
     // This method needs to be implemented based on requirements
     try {
-      return await invoke('get_task_project_stats', { projectId: id });
+      return await invokeTauri('get_task_project_stats', { projectId: id });
     } catch (error) {
       console.error('[DatabaseAPI] getTaskProjectStats failed:', error);
       throw error;
@@ -427,8 +515,10 @@ export class DatabaseAPI {
   }
 
   // ===== Habit Operations =====
-  
-  static async createHabit(habit: Omit<DBHabit, 'id' | 'created_at' | 'updated_at'>): Promise<number> {
+
+  static async createHabit(
+    habit: Omit<DBHabit, 'id' | 'created_at' | 'updated_at'>
+  ): Promise<number> {
     try {
       // Parameter validation
       if (!habit.name || habit.name.trim() === '') {
@@ -446,14 +536,14 @@ export class DatabaseAPI {
       if (habit.target_count <= 0) {
         throw new Error('Habit target count must be greater than 0');
       }
-      
-      return await invoke('create_habit', { 
+
+      return await invokeTauri('create_habit', {
         name: habit.name.trim(),
         description: habit.description || null,
         icon: habit.icon.trim(),
         color: habit.color.trim(),
         frequency: habit.frequency,
-        targetCount: habit.target_count
+        targetCount: habit.target_count,
       });
     } catch (error) {
       console.error('[DatabaseAPI] createHabit failed:', error);
@@ -463,14 +553,17 @@ export class DatabaseAPI {
 
   static async getHabits(): Promise<DBHabit[]> {
     try {
-      return await invoke('get_habits');
+      return await invokeTauri('get_habits');
     } catch (error) {
       console.error('[DatabaseAPI] getHabits failed:', error);
       throw error;
     }
   }
 
-  static async updateHabit(id: number, updates: Partial<Omit<DBHabit, 'id' | 'created_at'>>): Promise<void> {
+  static async updateHabit(
+    id: number,
+    updates: Partial<Omit<DBHabit, 'id' | 'created_at'>>
+  ): Promise<void> {
     try {
       // Parameter validation
       if (!id || id <= 0) {
@@ -488,22 +581,24 @@ export class DatabaseAPI {
       if (updates.target_count !== undefined && updates.target_count <= 0) {
         throw new Error('Habit target count must be greater than 0');
       }
-      
+
       // Get current habit to fill in missing required fields
-      const currentHabit = await this.getHabits().then(habits => habits.find(h => h.id === id));
+      const currentHabit = await this.getHabits().then((habits) => habits.find((h) => h.id === id));
       if (!currentHabit) {
         throw new Error(`Habit with ID ${id} not found`);
       }
-      
-      await invoke('update_habit', {
+
+      await invokeTauri('update_habit', {
         id,
         name: updates.name !== undefined ? updates.name.trim() : currentHabit.name,
-        description: updates.description !== undefined ? updates.description : currentHabit.description,
+        description:
+          updates.description !== undefined ? updates.description : currentHabit.description,
         icon: updates.icon !== undefined ? updates.icon.trim() : currentHabit.icon,
         color: updates.color !== undefined ? updates.color.trim() : currentHabit.color,
         frequency: updates.frequency !== undefined ? updates.frequency : currentHabit.frequency,
-        targetCount: updates.target_count !== undefined ? updates.target_count : currentHabit.target_count,
-        isActive: updates.is_active !== undefined ? updates.is_active : currentHabit.is_active
+        targetCount:
+          updates.target_count !== undefined ? updates.target_count : currentHabit.target_count,
+        isActive: updates.is_active !== undefined ? updates.is_active : currentHabit.is_active,
       });
     } catch (error) {
       console.error('[DatabaseAPI] updateHabit failed:', error);
@@ -513,25 +608,42 @@ export class DatabaseAPI {
 
   static async deleteHabit(id: number): Promise<void> {
     try {
-      await invoke('delete_habit', { id });
+      await invokeTauri('delete_habit', { id });
     } catch (error) {
       console.error('[DatabaseAPI] deleteHabit failed:', error);
       throw error;
     }
   }
 
-  static async createHabitRecord(habitId: number, date: string, count: number = 1): Promise<number> {
+  static async createHabitRecord(
+    habitId: number,
+    date: string,
+    count: number = 1
+  ): Promise<number> {
     try {
-      return await invoke('record_habit_completion', { habitId: habitId, date, completedCount: count, notes: null });
+      return await invokeTauri('record_habit_completion', {
+        habitId: habitId,
+        date,
+        completedCount: count,
+        notes: null,
+      });
     } catch (error) {
       console.error('[DatabaseAPI] createHabitRecord failed:', error);
       throw error;
     }
   }
 
-  static async getHabitRecords(habitId: number, startDate?: string, endDate?: string): Promise<DBHabitRecord[]> {
+  static async getHabitRecords(
+    habitId: number,
+    startDate?: string,
+    endDate?: string
+  ): Promise<DBHabitRecord[]> {
     try {
-      return await invoke('get_habit_records', { habitId: habitId, startDate: startDate, endDate: endDate });
+      return await invokeTauri('get_habit_records', {
+        habitId: habitId,
+        startDate: startDate,
+        endDate: endDate,
+      });
     } catch (error) {
       console.error('[DatabaseAPI] getHabitRecords failed:', error);
       throw error;
@@ -542,7 +654,9 @@ export class DatabaseAPI {
     try {
       // Note: Backend doesn't have update_habit_record command
       // This method is kept for API compatibility but will throw an error
-      throw new Error(`updateHabitRecord is not supported by backend. Use recordHabitCompletion instead. (Attempted to update record ${id} with count ${count})`);
+      throw new Error(
+        `updateHabitRecord is not supported by backend. Use recordHabitCompletion instead. (Attempted to update record ${id} with count ${count})`
+      );
     } catch (error) {
       console.error('[DatabaseAPI] updateHabitRecord failed:', error);
       throw error;
@@ -551,7 +665,7 @@ export class DatabaseAPI {
 
   static async deleteHabitRecord(id: number): Promise<void> {
     try {
-      await invoke('delete_habit_record', { id });
+      await invokeTauri('delete_habit_record', { id });
     } catch (error) {
       console.error('[DatabaseAPI] deleteHabitRecord failed:', error);
       throw error;
@@ -559,9 +673,19 @@ export class DatabaseAPI {
   }
 
   // Additional habit methods for compatibility
-  static async recordHabitCompletion(habitId: number, date: string, count: number = 1, notes?: string): Promise<number> {
+  static async recordHabitCompletion(
+    habitId: number,
+    date: string,
+    count: number = 1,
+    notes?: string
+  ): Promise<number> {
     try {
-      return await invoke('record_habit_completion', { habitId: habitId, date, completedCount: count, notes });
+      return await invokeTauri('record_habit_completion', {
+        habitId: habitId,
+        date,
+        completedCount: count,
+        notes,
+      });
     } catch (error) {
       console.error('[DatabaseAPI] recordHabitCompletion failed:', error);
       throw error;
@@ -570,7 +694,7 @@ export class DatabaseAPI {
 
   static async undoHabitCompletion(habitId: number, date: string): Promise<void> {
     try {
-      await invoke('undo_habit_completion', { habitId: habitId, date });
+      await invokeTauri('undo_habit_completion', { habitId: habitId, date });
     } catch (error) {
       console.error('[DatabaseAPI] undoHabitCompletion failed:', error);
       throw error;
@@ -580,7 +704,7 @@ export class DatabaseAPI {
   // Task search method
   static async searchTasks(query: string, filters?: any): Promise<DBTask[]> {
     try {
-      return await invoke('search_tasks', { query, filters });
+      return await invokeTauri('search_tasks', { query, filters });
     } catch (error) {
       console.error('[DatabaseAPI] searchTasks failed:', error);
       throw error;
@@ -590,7 +714,7 @@ export class DatabaseAPI {
   // 清理历史数据
   static async cleanupUnnamedPages(): Promise<number> {
     try {
-      return await invoke('cleanup_unnamed_pages');
+      return await invokeTauri('cleanup_unnamed_pages');
     } catch (error) {
       console.error('[DatabaseAPI] cleanupUnnamedPages failed:', error);
       throw error;

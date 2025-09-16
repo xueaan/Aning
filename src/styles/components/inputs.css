@@ -53,13 +53,13 @@
   border: 1px solid rgba(var(--border-primary), 0.3);
   outline: none;
   transition: all var(--duration-fast) ease;
-  
+
   /* 毛玻璃效果 */
   background: rgba(var(--bg-primary), 0.8);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   box-shadow: 0 2px 8px rgba(var(--bg-overlay), 0.05);
-  
+
   /* 文字样式 */
   color: rgba(var(--text-primary), 1);
 }
@@ -76,17 +76,16 @@
 }
 
 /* 深色主题下的精致输入框 */
-[data-theme="dark"] .input-refined {
+[data-theme='dark'] .input-refined {
   background: rgba(var(--bg-tertiary), 0.8);
   border: 1px solid rgba(var(--border-primary), 0.3);
   color: rgba(var(--text-primary), 1);
 }
 
-[data-theme="dark"] .input-refined:focus {
+[data-theme='dark'] .input-refined:focus {
   background: rgba(var(--bg-tertiary), 0.95);
   border: 1px solid rgba(var(--color-accent), 1);
 }
-
 
 /* =================
    Modern 玻璃输入框
@@ -100,13 +99,13 @@
   border: 1px solid rgba(var(--border-primary), 0.3);
   outline: none;
   transition: all var(--duration-fast) ease;
-  
+
   /* Modern 毛玻璃效果 */
-  background: rgba(var(--bg-primary), 0.90);
+  background: rgba(var(--bg-primary), 0.9);
   backdrop-filter: blur(6px) saturate(120%);
   -webkit-backdrop-filter: blur(6px) saturate(120%);
   box-shadow: 0 2px 8px rgba(var(--bg-overlay), 0.1);
-  
+
   /* 文字样式 */
   color: rgba(var(--text-primary), 1);
 }
@@ -122,13 +121,13 @@
 }
 
 /* 深色主题下的 Modern 输入框 */
-[data-theme="dark"] .glass-input-modern {
-  background: rgba(var(--bg-tertiary), 0.90);
+[data-theme='dark'] .glass-input-modern {
+  background: rgba(var(--bg-tertiary), 0.9);
   border: 1px solid rgba(var(--border-primary), 0.3);
   box-shadow: 0 2px 8px rgba(var(--bg-overlay), 0.2);
 }
 
-[data-theme="dark"] .glass-input-modern:focus {
+[data-theme='dark'] .glass-input-modern:focus {
   background: rgba(var(--bg-tertiary), 0.95);
   border: 1px solid rgba(var(--color-accent), 0.6);
   box-shadow: 0 0 0 3px rgba(var(--color-accent), 0.12);
@@ -161,12 +160,12 @@
 }
 
 /* 深色主题通用输入框 */
-[data-theme="dark"] .glass-input {
+[data-theme='dark'] .glass-input {
   background: rgba(var(--bg-tertiary), 1);
   border: 1px solid rgba(var(--border-primary), 1);
 }
 
-[data-theme="dark"] .glass-input:focus {
+[data-theme='dark'] .glass-input:focus {
   background: rgba(var(--bg-secondary), 1);
   border-color: rgba(var(--color-accent), 1);
 }
@@ -200,9 +199,9 @@ select.input-refined option {
   color: rgba(var(--text-primary), 1);
 }
 
-[data-theme="dark"] select.theme-input option,
-[data-theme="dark"] select.glass-input option,
-[data-theme="dark"] select.input-refined option {
+[data-theme='dark'] select.theme-input option,
+[data-theme='dark'] select.glass-input option,
+[data-theme='dark'] select.input-refined option {
   background: rgba(var(--bg-primary), 1);
   color: rgba(var(--text-primary), 1);
 }
@@ -242,7 +241,6 @@ textarea.input-refined {
   line-height: 1.5rem;
 }
 
-
 /* =================
    滑块样式系统
    ================= */
@@ -250,7 +248,7 @@ textarea.input-refined {
 /* 精致滑块样式 - 已清理未使用的slider-refined类 */
 
 /* 通用滑块样式 */
-input[type="range"].slider {
+input[type='range'].slider {
   -webkit-appearance: none;
   appearance: none;
   background: transparent;
@@ -259,18 +257,18 @@ input[type="range"].slider {
   height: 8px;
 }
 
-input[type="range"].slider::-webkit-slider-track {
+input[type='range'].slider::-webkit-slider-track {
   height: 6px;
   border-radius: 3px;
   background: rgba(var(--bg-tertiary), 1);
   transition: all var(--duration-fast) ease;
 }
 
-[data-theme="dark"] input[type="range"].slider::-webkit-slider-track {
+[data-theme='dark'] input[type='range'].slider::-webkit-slider-track {
   background: rgba(var(--bg-tertiary), 1);
 }
 
-input[type="range"].slider::-webkit-slider-thumb {
+input[type='range'].slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 16px;
@@ -282,24 +280,24 @@ input[type="range"].slider::-webkit-slider-thumb {
   border: none;
 }
 
-input[type="range"].slider::-webkit-slider-thumb:hover {
+input[type='range'].slider::-webkit-slider-thumb:hover {
   transform: scale(1.2);
   box-shadow: 0 0 0 4px rgba(var(--color-accent), 0.2);
 }
 
 /* Firefox 滑块样式 */
-input[type="range"].slider::-moz-range-track {
+input[type='range'].slider::-moz-range-track {
   height: 6px;
   border-radius: 3px;
   background: rgba(var(--bg-tertiary), 1);
   border: none;
 }
 
-[data-theme="dark"] input[type="range"].slider::-moz-range-track {
+[data-theme='dark'] input[type='range'].slider::-moz-range-track {
   background: rgba(var(--bg-tertiary), 1);
 }
 
-input[type="range"].slider::-moz-range-thumb {
+input[type='range'].slider::-moz-range-thumb {
   border: none;
   width: 16px;
   height: 16px;
@@ -309,7 +307,7 @@ input[type="range"].slider::-moz-range-thumb {
   transition: all var(--duration-fast) ease;
 }
 
-input[type="range"].slider::-moz-range-thumb:hover {
+input[type='range'].slider::-moz-range-thumb:hover {
   transform: scale(1.2);
   box-shadow: 0 0 0 4px rgba(var(--color-accent), 0.2);
 }

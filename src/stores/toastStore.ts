@@ -25,18 +25,18 @@ export const useToastStore = create<ToastStore>((set) => ({
     const newToast: Toast = {
       ...toast,
       id,
-      duration: toast.duration || 3000
+      duration: toast.duration || 3000,
     };
 
     set((state) => ({
-      toasts: [...state.toasts, newToast]
+      toasts: [...state.toasts, newToast],
     }));
 
     // 自动移除
     if (newToast.duration && newToast.duration > 0) {
       setTimeout(() => {
         set((state) => ({
-          toasts: state.toasts.filter((t) => t.id !== id)
+          toasts: state.toasts.filter((t) => t.id !== id),
         }));
       }, newToast.duration);
     }
@@ -44,14 +44,11 @@ export const useToastStore = create<ToastStore>((set) => ({
 
   removeToast: (id) => {
     set((state) => ({
-      toasts: state.toasts.filter((toast) => toast.id !== id)
+      toasts: state.toasts.filter((toast) => toast.id !== id),
     }));
   },
 
   clearToasts: () => {
     set({ toasts: [] });
-  }
+  },
 }));
-
-
-

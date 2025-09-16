@@ -8,16 +8,9 @@ interface KnowledgeProps {
 
 export const Knowledge: React.FC<KnowledgeProps> = ({
   onSidebarToggle: _onSidebarToggle,
-  searchQuery
+  searchQuery,
 }) => {
-  return (
-    <KnowledgeLayout searchQuery={searchQuery}
-    />
-  );
+  return <KnowledgeLayout searchQuery={searchQuery} />;
 };
 
 export default Knowledge;
-
-
-
-

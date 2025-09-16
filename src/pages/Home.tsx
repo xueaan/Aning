@@ -6,12 +6,7 @@ import { ConfirmDeleteModal } from '@/components/common/ConfirmDeleteModal';
 
 export const Home: React.FC = () => {
   // const appStore = useAppStore(); // Unused for now
-  const {
-    shortcuts,
-    addShortcut,
-    updateShortcut,
-    deleteShortcut
-  } = useHomeStore();
+  const { shortcuts, addShortcut, updateShortcut, deleteShortcut } = useHomeStore();
 
   // State declarations - 所有状态声明
   const [searchQuery, setSearchQuery] = useState('');
@@ -20,7 +15,10 @@ export const Home: React.FC = () => {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [newShortcut, setNewShortcut] = useState({ title: '', url: '' });
   const [searchEngineIndex, setSearchEngineIndex] = useState(0);
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: 'success' | 'error' | 'info';
+  } | null>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
@@ -31,9 +29,8 @@ export const Home: React.FC = () => {
     const now = new Date();
 
     // 计算今日进度 (0-100%)
-    const todayMs = now.getHours() * 60 * 60 * 1000 +
-      now.getMinutes() * 60 * 1000 +
-      now.getSeconds() * 1000;
+    const todayMs =
+      now.getHours() * 60 * 60 * 1000 + now.getMinutes() * 60 * 1000 + now.getSeconds() * 1000;
     const totalDayMs = 24 * 60 * 60 * 1000;
     const dayProgress = Math.floor((todayMs / totalDayMs) * 100);
 
@@ -42,15 +39,18 @@ export const Home: React.FC = () => {
     const mondayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // 转换为周一=0, 周二=1...周日=6
     const weekProgress = Math.floor(((mondayOfWeek + dayProgress / 100) / 7) * 100);
 
-    // 计算本年进度 (0-100%)  
+    // 计算本年进度 (0-100%)
     const startOfYear = new Date(now.getFullYear(), 0, 1);
     const endOfYear = new Date(now.getFullYear() + 1, 0, 1);
-    const yearProgress = Math.floor(((now.getTime() - startOfYear.getTime()) / (endOfYear.getTime() - startOfYear.getTime())) * 100);
+    const yearProgress = Math.floor(
+      ((now.getTime() - startOfYear.getTime()) / (endOfYear.getTime() - startOfYear.getTime())) *
+        100
+    );
 
     return {
       day: { progress: dayProgress, remaining: 100 - dayProgress },
       week: { progress: weekProgress, remaining: 100 - weekProgress },
-      year: { progress: yearProgress, remaining: 100 - yearProgress }
+      year: { progress: yearProgress, remaining: 100 - yearProgress },
     };
   };
 
@@ -66,7 +66,7 @@ export const Home: React.FC = () => {
           <div className="flex flex-col items-center">
             <div className="text-xs font-medium mb-2 theme-text-secondary">今日</div>
             <div className="relative w-8 h-24 bg-white/10 rounded-full overflow-hidden">
-              <div 
+              <div
                 className="absolute bottom-0 w-full bg-gradient-to-t from-blue-400 to-blue-600 transition-all duration-1000 ease-out rounded-full"
                 style={{ height: `${progress.day.progress}%` }}
               />
@@ -78,7 +78,7 @@ export const Home: React.FC = () => {
           <div className="flex flex-col items-center">
             <div className="text-xs font-medium mb-2 theme-text-secondary">本周</div>
             <div className="relative w-8 h-24 bg-white/10 rounded-full overflow-hidden">
-              <div 
+              <div
                 className="absolute bottom-0 w-full bg-gradient-to-t from-green-400 to-green-600 transition-all duration-1000 ease-out rounded-full"
                 style={{ height: `${progress.week.progress}%` }}
               />
@@ -90,7 +90,7 @@ export const Home: React.FC = () => {
           <div className="flex flex-col items-center">
             <div className="text-xs font-medium mb-2 theme-text-secondary">本年</div>
             <div className="relative w-8 h-24 bg-white/10 rounded-full overflow-hidden">
-              <div 
+              <div
                 className="absolute bottom-0 w-full bg-gradient-to-t from-purple-400 to-purple-600 transition-all duration-1000 ease-out rounded-full"
                 style={{ height: `${progress.year.progress}%` }}
               />
@@ -114,7 +114,7 @@ export const Home: React.FC = () => {
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
           <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM8.5 8c.83 0 1.5.67 1.5 1.5S9.33 11 8.5 11 7 10.33 7 9.5 7.67 8 8.5 8zm7 0c.83 0 1.5.67 1.5 1.5S16.33 11 15.5 11 14 10.33 14 9.5 14.67 8 15.5 8zm-3.5 6c-1.48 0-2.75-.81-3.45-2H6.88c.8 2.05 2.79 3.5 5.12 3.5s4.32-1.45 5.12-3.5h-1.67c-.7 1.19-1.97 2-3.45 2z" />
         </svg>
-      )
+      ),
     },
     {
       name: 'Google',
@@ -127,7 +127,7 @@ export const Home: React.FC = () => {
           <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H1.84C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
           <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
         </svg>
-      )
+      ),
     },
     {
       name: 'Bing',
@@ -137,8 +137,8 @@ export const Home: React.FC = () => {
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
           <path d="M5.71 3v11.29l4.51 2.7L17 14.07V9.5l-4.93-1.85L10.22 6.8 5.71 3zm4.08 13.54l-2.51-1.5V6.96l2.51.94v8.64zm2.93-1.8l2.93 1.1V10.5l-2.93 1.1v3.14z" />
         </svg>
-      )
-    }
+      ),
+    },
   ];
 
   const currentEngine = searchEngines[searchEngineIndex];
@@ -216,12 +216,12 @@ export const Home: React.FC = () => {
 
   // 编辑快捷方式
   const handleEdit = (id: string) => {
-    const shortcut = shortcuts.find(s => s.id === id);
+    const shortcut = shortcuts.find((s) => s.id === id);
 
     if (shortcut) {
       const formData = {
         title: shortcut.title || '',
-        url: shortcut.url || ''
+        url: shortcut.url || '',
       };
       setEditFormData(formData);
       setEditingShortcut(id);
@@ -232,7 +232,6 @@ export const Home: React.FC = () => {
 
   // 保存编辑
   const handleSaveEdit = () => {
-
     if (editingShortcut && editFormData.title && editFormData.url) {
       updateShortcut(editingShortcut, editFormData);
 
@@ -251,7 +250,7 @@ export const Home: React.FC = () => {
   // 获取要删除的快捷方式名称
   const getDeleteTargetName = () => {
     if (!deleteTargetId) return '';
-    const shortcut = shortcuts.find(s => s.id === deleteTargetId);
+    const shortcut = shortcuts.find((s) => s.id === deleteTargetId);
     return shortcut?.title || '快捷方式';
   };
 
@@ -296,9 +295,7 @@ export const Home: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6">
             {/* 左侧：时间和问候语 */}
             <div className="text-center py-12 px-8 rounded-2xl flex flex-col justify-center min-h-[200px] feather-glass-deco">
-              <div className="text-sm mb-3 theme-text-tertiary">
-                {formatDate(currentTime)}
-              </div>
+              <div className="text-sm mb-3 theme-text-tertiary">{formatDate(currentTime)}</div>
 
               <div className="text-5xl lg:text-7xl font-light mb-4 theme-text-primary leading-tight">
                 {formatTime(currentTime)}
@@ -320,15 +317,17 @@ export const Home: React.FC = () => {
           <form onSubmit={handleSearch} className="relative">
             <div className="flex items-center overflow-hidden rounded-2xl feather-glass-deco">
               {/* 搜索引擎切换按钮 */}
-              <button type="button"
-                onClick={switchSearchEngine} 
+              <button
+                type="button"
+                onClick={switchSearchEngine}
                 className="px-4 py-3.5 font-bold text-sm border-r theme-text-primary theme-border-primary/40 transition-all hover:bg-white/10"
-                title={`当前：${currentEngine.name}\n点击切换`}>
+                title={`当前：${currentEngine.name}\n点击切换`}
+              >
                 {currentEngine.icon}
               </button>
-              <input 
+              <input
                 type="text"
-                value={searchQuery} 
+                value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={currentEngine.placeholder}
                 autoFocus
@@ -336,9 +335,10 @@ export const Home: React.FC = () => {
               />
 
               {/* 搜索按钮 */}
-              <button 
+              <button
                 type="submit"
-                className="px-5 py-3.5 transition-all hover:bg-white/10 group theme-text-primary">
+                className="px-5 py-3.5 transition-all hover:bg-white/10 group theme-text-primary"
+              >
                 <Search size={22} className="transition-transform group-hover:scale-110" />
               </button>
             </div>
@@ -348,15 +348,18 @@ export const Home: React.FC = () => {
         {/* 快捷方式网格 */}
         <div className="grid grid-cols-3 md:grid-cols-6 gap-6 max-w-4xl w-full">
           {shortcuts.map((shortcut) => (
-            <div key={shortcut.id} className={`relative group ${editingShortcut === shortcut.id ? 'col-span-3 md:col-span-2' : ''}`}>
+            <div
+              key={shortcut.id}
+              className={`relative group ${editingShortcut === shortcut.id ? 'col-span-3 md:col-span-2' : ''}`}
+            >
               {editingShortcut === shortcut.id ? (
                 // 编辑模式
                 <div className="p-4 rounded-2xl feather-glass-panel">
                   {/* 标题输入区域 */}
                   <div className="mb-2">
-                    <input 
+                    <input
                       type="text"
-                      value={editFormData.title} 
+                      value={editFormData.title}
                       onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
                       className="w-full text-center text-sm py-2.5 px-4 rounded-lg bg-transparent outline-none theme-text-primary placeholder:theme-text-tertiary feather-glass-content"
                       style={{ border: '1px solid rgba(var(--border-primary), 0.2)' }}
@@ -364,9 +367,9 @@ export const Home: React.FC = () => {
                     />
                   </div>
                   <div className="mb-4">
-                    <input 
+                    <input
                       type="text"
-                      value={editFormData.url} 
+                      value={editFormData.url}
                       onChange={(e) => setEditFormData({ ...editFormData, url: e.target.value })}
                       className="w-full text-center text-sm py-2.5 px-4 rounded-lg bg-transparent outline-none theme-text-primary placeholder:theme-text-tertiary feather-glass-content"
                       style={{ border: '1px solid rgba(var(--border-primary), 0.2)' }}
@@ -374,17 +377,19 @@ export const Home: React.FC = () => {
                     />
                   </div>
                   <div className="flex gap-3">
-                    <button 
-                      onClick={handleSaveEdit} 
-                      className="flex-1 py-2.5 px-4 text-sm font-medium rounded-xl theme-text-on-accent transition-all hover:scale-105 feather-glass-content">
+                    <button
+                      onClick={handleSaveEdit}
+                      className="flex-1 py-2.5 px-4 text-sm font-medium rounded-xl theme-text-on-accent transition-all hover:scale-105 feather-glass-content"
+                    >
                       ✓ 保存
                     </button>
-                    <button 
+                    <button
                       onClick={() => {
                         setEditingShortcut(null);
                         setEditFormData({ title: '', url: '' });
                       }}
-                      className="flex-1 py-2.5 px-4 text-sm font-medium rounded-xl theme-text-secondary transition-all hover:scale-105 feather-glass-deco">
+                      className="flex-1 py-2.5 px-4 text-sm font-medium rounded-xl theme-text-secondary transition-all hover:scale-105 feather-glass-deco"
+                    >
                       ✕ 取消
                     </button>
                   </div>
@@ -392,7 +397,7 @@ export const Home: React.FC = () => {
               ) : (
                 // 正常显示模式
                 <div className="relative">
-                  <div 
+                  <div
                     onClick={async (e) => {
                       e.preventDefault();
                       e.stopPropagation();
@@ -418,29 +423,32 @@ export const Home: React.FC = () => {
                         }
                       }
                     }}
-                    className="block p-4 cursor-pointer select-none rounded-2xl transition-all hover:scale-105 feather-glass-deco w-full">
+                    className="block p-4 cursor-pointer select-none rounded-2xl transition-all hover:scale-105 feather-glass-deco w-full"
+                  >
                     <div className="text-sm text-center theme-text-primary font-medium">
                       {shortcut.title}
                     </div>
                   </div>
                   {/* 悬停时显示的操作按钮 */}
                   <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-1">
-                    <button 
+                    <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleEdit(shortcut.id);
                       }}
                       className="w-6 h-6 rounded-lg feather-glass-content hover:theme-bg-accent transition-colors theme-text-primary flex items-center justify-center"
-                      title="编辑">
+                      title="编辑"
+                    >
                       <Edit2 size={16} />
                     </button>
-                    <button 
+                    <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleDelete(shortcut.id);
                       }}
                       className="w-6 h-6 rounded-lg feather-glass-content hover:bg-red-500/20 transition-colors text-red-400 flex items-center justify-center"
-                      title="删除">
+                      title="删除"
+                    >
                       <Trash2 size={14} />
                     </button>
                   </div>
@@ -456,9 +464,9 @@ export const Home: React.FC = () => {
               <div className="p-4 rounded-2xl feather-glass-panel">
                 {/* 标题输入区域 */}
                 <div className="mb-2">
-                  <input 
+                  <input
                     type="text"
-                    value={newShortcut.title} 
+                    value={newShortcut.title}
                     onChange={(e) => setNewShortcut({ ...newShortcut, title: e.target.value })}
                     className="w-full text-center text-sm py-2.5 px-4 rounded-lg bg-transparent outline-none theme-text-primary placeholder:theme-text-tertiary feather-glass-content"
                     style={{ border: '1px solid rgba(var(--border-primary), 0.2)' }}
@@ -466,9 +474,9 @@ export const Home: React.FC = () => {
                   />
                 </div>
                 <div className="mb-4">
-                  <input 
+                  <input
                     type="text"
-                    value={newShortcut.url} 
+                    value={newShortcut.url}
                     onChange={(e) => setNewShortcut({ ...newShortcut, url: e.target.value })}
                     className="w-full text-center text-sm py-2.5 px-4 rounded-lg bg-transparent outline-none theme-text-primary placeholder:theme-text-tertiary feather-glass-content"
                     style={{ border: '1px solid rgba(var(--border-primary), 0.2)' }}
@@ -476,36 +484,37 @@ export const Home: React.FC = () => {
                   />
                 </div>
                 <div className="flex gap-3">
-                  <button 
-                    onClick={handleAdd} 
-                    className="flex-1 py-2.5 px-4 text-sm font-medium rounded-xl theme-text-on-accent transition-all hover:scale-105 feather-glass-content">
+                  <button
+                    onClick={handleAdd}
+                    className="flex-1 py-2.5 px-4 text-sm font-medium rounded-xl theme-text-on-accent transition-all hover:scale-105 feather-glass-content"
+                  >
                     ✓ 保存
                   </button>
-                  <button 
+                  <button
                     onClick={() => {
                       setShowAddDialog(false);
                       setNewShortcut({ title: '', url: '' });
                     }}
-                    className="flex-1 py-2.5 px-4 text-sm font-medium rounded-xl theme-text-secondary transition-all hover:scale-105 feather-glass-deco">
+                    className="flex-1 py-2.5 px-4 text-sm font-medium rounded-xl theme-text-secondary transition-all hover:scale-105 feather-glass-deco"
+                  >
                     ✕ 取消
                   </button>
                 </div>
               </div>
             ) : (
               // 添加按钮
-              <button 
+              <button
                 onClick={() => setShowAddDialog(true)}
-                className="block p-4 cursor-pointer select-none rounded-2xl transition-all hover:scale-105 feather-glass-deco w-full">
-                <div className="text-sm text-center theme-text-primary font-medium">
-                  ＋ 添加
-                </div>
+                className="block p-4 cursor-pointer select-none rounded-2xl transition-all hover:scale-105 feather-glass-deco w-full"
+              >
+                <div className="text-sm text-center theme-text-primary font-medium">＋ 添加</div>
               </button>
             )}
           </div>
         </div>
 
         {/* 删除确认弹窗 */}
-        <ConfirmDeleteModal 
+        <ConfirmDeleteModal
           isOpen={showDeleteConfirm}
           onClose={() => setShowDeleteConfirm(false)}
           onConfirm={handleConfirmDelete}
@@ -516,11 +525,15 @@ export const Home: React.FC = () => {
 
         {/* Toast 消息 */}
         {toast && (
-          <div className={`fixed top-4 right-4 z-50 px-4 py-2 rounded-lg shadow-lg transition-all transform ${
-            toast.type === 'success' ? 'status-success' :
-            toast.type === 'error' ? 'status-error' :
-            'status-info'
-          } theme-text-on-accent`}>
+          <div
+            className={`fixed top-4 right-4 z-50 px-4 py-2 rounded-lg shadow-lg transition-all transform ${
+              toast.type === 'success'
+                ? 'status-success'
+                : toast.type === 'error'
+                  ? 'status-error'
+                  : 'status-info'
+            } theme-text-on-accent`}
+          >
             {toast.message}
           </div>
         )}

@@ -45,7 +45,7 @@ export const useSearchStore = create<SearchStore>((set, get) => ({
   recentSearches: JSON.parse(localStorage.getItem('knowledgeSearchRecent') || '[]'),
   isSearching: false,
   searchFilters: {
-    type: 'all'
+    type: 'all',
   },
 
   // Actions
@@ -63,7 +63,7 @@ export const useSearchStore = create<SearchStore>((set, get) => ({
     }
 
     set({ isSearching: true, searchQuery: query });
-    
+
     try {
       const { searchFilters } = get();
       const results: SearchResult[] = [];
@@ -71,35 +71,39 @@ export const useSearchStore = create<SearchStore>((set, get) => ({
       // 搜索页面
       if (searchFilters.type === 'all' || searchFilters.type === 'page') {
         const pages = await get().searchPages(query, searchFilters.knowledgeBaseId);
-        results.push(...pages.map(page => ({
-          type: 'page' as const,
-          id: page.id,
-          title: page.title,
-          content: page.title,
-          highlight: page.title.toLowerCase().includes(query.toLowerCase()) ? page.title : '',
-          score: page.title.toLowerCase().includes(query.toLowerCase()) ? 1 : 0.5
-        })));
+        results.push(
+          ...pages.map((page) => ({
+            type: 'page' as const,
+            id: page.id,
+            title: page.title,
+            content: page.title,
+            highlight: page.title.toLowerCase().includes(query.toLowerCase()) ? page.title : '',
+            score: page.title.toLowerCase().includes(query.toLowerCase()) ? 1 : 0.5,
+          }))
+        );
       }
 
       // 搜索块内容
       if (searchFilters.type === 'all' || searchFilters.type === 'block') {
         const blocks = await get().searchBlocks(query, searchFilters.knowledgeBaseId);
-        results.push(...blocks.map(block => ({
-          type: 'block' as const,
-          id: block.id,
-          title: `Block in page ${block.page_id}`,
-          content: block.content,
-          highlight: get().highlightText(block.content, query),
-          score: block.content.toLowerCase().includes(query.toLowerCase()) ? 1 : 0.3
-        })));
+        results.push(
+          ...blocks.map((block) => ({
+            type: 'block' as const,
+            id: block.id,
+            title: `Block in page ${block.page_id}`,
+            content: block.content,
+            highlight: get().highlightText(block.content, query),
+            score: block.content.toLowerCase().includes(query.toLowerCase()) ? 1 : 0.3,
+          }))
+        );
       }
 
       // 按相关性排序
       results.sort((a, b) => (b.score || 0) - (a.score || 0));
 
-      set({ 
-        searchResults: results, 
-        isSearching: false 
+      set({
+        searchResults: results,
+        isSearching: false,
       });
 
       // 添加到最近搜索
@@ -114,13 +118,16 @@ export const useSearchStore = create<SearchStore>((set, get) => ({
     set({
       searchQuery: '',
       searchResults: [],
-      searchFilters: { type: 'all' }
+      searchFilters: { type: 'all' },
     });
   },
 
   addToRecentSearches: (query: string) => {
-    set(state => {
-      const recentSearches = [query, ...state.recentSearches.filter(s => s !== query)].slice(0, 10);
+    set((state) => {
+      const recentSearches = [query, ...state.recentSearches.filter((s) => s !== query)].slice(
+        0,
+        10
+      );
       localStorage.setItem('knowledgeSearchRecent', JSON.stringify(recentSearches));
       return { recentSearches };
     });
@@ -132,8 +139,8 @@ export const useSearchStore = create<SearchStore>((set, get) => ({
   },
 
   setSearchFilters: (filters: Partial<SearchState['searchFilters']>) => {
-    set(state => ({
-      searchFilters: { ...state.searchFilters, ...filters }
+    set((state) => ({
+      searchFilters: { ...state.searchFilters, ...filters },
     }));
   },
 
@@ -158,8 +165,8 @@ export const useSearchStore = create<SearchStore>((set, get) => ({
   // Helper method to highlight search terms
   highlightText: (text: string, query: string): string => {
     if (!query.trim()) return text;
-    
+
     const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
     return text.replace(regex, '<mark>$1</mark>');
-  }
+  },
 }));

@@ -1,9 +1,9 @@
-﻿import React, { useState, useRef, useEffect } from "react";
-import ReactDOM from "react-dom";
-import { useAppStore } from "@/stores";
-import { gradientThemes } from "@/utils/gradientThemes";
-import { Settings2, X, Check } from "lucide-react";
-import { getBlendModeLabel } from "@/utils/colorBlend";
+﻿import React, { useState, useRef, useEffect } from 'react';
+import ReactDOM from 'react-dom';
+import { useAppStore } from '@/stores';
+import { gradientThemes } from '@/utils/gradientThemes';
+import { Settings2, X, Check } from 'lucide-react';
+import { getBlendModeLabel } from '@/utils/colorBlend';
 
 export const ThemePicker: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -38,13 +38,13 @@ export const ThemePicker: React.FC = () => {
     };
 
     if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside);
     }
 
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen]);
 
-  const handleThemeSelect = (newTheme: "light" | "dark" | "auto") => {
+  const handleThemeSelect = (newTheme: 'light' | 'dark' | 'auto') => {
     setTheme(newTheme);
   };
 
@@ -73,7 +73,7 @@ export const ThemePicker: React.FC = () => {
         className="btn-toolbar w-8 h-8 flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 tooltip-up"
         title="主题设置"
         style={{
-          transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+          transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
         }}
       >
         <Settings2 size={16} />
@@ -85,17 +85,15 @@ export const ThemePicker: React.FC = () => {
             ref={panelRef}
             className="fixed w-80 rounded-xl shadow-2xl p-4 z-[99999] feather-glass-content animate-in fade-in slide-in-from-bottom-4 duration-200"
             style={{
-              bottom: "50px",
-              left: "10px",
-              maxHeight: "calc(100vh - 100px)",
-              overflowY: "auto",
+              bottom: '50px',
+              left: '10px',
+              maxHeight: 'calc(100vh - 100px)',
+              overflowY: 'auto',
             }}
           >
             {/* 标题栏 */}
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xs font-medium theme-text-primary">
-                主题设置
-              </h3>
+              <h3 className="text-xs font-medium theme-text-primary">主题设置</h3>
               <button
                 onClick={() => setIsOpen(false)}
                 className="btn-icon p-1 theme-text-secondary hover:theme-text-primary transition-all duration-200 hover:scale-110 hover:rotate-90 active:scale-90"
@@ -107,31 +105,31 @@ export const ThemePicker: React.FC = () => {
             {/* 主题选择 */}
             <div className="flex gap-2 mb-3">
               <button
-                onClick={() => handleThemeSelect("auto")}
+                onClick={() => handleThemeSelect('auto')}
                 className={`flex-1 py-1 px-2 rounded-lg text-xs transition-all hover:scale-102 active:scale-98 ${
-                  theme === "auto"
-                    ? "theme-bg-accent theme-text-smart-contrast"
-                    : "theme-bg-secondary theme-text-primary hover:theme-bg-secondary-hover"
+                  theme === 'auto'
+                    ? 'theme-bg-accent theme-text-smart-contrast'
+                    : 'theme-bg-secondary theme-text-primary hover:theme-bg-secondary-hover'
                 }`}
               >
                 通用
               </button>
               <button
-                onClick={() => handleThemeSelect("light")}
+                onClick={() => handleThemeSelect('light')}
                 className={`flex-1 py-1 px-2 rounded-lg text-xs transition-all hover:scale-102 active:scale-98 ${
-                  theme === "light"
-                    ? "theme-bg-accent theme-text-smart-contrast"
-                    : "theme-bg-secondary theme-text-primary hover:theme-bg-secondary-hover"
+                  theme === 'light'
+                    ? 'theme-bg-accent theme-text-smart-contrast'
+                    : 'theme-bg-secondary theme-text-primary hover:theme-bg-secondary-hover'
                 }`}
               >
                 亮色
               </button>
               <button
-                onClick={() => handleThemeSelect("dark")}
+                onClick={() => handleThemeSelect('dark')}
                 className={`flex-1 py-1 px-2 rounded-lg text-xs transition-all hover:scale-102 active:scale-98 ${
-                  theme === "dark"
-                    ? "theme-bg-accent theme-text-smart-contrast"
-                    : "theme-bg-secondary theme-text-primary hover:theme-bg-secondary-hover"
+                  theme === 'dark'
+                    ? 'theme-bg-accent theme-text-smart-contrast'
+                    : 'theme-bg-secondary theme-text-primary hover:theme-bg-secondary-hover'
                 }`}
               >
                 暗色
@@ -142,9 +140,7 @@ export const ThemePicker: React.FC = () => {
             <div className="mb-3">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs theme-text-primary">噪点</span>
-                <span className="text-xs theme-text-secondary">
-                  {noiseLevel}%
-                </span>
+                <span className="text-xs theme-text-secondary">{noiseLevel}%</span>
               </div>
               <input
                 type="range"
@@ -153,7 +149,7 @@ export const ThemePicker: React.FC = () => {
                 value={noiseLevel}
                 onChange={handleNoiseChange}
                 className="w-full slider"
-                style={{ height: "8px" }}
+                style={{ height: '8px' }}
               />
             </div>
 
@@ -161,9 +157,7 @@ export const ThemePicker: React.FC = () => {
             <div className="mb-3">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs theme-text-primary">角度</span>
-                <span className="text-xs theme-text-secondary">
-                  {gradientAngle}°
-                </span>
+                <span className="text-xs theme-text-secondary">{gradientAngle}°</span>
               </div>
               <input
                 type="range"
@@ -172,7 +166,7 @@ export const ThemePicker: React.FC = () => {
                 value={gradientAngle}
                 onChange={handleAngleChange}
                 className="w-full slider"
-                style={{ height: "8px" }}
+                style={{ height: '8px' }}
               />
             </div>
 
@@ -180,9 +174,7 @@ export const ThemePicker: React.FC = () => {
             <div className="mb-3">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs theme-text-primary">混合</span>
-                <span className="text-xs theme-text-secondary">
-                  {getBlendModeLabel(blendMode)}
-                </span>
+                <span className="text-xs theme-text-secondary">{getBlendModeLabel(blendMode)}</span>
               </div>
               <input
                 type="range"
@@ -191,7 +183,7 @@ export const ThemePicker: React.FC = () => {
                 value={blendMode}
                 onChange={handleBlendModeChange}
                 className="w-full slider"
-                style={{ height: "8px" }}
+                style={{ height: '8px' }}
               />
               <div className="flex justify-between mt-1">
                 <span className="text-[10px] theme-text-tertiary">黑</span>
@@ -208,8 +200,8 @@ export const ThemePicker: React.FC = () => {
                   onClick={() => handleGradientSelect(themeItem.id)}
                   className={`relative h-14 rounded-lg overflow-hidden transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95 ${
                     gradientTheme === themeItem.id
-                      ? "ring-2 ring-blue-500 ring-offset-2 ring-offset-bg-secondary"
-                      : ""
+                      ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-bg-secondary'
+                      : ''
                   }`}
                   style={{ background: themeItem.gradient }}
                   title={themeItem.name}
@@ -221,7 +213,7 @@ export const ThemePicker: React.FC = () => {
                       style={{
                         opacity: noiseLevel / 100,
                         backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px)`,
-                        backgroundSize: "3px 3px",
+                        backgroundSize: '3px 3px',
                       }}
                     />
                   )}
@@ -243,7 +235,7 @@ export const ThemePicker: React.FC = () => {
               ))}
             </div>
           </div>,
-          document.body,
+          document.body
         )}
     </div>
   );

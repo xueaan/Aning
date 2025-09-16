@@ -8,7 +8,7 @@ export const formatDate = (timestamp: number): string => {
   const today = new Date();
   const yesterday = new Date(today);
   yesterday.setDate(today.getDate() - 1);
-  
+
   if (date.toDateString() === today.toDateString()) {
     return '今天';
   } else if (date.toDateString() === yesterday.toDateString()) {
@@ -16,7 +16,7 @@ export const formatDate = (timestamp: number): string => {
   } else {
     return date.toLocaleDateString('zh-CN', {
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     });
   }
 };
@@ -33,7 +33,7 @@ export const formatDateTime = (timestamp: number): string => {
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   });
 };
 
@@ -45,12 +45,12 @@ export const formatDateTime = (timestamp: number): string => {
 export const formatRelativeTime = (timestamp: number): string => {
   const now = Date.now();
   const diff = now - timestamp;
-  
+
   const seconds = Math.floor(diff / 1000);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
-  
+
   if (seconds < 60) {
     return '刚刚';
   } else if (minutes < 60) {
@@ -63,4 +63,3 @@ export const formatRelativeTime = (timestamp: number): string => {
     return formatDate(timestamp);
   }
 };
-

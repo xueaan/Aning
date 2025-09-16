@@ -39,13 +39,16 @@ interface DbAiAgent {
  * AI配置数据库同步服务
  */
 export class AiConfigSync {
-  
   // ===== AI提供商同步方法 =====
-  
+
   /**
    * 保存AI提供商配置到数据库
    */
-  static async saveAiProvider(provider: AiProviderType, config: AiConfig, isCurrent = false): Promise<void> {
+  static async saveAiProvider(
+    provider: AiProviderType,
+    config: AiConfig,
+    isCurrent = false
+  ): Promise<void> {
     const dbProvider: DbAiProvider = {
       provider,
       api_key: config.apiKey || '',
@@ -57,7 +60,7 @@ export class AiConfigSync {
       enabled: config.enabled ? 1 : 0,
       is_current: isCurrent ? 1 : 0,
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
 
     await safeAiInvoke('save_ai_provider', { provider: dbProvider });
@@ -67,10 +70,11 @@ export class AiConfigSync {
    * 从数据库获取所有AI提供商配置
    */
   static async getAiProviders(): Promise<{ [key in AiProviderType]?: AiConfig }> {
-    const dbProviders: DbAiProvider[] = await safeAiInvoke('get_ai_providers', undefined, []) || [];
+    const dbProviders: DbAiProvider[] =
+      (await safeAiInvoke('get_ai_providers', undefined, [])) || [];
     const result: { [key in AiProviderType]?: AiConfig } = {};
 
-    dbProviders.forEach(dbProvider => {
+    dbProviders.forEach((dbProvider) => {
       const providerType = dbProvider.provider as AiProviderType;
       result[providerType] = {
         provider: providerType,
@@ -80,7 +84,7 @@ export class AiConfigSync {
         temperature: dbProvider.temperature,
         maxTokens: dbProvider.max_tokens,
         systemPrompt: dbProvider.system_prompt,
-        enabled: dbProvider.enabled === 1
+        enabled: dbProvider.enabled === 1,
       };
     });
 
@@ -91,8 +95,10 @@ export class AiConfigSync {
    * 获取特定AI提供商配置
    */
   static async getAiProvider(provider: AiProviderType): Promise<AiConfig | null> {
-    const dbProvider: DbAiProvider | null = await safeAiInvoke('get_ai_provider', { providerName: provider });
-    
+    const dbProvider: DbAiProvider | null = await safeAiInvoke('get_ai_provider', {
+      providerName: provider,
+    });
+
     if (!dbProvider) {
       return null;
     }
@@ -105,7 +111,7 @@ export class AiConfigSync {
       temperature: dbProvider.temperature,
       maxTokens: dbProvider.max_tokens,
       systemPrompt: dbProvider.system_prompt,
-      enabled: dbProvider.enabled === 1
+      enabled: dbProvider.enabled === 1,
     };
   }
 
@@ -127,8 +133,9 @@ export class AiConfigSync {
    * 获取当前选中的AI提供商
    */
   static async getCurrentAiProvider(): Promise<AiProviderType | null> {
-    const dbProviders: DbAiProvider[] = await safeAiInvoke('get_ai_providers', undefined, []) || [];
-    const currentProvider = dbProviders.find(p => p.is_current === 1);
+    const dbProviders: DbAiProvider[] =
+      (await safeAiInvoke('get_ai_providers', undefined, [])) || [];
+    const currentProvider = dbProviders.find((p) => p.is_current === 1);
     return currentProvider ? (currentProvider.provider as AiProviderType) : null;
   }
 
@@ -151,7 +158,7 @@ export class AiConfigSync {
       is_builtin: agent.isBuiltIn ? 1 : 0,
       is_current: isCurrent ? 1 : 0,
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
 
     await safeAiInvoke('save_ai_agent', { agent: dbAgent });
@@ -161,9 +168,9 @@ export class AiConfigSync {
    * 从数据库获取所有AI智能体
    */
   static async getAiAgents(): Promise<AiAgent[]> {
-    const dbAgents: DbAiAgent[] = await safeAiInvoke('get_ai_agents', undefined, []) || [];
-    
-    return dbAgents.map(dbAgent => ({
+    const dbAgents: DbAiAgent[] = (await safeAiInvoke('get_ai_agents', undefined, [])) || [];
+
+    return dbAgents.map((dbAgent) => ({
       id: dbAgent.agent_id,
       name: dbAgent.name,
       description: dbAgent.description,
@@ -175,7 +182,7 @@ export class AiConfigSync {
       model: dbAgent.model,
       isBuiltIn: dbAgent.is_builtin === 1,
       createdAt: new Date(dbAgent.created_at).getTime(),
-      updatedAt: new Date(dbAgent.updated_at).getTime()
+      updatedAt: new Date(dbAgent.updated_at).getTime(),
     }));
   }
 
@@ -183,8 +190,12 @@ export class AiConfigSync {
    * 获取特定AI智能体
    */
   static async getAiAgent(agentId: string): Promise<AiAgent | null> {
-    const dbAgent: DbAiAgent | null = await safeAiInvoke<DbAiAgent>('get_ai_agent', { agentId }, undefined);
-    
+    const dbAgent: DbAiAgent | null = await safeAiInvoke<DbAiAgent>(
+      'get_ai_agent',
+      { agentId },
+      undefined
+    );
+
     if (!dbAgent) {
       return null;
     }
@@ -201,7 +212,7 @@ export class AiConfigSync {
       model: dbAgent.model,
       isBuiltIn: dbAgent.is_builtin === 1,
       createdAt: new Date(dbAgent.created_at).getTime(),
-      updatedAt: new Date(dbAgent.updated_at).getTime()
+      updatedAt: new Date(dbAgent.updated_at).getTime(),
     };
   }
 
@@ -223,8 +234,8 @@ export class AiConfigSync {
    * 获取当前选中的AI智能体ID
    */
   static async getCurrentAiAgent(): Promise<string | null> {
-    const dbAgents: DbAiAgent[] = await safeAiInvoke('get_ai_agents', undefined, []) || [];
-    const currentAgent = dbAgents.find(a => a.is_current === 1);
+    const dbAgents: DbAiAgent[] = (await safeAiInvoke('get_ai_agents', undefined, [])) || [];
+    const currentAgent = dbAgents.find((a) => a.is_current === 1);
     return currentAgent ? currentAgent.agent_id : null;
   }
 
@@ -235,39 +246,37 @@ export class AiConfigSync {
    */
   static async migrateFromLocalStorage(aiConfig: any): Promise<void> {
     try {
-      
       // 迁移AI提供商配置
       if (aiConfig && typeof aiConfig === 'object') {
         const currentProvider = aiConfig.currentProvider;
-        
+
         // 遍历所有提供商配置
         for (const [providerKey, config] of Object.entries(aiConfig)) {
-          if (providerKey === 'currentProvider' || providerKey === 'agents' || providerKey === 'currentAgentId') {
+          if (
+            providerKey === 'currentProvider' ||
+            providerKey === 'agents' ||
+            providerKey === 'currentAgentId'
+          ) {
             continue;
           }
 
           const providerType = providerKey as AiProviderType;
           const aiConfigData = config as AiConfig;
-          
+
           if (aiConfigData && aiConfigData.provider) {
-            await this.saveAiProvider(
-              providerType, 
-              aiConfigData,
-              providerType === currentProvider
-            );
+            await this.saveAiProvider(providerType, aiConfigData, providerType === currentProvider);
           }
         }
-        
+
         // 迁移AI智能体配置
         if (aiConfig.agents && Array.isArray(aiConfig.agents)) {
           const currentAgentId = aiConfig.currentAgentId;
-          
+
           for (const agent of aiConfig.agents) {
             await this.saveAiAgent(agent, agent.id === currentAgentId);
           }
         }
       }
-      
     } catch (error) {
       console.error('AI配置迁移失败:', error);
       throw error;
@@ -287,14 +296,14 @@ export class AiConfigSync {
       this.getAiProviders(),
       this.getCurrentAiProvider(),
       this.getAiAgents(),
-      this.getCurrentAiAgent()
+      this.getCurrentAiAgent(),
     ]);
 
     return {
       providers,
       currentProvider,
       agents,
-      currentAgentId
+      currentAgentId,
     };
   }
 
@@ -303,7 +312,8 @@ export class AiConfigSync {
    */
   static async needsMigration(): Promise<boolean> {
     try {
-      const dbProviders: DbAiProvider[] = await safeAiInvoke('get_ai_providers', undefined, []) || [];
+      const dbProviders: DbAiProvider[] =
+        (await safeAiInvoke('get_ai_providers', undefined, [])) || [];
       // 如果数据库中没有任何提供商配置，则需要迁移
       return dbProviders.length === 0;
     } catch (error) {

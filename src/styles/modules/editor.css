@@ -60,7 +60,7 @@
   cursor: pointer;
   transition: all var(--duration-fast) ease;
   font-size: 0.85rem;
-  
+
   /* 按钮尺寸 */
   min-width: 32px;
   height: 32px;
@@ -82,15 +82,33 @@
 }
 
 /* Novel Editor 高亮颜色 */
-.novel-highlight-default { background-color: var(--novel-highlight-default); }
-.novel-highlight-purple { background-color: var(--novel-highlight-purple); }
-.novel-highlight-red { background-color: var(--novel-highlight-red); }
-.novel-highlight-yellow { background-color: var(--novel-highlight-yellow); }
-.novel-highlight-blue { background-color: var(--novel-highlight-blue); }
-.novel-highlight-green { background-color: var(--novel-highlight-green); }
-.novel-highlight-orange { background-color: var(--novel-highlight-orange); }
-.novel-highlight-pink { background-color: var(--novel-highlight-pink); }
-.novel-highlight-gray { background-color: var(--novel-highlight-gray); }
+.novel-highlight-default {
+  background-color: var(--novel-highlight-default);
+}
+.novel-highlight-purple {
+  background-color: var(--novel-highlight-purple);
+}
+.novel-highlight-red {
+  background-color: var(--novel-highlight-red);
+}
+.novel-highlight-yellow {
+  background-color: var(--novel-highlight-yellow);
+}
+.novel-highlight-blue {
+  background-color: var(--novel-highlight-blue);
+}
+.novel-highlight-green {
+  background-color: var(--novel-highlight-green);
+}
+.novel-highlight-orange {
+  background-color: var(--novel-highlight-orange);
+}
+.novel-highlight-pink {
+  background-color: var(--novel-highlight-pink);
+}
+.novel-highlight-gray {
+  background-color: var(--novel-highlight-gray);
+}
 
 /* =================
    Line Editor 样式
@@ -112,7 +130,7 @@
   padding: var(--spacing-md) var(--spacing-lg);
   color: rgba(var(--text-primary), 1);
   font-size: 0.95rem;
-  line-height: 1.6;
+  line-height: 1.4;
   resize: none;
   min-height: 120px;
   caret-color: rgba(var(--color-accent), 1);
@@ -232,8 +250,8 @@
 }
 
 /* 深色模式下的融合编辑器 */
-[data-theme="dark"] .seamless-editor-container,
-[data-theme="dark"] .timeline-editor-transparent {
+[data-theme='dark'] .seamless-editor-container,
+[data-theme='dark'] .timeline-editor-transparent {
   color: rgba(var(--text-primary), 0.95) !important;
 }
 
@@ -246,8 +264,8 @@
 /* 编辑器占位符样式 */
 .seamless-editor-container .ProseMirror-empty::before,
 .timeline-editor-transparent .ProseMirror-empty::before,
-.seamless-editor-container .bn-editor[data-is-empty="true"] .bn-inline-content:before,
-.timeline-editor-transparent .bn-editor[data-is-empty="true"] .bn-inline-content:before {
+.seamless-editor-container .bn-editor[data-is-empty='true'] .bn-inline-content:before,
+.timeline-editor-transparent .bn-editor[data-is-empty='true'] .bn-inline-content:before {
   color: rgba(var(--text-tertiary), 1) !important;
   opacity: 0.6 !important;
 }
@@ -264,7 +282,7 @@
   margin: var(--spacing-md) 0;
   font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
   font-size: 0.9em;
-  line-height: 1.6;
+  line-height: 1.4;
   color: rgba(var(--text-primary), 1);
   overflow-x: auto;
 }
@@ -352,16 +370,16 @@
   .novel-editor-toolbar {
     padding: var(--spacing-sm);
   }
-  
+
   .novel-editor-container {
     padding: var(--spacing-md);
   }
-  
+
   .line-editor-input {
     padding: var(--spacing-sm) var(--spacing-md);
     min-height: 100px;
   }
-  
+
   .editor-toolbar {
     flex-wrap: wrap;
     gap: var(--spacing-xs);

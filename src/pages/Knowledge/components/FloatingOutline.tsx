@@ -18,7 +18,7 @@ export const FloatingOutline: React.FC<FloatingOutlineProps> = ({
   activeHeadingId,
   className = '',
   isExpanded: controlledExpanded,
-  onClose
+  onClose,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
@@ -31,7 +31,7 @@ export const FloatingOutline: React.FC<FloatingOutlineProps> = ({
     if (headings.length > 0) {
       const getAllIds = (items: OutlineItem[]): string[] => {
         const ids: string[] = [];
-        items.forEach(item => {
+        items.forEach((item) => {
           ids.push(item.id);
           if (item.children) {
             ids.push(...getAllIds(item.children));
@@ -68,18 +68,18 @@ export const FloatingOutline: React.FC<FloatingOutlineProps> = ({
 
     return (
       <div key={item.id}>
-        <div 
+        <div
           className={cn(
             'flex items-center gap-1 py-1.5 px-2 rounded-md cursor-pointer transition-all duration-200 text-sm group',
             'hover:theme-bg-secondary hover:backdrop-blur-sm',
             isActive
               ? 'theme-bg-accent theme-text-accent shadow-sm backdrop-blur-sm'
               : 'theme-text-secondary hover:theme-text-primary'
-          )} 
+          )}
           style={{ paddingLeft }}
         >
           {hasChildren && (
-            <button 
+            <button
               onClick={(e) => {
                 e.stopPropagation();
                 toggleExpanded(item.id);
@@ -99,18 +99,13 @@ export const FloatingOutline: React.FC<FloatingOutlineProps> = ({
           )}
           {!hasChildren && <div className="w-4" />}
 
-          <span 
-            onClick={() => handleHeadingClick(item.id)}
-            className="flex-1 truncate"
-          >
+          <span onClick={() => handleHeadingClick(item.id)} className="flex-1 truncate">
             {item.text}
           </span>
         </div>
 
         {hasChildren && isExpanded && (
-          <div>
-            {item.children?.map(child => renderOutlineItem(child, depth + 1))}
-          </div>
+          <div>{item.children?.map((child) => renderOutlineItem(child, depth + 1))}</div>
         )}
       </div>
     );
@@ -126,8 +121,8 @@ export const FloatingOutline: React.FC<FloatingOutlineProps> = ({
       {!actualIsExpanded ? (
         // 折叠状态：显示"Show Outline"按钮 (只在非受控模式下显示)
         controlledExpanded === undefined && (
-          <button 
-            onClick={() => setIsExpanded(true)} 
+          <button
+            onClick={() => setIsExpanded(true)}
             className={cn(
               'flex items-center gap-2 px-3 py-2 rounded-lg shadow-lg backdrop-blur-md transition-all duration-200 text-sm',
               'theme-bg-secondary/85 theme-text-secondary border-2 theme-border-primary',
@@ -141,17 +136,21 @@ export const FloatingOutline: React.FC<FloatingOutlineProps> = ({
         )
       ) : (
         // 展开状态：显示大纲内容
-        <div className={cn(
-          'theme-bg-primary/85 backdrop-blur-md rounded-lg shadow-2xl w-64 max-h-96 overflow-hidden',
-          'border-2 theme-border-primary'
-        )}>
+        <div
+          className={cn(
+            'theme-bg-primary/85 backdrop-blur-md rounded-lg shadow-2xl w-64 max-h-96 overflow-hidden',
+            'border-2 theme-border-primary'
+          )}
+        >
           {/* 头部 */}
-          <div className={cn(
-            'flex items-center justify-between px-3 py-2.5 border-b-2 theme-border-primary backdrop-blur-sm'
-          )}>
+          <div
+            className={cn(
+              'flex items-center justify-between px-3 py-2.5 border-b-2 theme-border-primary backdrop-blur-sm'
+            )}
+          >
             <span className="text-sm font-semibold theme-text-primary">大纲</span>
             <div className="flex items-center gap-1">
-              <button 
+              <button
                 onClick={() => {
                   if (onClose) {
                     onClose();
@@ -163,17 +162,17 @@ export const FloatingOutline: React.FC<FloatingOutlineProps> = ({
                   'p-1 rounded transition-all duration-200',
                   'hover:theme-bg-secondary hover:backdrop-blur-sm',
                   'theme-text-secondary hover:theme-text-primary'
-                )} 
+                )}
                 title="收起"
               >
                 <ChevronUp className="w-3 h-3" />
               </button>
             </div>
           </div>
-          
+
           {/* 大纲内容 */}
           <div className="p-2 overflow-y-auto max-h-80 scrollbar-thin">
-            {headings.map(item => renderOutlineItem(item, 0))}
+            {headings.map((item) => renderOutlineItem(item, 0))}
           </div>
         </div>
       )}

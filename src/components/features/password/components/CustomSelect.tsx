@@ -17,11 +17,11 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
   onChange,
   placeholder,
   options,
-  error
+  error,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const selectedOption = options.find(opt => opt.value === value);
+  const selectedOption = options.find((opt) => opt.value === value);
 
   return (
     <div className="relative">
@@ -40,17 +40,21 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
           error ? 'border border-red-400/40' : 'border border-white/20'
         )}
       >
-        <div className={cn(
-          'flex items-center gap-2',
-          selectedOption ? 'theme-text-primary' : 'theme-text-tertiary'
-        )}>
-          {selectedOption?.icon && React.isValidElement(selectedOption.icon) ? selectedOption.icon : null}
+        <div
+          className={cn(
+            'flex items-center gap-2',
+            selectedOption ? 'theme-text-primary' : 'theme-text-tertiary'
+          )}
+        >
+          {selectedOption?.icon && React.isValidElement(selectedOption.icon)
+            ? selectedOption.icon
+            : null}
           <span>{selectedOption ? selectedOption.label : placeholder}</span>
         </div>
-        <ChevronDown size={16} className={cn(
-          'transform transition-transform text-text-muted',
-          isOpen && 'rotate-180'
-        )} />
+        <ChevronDown
+          size={16}
+          className={cn('transform transition-transform text-text-muted', isOpen && 'rotate-180')}
+        />
       </button>
 
       {isOpen && (
@@ -72,12 +76,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
         </div>
       )}
 
-      {isOpen && (
-        <div
-          className="fixed inset-0 z-40"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
+      {isOpen && <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />}
     </div>
   );
 };

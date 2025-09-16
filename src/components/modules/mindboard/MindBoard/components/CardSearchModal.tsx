@@ -14,7 +14,7 @@ interface CardSearchModalProps {
 export const CardSearchModal: React.FC<CardSearchModalProps> = ({
   isOpen,
   onClose,
-  onSelectCard
+  onSelectCard,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
@@ -114,14 +114,16 @@ export const CardSearchModal: React.FC<CardSearchModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="feather-glass-modal-backdrop"
+    <div
+      className="feather-glass-modal-backdrop"
       onClick={(e) => e.target === e.currentTarget && handleClose()}
     >
       <div className="feather-glass-modal w-[800px] max-w-[90vw] h-[600px] max-h-[80vh] rounded-xl shadow-2xl overflow-hidden flex flex-col">
         {/* 标题栏 */}
         <div className="flex items-center justify-between px-5 py-3 border-b theme-border-primary">
           <h2 className="text-base font-medium theme-text-primary">搜索笔记卡片</h2>
-          <button onClick={handleClose}
+          <button
+            onClick={handleClose}
             className="p-1 rounded-lg theme-text-tertiary hover:theme-text-primary hover:theme-bg-secondary transition-colors"
           >
             <X className="w-5 h-5" />
@@ -135,8 +137,9 @@ export const CardSearchModal: React.FC<CardSearchModalProps> = ({
             <div className="px-4 py-3 border-b theme-border-primary">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 theme-text-tertiary" />
-                <input type="text"
-                  value={searchQuery} 
+                <input
+                  type="text"
+                  value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="搜索笔记内容..."
                   className="w-full pl-10 pr-4 py-2 feather-glass-input rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 theme-text-primary"
@@ -144,7 +147,7 @@ export const CardSearchModal: React.FC<CardSearchModalProps> = ({
                 />
               </div>
             </div>
-            
+
             {/* 搜索结果列表 */}
             <div className="flex-1 overflow-y-auto p-2">
               {isLoading ? (
@@ -154,8 +157,8 @@ export const CardSearchModal: React.FC<CardSearchModalProps> = ({
               ) : filteredCards.length > 0 ? (
                 <div className="space-y-2">
                   {filteredCards.map((card) => (
-                    <div 
-                      key={card.id} 
+                    <div
+                      key={card.id}
                       onClick={() => setSelectedCard(card)}
                       className={cn(
                         'p-3 rounded-lg cursor-pointer transition-all feather-glass-deco',
@@ -193,14 +196,12 @@ export const CardSearchModal: React.FC<CardSearchModalProps> = ({
               ) : (
                 <div className="flex flex-col items-center justify-center h-32 theme-text-tertiary">
                   <Search className="w-8 h-8 mb-2" />
-                  <p>
-                    {searchQuery ? '未找到匹配的笔记' : '暂无笔记'}
-                  </p>
+                  <p>{searchQuery ? '未找到匹配的笔记' : '暂无笔记'}</p>
                 </div>
               )}
             </div>
           </div>
-          
+
           {/* 右侧：预览区域 */}
           <div className="w-[350px] flex flex-col">
             {selectedCard ? (
@@ -215,7 +216,7 @@ export const CardSearchModal: React.FC<CardSearchModalProps> = ({
                     <span>更新于 {formatDate(selectedCard.updated_at)}</span>
                   </div>
                 </div>
-                
+
                 {/* 预览内容 */}
                 <div className="flex-1 p-4 overflow-y-auto feather-glass">
                   <div className="prose prose-sm max-w-none theme-text-primary">
@@ -228,16 +229,18 @@ export const CardSearchModal: React.FC<CardSearchModalProps> = ({
                     )}
                   </div>
                 </div>
-                
+
                 {/* 操作按钮 */}
                 <div className="px-4 py-3 border-t theme-border-primary feather-glass-deco">
                   <div className="flex gap-2 justify-end">
-                    <button onClick={handleClose}
+                    <button
+                      onClick={handleClose}
                       className="px-3 py-1.5 text-sm rounded-lg feather-glass-button theme-text-secondary hover:theme-text-primary transition-colors"
                     >
                       取消
                     </button>
-                    <button onClick={() => handleCardSelect(selectedCard)}
+                    <button
+                      onClick={() => handleCardSelect(selectedCard)}
                       className="px-3 py-1.5 text-sm rounded-lg feather-glass-button-primary text-white transition-colors shadow-lg"
                     >
                       添加到思维板

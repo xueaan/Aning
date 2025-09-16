@@ -26,14 +26,13 @@ class DatabaseConnection {
 
       // 创建数据库连接
       this.db = new Database(this.dbPath);
-      
+
       // 性能优化设置
       this.db.pragma('journal_mode = WAL'); // 写前日志模式
       this.db.pragma('synchronous = NORMAL'); // 平衡性能和安全
       this.db.pragma('cache_size = 10000'); // 缓存大小
       this.db.pragma('foreign_keys = ON'); // 启用外键约束
       this.db.pragma('temp_store = MEMORY'); // 临时表存储在内存
-      
     } catch (error) {
       console.error('数据库连接失败:', error);
       throw error;
@@ -74,7 +73,7 @@ class DatabaseConnection {
       memoryUsed: (db.pragma('cache_size') as any[])[0],
       pageSize: (db.pragma('page_size') as any[])[0],
       pageCount: (db.pragma('page_count') as any[])[0],
-      walMode: (db.pragma('journal_mode') as any[])[0]
+      walMode: (db.pragma('journal_mode') as any[])[0],
     };
   }
 }

@@ -10,12 +10,12 @@ interface MessageInputProps {
 
 export const MessageInput: React.FC<MessageInputProps> = ({
   onSendMessage,
-  isStreaming = false
+  isStreaming = false,
 }) => {
   const [message, setMessage] = useState('');
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [showImageUpload, setShowImageUpload] = useState(false);
-  
+
   const { activeContexts, clearAllContexts } = useDialogueContextStore();
 
   // 全局剪贴板监听 - 处理Ctrl+V图片粘贴
@@ -38,13 +38,13 @@ export const MessageInput: React.FC<MessageInputProps> = ({
             for (const type of clipboardItem.types) {
               if (type.startsWith('image/')) {
                 const blob = await clipboardItem.getType(type);
-                
+
                 // 转换为Base64
                 const reader = new FileReader();
                 reader.onload = (e) => {
                   const base64 = e.target?.result as string;
                   if (base64) {
-                    setSelectedImages(prev => [...prev, base64]);
+                    setSelectedImages((prev) => [...prev, base64]);
                     setShowImageUpload(true);
                   }
                 };
@@ -53,8 +53,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
               }
             }
           }
-        } catch (err) {
-        }
+        } catch (err) {}
       }
     };
 
@@ -67,17 +66,17 @@ export const MessageInput: React.FC<MessageInputProps> = ({
 
   const handleSend = () => {
     if (!message.trim() && selectedImages.length === 0) return;
-    
-    // 收集活动上下文  
+
+    // 收集活动上下文
     // const contextData = activeContexts.size > 0 ? Array.from(activeContexts.values()) : undefined;
-    
+
     onSendMessage(message, selectedImages.length > 0 ? selectedImages : undefined);
-    
+
     // 清空输入
     setMessage('');
     setSelectedImages([]);
     setShowImageUpload(false);
-    
+
     // 清除上下文
     if (activeContexts.size > 0) {
       clearAllContexts();
@@ -90,7 +89,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   // };
 
   const removeImage = (index: number) => {
-    setSelectedImages(prev => prev.filter((_, i) => i !== index));
+    setSelectedImages((prev) => prev.filter((_, i) => i !== index));
     if (selectedImages.length === 1) {
       setShowImageUpload(false);
     }
@@ -106,14 +105,16 @@ export const MessageInput: React.FC<MessageInputProps> = ({
               引用上下文 ({activeContexts.size}个)
             </div>
             <div className="flex flex-wrap gap-2">
-              {Array.from(activeContexts.values()).slice(0, 3).map((context: any) => (
-                <span
-                  key={context.id}
-                  className="px-2 py-1 theme-bg-primary/20 rounded text-xs theme-text-primary backdrop-blur-sm"
-                >
-                  {context.type}: {context.content.slice(0, 30)}...
-                </span>
-              ))}
+              {Array.from(activeContexts.values())
+                .slice(0, 3)
+                .map((context: any) => (
+                  <span
+                    key={context.id}
+                    className="px-2 py-1 theme-bg-primary/20 rounded text-xs theme-text-primary backdrop-blur-sm"
+                  >
+                    {context.type}: {context.content.slice(0, 30)}...
+                  </span>
+                ))}
               {activeContexts.size > 3 && (
                 <span className="px-2 py-1 theme-bg-primary/20 rounded text-xs theme-text-secondary backdrop-blur-sm">
                   还有 {activeContexts.size - 3} 个...
@@ -156,17 +157,13 @@ export const MessageInput: React.FC<MessageInputProps> = ({
               showImageUpload={showImageUpload}
               onImageUploadToggle={() => setShowImageUpload(!showImageUpload)}
               disabled={isStreaming}
-              placeholder={isStreaming ? "AI正在思考中..." : "输入消息..."}
+              placeholder={isStreaming ? 'AI正在思考中...' : '输入消息...'}
             />
           </div>
         </div>
 
         {/* 图片上传组件 */}
-        <ImageUpload
-          images={selectedImages}
-          onImagesChange={setSelectedImages}
-          maxImages={5}
-        />
+        <ImageUpload images={selectedImages} onImagesChange={setSelectedImages} maxImages={5} />
       </div>
     </div>
   );

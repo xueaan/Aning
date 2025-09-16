@@ -18,18 +18,18 @@ export const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
   isOpen,
   onClose,
   onConfirm,
-  title = "确认删除",
+  title = '确认删除',
   message,
   content,
   itemName,
-  isLoading = false
+  isLoading = false,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
   // 默认消息
   const defaultMessage = itemName
     ? `确定要删除"${itemName}"吗？此操作无法撤销。`
-    : "确定要删除这个项目吗？此操作无法撤销。";
+    : '确定要删除这个项目吗？此操作无法撤销。';
 
   const displayMessage = content || message || defaultMessage;
 
@@ -80,21 +80,17 @@ export const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
             exit={{ opacity: 0, scale: 0.9, y: -20 }}
             transition={{
               duration: 0.15,
-              ease: [0.16, 1, 0.3, 1]
+              ease: [0.16, 1, 0.3, 1],
             }}
           >
             {/* 简洁标题 */}
             <div className="flex items-center gap-2 mb-3">
               <Trash2 size={16} className="theme-text-error" />
-              <h3 className="text-sm font-medium theme-text-primary">
-                {title}
-              </h3>
+              <h3 className="text-sm font-medium theme-text-primary">{title}</h3>
             </div>
 
             {/* 提示文字 */}
-            <p className="text-xs theme-text-secondary mb-4 leading-relaxed">
-              {displayMessage}
-            </p>
+            <p className="text-xs theme-text-secondary mb-4 leading-relaxed">{displayMessage}</p>
 
             {/* 按钮组 */}
             <div className="flex gap-2">

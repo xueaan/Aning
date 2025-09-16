@@ -13,7 +13,7 @@ export interface HomeStore {
   // 状态
   shortcuts: Shortcut[];
   backgroundImage: string;
-  
+
   // Actions
   addShortcut: (shortcut: Omit<Shortcut, 'id'>) => void;
   updateShortcut: (id: string, shortcut: Partial<Shortcut>) => void;
@@ -44,26 +44,24 @@ export const useHomeStore = create<HomeStore>()(
       addShortcut: (shortcut) => {
         const newShortcut: Shortcut = {
           ...shortcut,
-          id: Date.now().toString()
+          id: Date.now().toString(),
         };
-        set(state => ({
-          shortcuts: [...state.shortcuts, newShortcut]
+        set((state) => ({
+          shortcuts: [...state.shortcuts, newShortcut],
         }));
       },
 
       // 更新快捷方式
       updateShortcut: (id, shortcut) => {
-        set(state => ({
-          shortcuts: state.shortcuts.map(s => 
-            s.id === id ? { ...s, ...shortcut } : s
-          )
+        set((state) => ({
+          shortcuts: state.shortcuts.map((s) => (s.id === id ? { ...s, ...shortcut } : s)),
         }));
       },
 
       // 删除快捷方式
       deleteShortcut: (id) => {
-        set(state => ({
-          shortcuts: state.shortcuts.filter(s => s.id !== id)
+        set((state) => ({
+          shortcuts: state.shortcuts.filter((s) => s.id !== id),
         }));
       },
 
@@ -81,18 +79,16 @@ export const useHomeStore = create<HomeStore>()(
       resetToDefaults: () => {
         set({
           shortcuts: defaultShortcuts,
-          backgroundImage: ''
+          backgroundImage: '',
         });
-      }}),
+      },
+    }),
     {
       name: 'home-storage', // localStorage的key
       partialize: (state) => ({
         shortcuts: state.shortcuts,
-        backgroundImage: state.backgroundImage
-      })
+        backgroundImage: state.backgroundImage,
+      }),
     }
   )
 );
-
-
-

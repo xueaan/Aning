@@ -1,7 +1,7 @@
-import { Check, ChevronDown } from "lucide-react";
-import { EditorBubbleItem, useEditor } from "novel";
-import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Check, ChevronDown } from 'lucide-react';
+import { EditorBubbleItem, useEditor } from 'novel';
+import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 export interface BubbleColorMenuItem {
   name: string;
@@ -10,80 +10,80 @@ export interface BubbleColorMenuItem {
 
 const TEXT_COLORS: BubbleColorMenuItem[] = [
   {
-    name: "默认",
-    color: "var(--novel-black)"
+    name: '默认',
+    color: 'var(--novel-black)',
   },
   {
-    name: "紫色",
-    color: "#9333EA"
+    name: '紫色',
+    color: '#9333EA',
   },
   {
-    name: "红色",
-    color: "#E00000"
+    name: '红色',
+    color: '#E00000',
   },
   {
-    name: "黄色",
-    color: "#EAB308"
+    name: '黄色',
+    color: '#EAB308',
   },
   {
-    name: "蓝色",
-    color: "#2563EB"
+    name: '蓝色',
+    color: '#2563EB',
   },
   {
-    name: "绿色",
-    color: "#008A00"
+    name: '绿色',
+    color: '#008A00',
   },
   {
-    name: "橙色",
-    color: "#FFA500"
+    name: '橙色',
+    color: '#FFA500',
   },
   {
-    name: "粉色",
-    color: "#BA4081"
+    name: '粉色',
+    color: '#BA4081',
   },
   {
-    name: "灰色",
-    color: "#A8A29E"
-  }
+    name: '灰色',
+    color: '#A8A29E',
+  },
 ];
 
 const HIGHLIGHT_COLORS: BubbleColorMenuItem[] = [
   {
-    name: "默认",
-    color: "transparent"
+    name: '默认',
+    color: 'transparent',
   },
   {
-    name: "紫色",
-    color: "#E9D5FF"
+    name: '紫色',
+    color: '#E9D5FF',
   },
   {
-    name: "红色",
-    color: "#FECACA"
+    name: '红色',
+    color: '#FECACA',
   },
   {
-    name: "黄色",
-    color: "#FEF3C7"
+    name: '黄色',
+    color: '#FEF3C7',
   },
   {
-    name: "蓝色",
-    color: "#DBEAFE"
+    name: '蓝色',
+    color: '#DBEAFE',
   },
   {
-    name: "绿色",
-    color: "#D1FAE5"
+    name: '绿色',
+    color: '#D1FAE5',
   },
   {
-    name: "橙色",
-    color: "#FED7AA"
+    name: '橙色',
+    color: '#FED7AA',
   },
   {
-    name: "粉色",
-    color: "#FBCFE8"
+    name: '粉色',
+    color: '#FBCFE8',
   },
   {
-    name: "灰色",
-    color: "#F3F4F6"
-  }
+    name: '灰色',
+    color: '#F3F4F6',
+  },
 ];
 
 interface ColorSelectorProps {
@@ -95,9 +95,11 @@ export const ColorSelector = ({ open, onOpenChange }: ColorSelectorProps) => {
   const { editor } = useEditor();
 
   if (!editor) return null;
-  const activeColorItem = TEXT_COLORS.find(({ color }) => editor.isActive("textStyle", { color }));
+  const activeColorItem = TEXT_COLORS.find(({ color }) => editor.isActive('textStyle', { color }));
 
-  const activeHighlightItem = HIGHLIGHT_COLORS.find(({ color }) => editor.isActive("highlight", { color }));
+  const activeHighlightItem = HIGHLIGHT_COLORS.find(({ color }) =>
+    editor.isActive('highlight', { color })
+  );
 
   return (
     <Popover modal={true} open={open} onOpenChange={onOpenChange}>
@@ -107,11 +109,11 @@ export const ColorSelector = ({ open, onOpenChange }: ColorSelectorProps) => {
           className="h-8 w-8 p-0 bg-transparent border-none hover:bg-transparent"
           variant="ghost"
         >
-          <span 
+          <span
             className="rounded-sm px-1"
             style={{
               color: activeColorItem?.color,
-              backgroundColor: activeHighlightItem?.color
+              backgroundColor: activeHighlightItem?.color,
             }}
           >
             A
@@ -120,7 +122,7 @@ export const ColorSelector = ({ open, onOpenChange }: ColorSelectorProps) => {
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent 
+      <PopoverContent
         sideOffset={5}
         className="my-1 flex max-h-80 w-48 flex-col overflow-hidden overflow-y-auto rounded border p-1 shadow-xl"
         align="start"
@@ -128,13 +130,17 @@ export const ColorSelector = ({ open, onOpenChange }: ColorSelectorProps) => {
         <div className="flex flex-col">
           <div className="my-1 px-2 text-sm font-semibold text-muted-foreground">字体颜色</div>
           {TEXT_COLORS.map(({ name, color }) => (
-            <EditorBubbleItem 
-              key={name} 
+            <EditorBubbleItem
+              key={name}
               onSelect={() => {
-                if (name === "默认") {
+                if (name === '默认') {
                   editor.chain().focus().unsetColor().run();
                 } else {
-                  editor.chain().focus().setColor(color || "").run();
+                  editor
+                    .chain()
+                    .focus()
+                    .setColor(color || '')
+                    .run();
                 }
                 onOpenChange(false);
               }}
@@ -146,17 +152,17 @@ export const ColorSelector = ({ open, onOpenChange }: ColorSelectorProps) => {
                 </div>
                 <span>{name}</span>
               </div>
-              {editor.isActive("textStyle", { color }) && <Check className="h-4 w-4" />}
+              {editor.isActive('textStyle', { color }) && <Check className="h-4 w-4" />}
             </EditorBubbleItem>
           ))}
         </div>
         <div>
           <div className="my-1 px-2 text-sm font-semibold text-muted-foreground">背景色</div>
           {HIGHLIGHT_COLORS.map(({ name, color }) => (
-            <EditorBubbleItem 
-              key={name} 
+            <EditorBubbleItem
+              key={name}
               onSelect={() => {
-                if (name === "默认") {
+                if (name === '默认') {
                   editor.chain().focus().unsetHighlight().run();
                 } else {
                   editor.chain().focus().setHighlight({ color }).run();
@@ -166,12 +172,15 @@ export const ColorSelector = ({ open, onOpenChange }: ColorSelectorProps) => {
               className="flex cursor-pointer items-center justify-between px-2 py-1 text-sm hover:bg-accent"
             >
               <div className="flex items-center gap-2">
-                <div className="rounded-sm border px-2 py-px font-medium" style={{ backgroundColor: color }}>
+                <div
+                  className="rounded-sm border px-2 py-px font-medium"
+                  style={{ backgroundColor: color }}
+                >
                   A
                 </div>
                 <span>{name}</span>
               </div>
-              {editor.isActive("highlight", { color }) && <Check className="h-4 w-4" />}
+              {editor.isActive('highlight', { color }) && <Check className="h-4 w-4" />}
             </EditorBubbleItem>
           ))}
         </div>

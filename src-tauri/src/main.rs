@@ -49,8 +49,11 @@ fn main() {
             
             let menu = Menu::with_items(app, &[&show, &hide, &quit])?;
             
-            let _tray = TrayIconBuilder::new()
-                .icon(app.default_window_icon().unwrap().clone())
+            let mut tray_builder = TrayIconBuilder::new();
+            if let Some(icon) = app.default_window_icon() {
+                tray_builder = tray_builder.icon(icon.clone());
+            }
+            let _tray = tray_builder
                 .menu(&menu)
                 .show_menu_on_left_click(false)
                 .on_tray_icon_event(|tray, event| {
@@ -86,7 +89,7 @@ fn main() {
         })
         .on_window_event(|window, event| {
             if let WindowEvent::CloseRequested { api, .. } = event {
-                window.hide().unwrap();
+                let _ = window.hide();
                 api.prevent_close();
             }
         })
@@ -222,6 +225,23 @@ fn main() {
             knowledge::get_recent_pages,
             knowledge::get_pending_tasks,
             knowledge::get_tasks_by_filter,
+            // 书籍管理命令
+            commands::book::get_books,
+            commands::book::get_book_by_id,
+            commands::book::create_book,
+            commands::book::update_book,
+            commands::book::delete_book,
+            commands::book::search_books,
+            // 读书笔记命令
+            commands::book::get_reading_notes,
+            commands::book::create_reading_note,
+            commands::book::delete_reading_note,
+            // 高亮句子命令
+            commands::book::get_book_highlights,
+            commands::book::create_book_highlight,
+            commands::book::delete_book_highlight,
+            // 豆瓣爬取命令
+            commands::douban::fetch_douban_book,
             knowledge::get_page_content_for_context,
             knowledge::get_task_content_for_context,
         ])

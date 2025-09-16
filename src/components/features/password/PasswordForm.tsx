@@ -19,7 +19,7 @@ export const PasswordForm: React.FC = () => {
     createEntry,
     updateEntry,
     setIsCreating,
-    setIsEditing
+    setIsEditing,
   } = usePasswordStore();
 
   // 使用自定义 hooks
@@ -32,21 +32,42 @@ export const PasswordForm: React.FC = () => {
     passwordStrength,
     isSubmitting,
     setIsSubmitting,
-    updateField
-  } = usePasswordFormState({ isCreating, isEditing, editingEntry: editingEntry || null, categories });
+    updateField,
+  } = usePasswordFormState({
+    isCreating,
+    isEditing,
+    editingEntry: editingEntry || null,
+    categories,
+  });
 
-  const {
-    errors,
-    validateForm,
-    setSubmitError
-  } = usePasswordFormValidation(categories);
+  const { errors, validateForm, setSubmitError } = usePasswordFormValidation(categories);
 
-  const selectedCategory = categories.find(c => c.id === formData.category_id);
+  const selectedCategory = categories.find((c) => c.id === formData.category_id);
+
+  // URL格式化处理
+  const formatUrlForSave = (url: string | undefined): string | undefined => {
+    if (!url || url.trim() === '') return undefined;
+
+    const trimmedUrl = url.trim();
+
+    // 如果已经有协议，直接返回
+    if (trimmedUrl.match(/^https?:\/\//)) {
+      return trimmedUrl;
+    }
+
+    // 对于IP地址或localhost，默认使用http
+    if (trimmedUrl.match(/^(localhost|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(:\d+)?/)) {
+      return `http://${trimmedUrl}`;
+    }
+
+    // 其他情况默认使用https
+    return `https://${trimmedUrl}`;
+  };
 
   // 事件处理函数
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm(formData)) {
       return;
     }
@@ -54,10 +75,16 @@ export const PasswordForm: React.FC = () => {
     setIsSubmitting(true);
 
     try {
+      // 格式化URL后再保存
+      const processedData = {
+        ...formData,
+        url: formatUrlForSave(formData.url),
+      };
+
       if (isEditing && editingEntry) {
-        await updateEntry(editingEntry.id!, formData);
+        await updateEntry(editingEntry.id!, processedData);
       } else {
-        await createEntry(formData);
+        await createEntry(processedData);
       }
       handleClose();
     } catch (error: any) {
@@ -121,37 +148,48 @@ export const PasswordForm: React.FC = () => {
                 value={formData.category_id?.toString() || ''}
                 onChange={(value) => updateField('category_id', value ? Number(value) : undefined)}
                 placeholder="选择分类"
-                options={categories.map(category => {
+                options={categories.map((category) => {
                   const IconComponent = getIconComponent(category.icon || 'folder');
                   return {
                     value: category.id?.toString() || '',
                     label: category.name,
-                    icon: React.createElement(IconComponent, { size: 16 })
+                    icon: React.createElement(IconComponent, { size: 16 }),
                   };
                 })}
                 error={!!errors.category_id}
               />
-              {errors.category_id && <p className="mt-1 text-xs theme-text-error">{errors.category_id}</p>}
+              {errors.category_id && (
+                <p className="mt-1 text-xs theme-text-error">{errors.category_id}</p>
+              )}
             </div>
 
             <div>
               <label className="block text-sm font-medium theme-text-secondary mb-2">
-                {selectedCategory?.name === '网站' ? '网站名称' : 
-                 selectedCategory?.name === '应用软件' ? '软件名称' :
-                 selectedCategory?.name === '服务器' ? '服务器名称' :
-                 selectedCategory?.name === '数据库' ? '数据库名称' :
-                 '输入标题'} *
+                {selectedCategory?.name === '网站'
+                  ? '网站名称'
+                  : selectedCategory?.name === '应用软件'
+                    ? '软件名称'
+                    : selectedCategory?.name === '服务器'
+                      ? '服务器名称'
+                      : selectedCategory?.name === '数据库'
+                        ? '数据库名称'
+                        : '输入标题'}{' '}
+                *
               </label>
               <input
                 type="text"
                 value={formData.title || ''}
                 onChange={(e) => updateField('title', e.target.value)}
                 placeholder={
-                  selectedCategory?.name === '网站' ? '网站名称' : 
-                  selectedCategory?.name === '应用软件' ? '软件名称' :
-                  selectedCategory?.name === '服务器' ? '服务器名称' :
-                  selectedCategory?.name === '数据库' ? '数据库名称' :
-                  '输入标题'
+                  selectedCategory?.name === '网站'
+                    ? '网站名称'
+                    : selectedCategory?.name === '应用软件'
+                      ? '软件名称'
+                      : selectedCategory?.name === '服务器'
+                        ? '服务器名称'
+                        : selectedCategory?.name === '数据库'
+                          ? '数据库名称'
+                          : '输入标题'
                 }
                 className={cn(
                   'w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:theme-ring-accent transition-all theme-text-primary placeholder:theme-text-tertiary feather-glass-deco',
@@ -230,7 +268,7 @@ export const PasswordForm: React.FC = () => {
 
           {/* Action Buttons */}
           <div className="flex gap-3 pt-2">
-            <button 
+            <button
               type="button"
               onClick={handleClose}
               className="px-6 py-3 rounded-lg transition-all hover:scale-[1.02] theme-text-secondary feather-glass-deco"
@@ -238,7 +276,7 @@ export const PasswordForm: React.FC = () => {
             >
               取消
             </button>
-            <button 
+            <button
               type="submit"
               disabled={isSubmitting}
               className="flex-1 px-6 py-3 theme-button-primary rounded-lg transition-all hover:scale-[1.02] disabled:opacity-50 flex items-center justify-center gap-2"

@@ -11,7 +11,7 @@ interface PasswordListProps {
 export const PasswordList: React.FC<PasswordListProps> = ({
   entries,
   selectedEntry,
-  onSelectEntry
+  onSelectEntry,
 }) => {
   if (entries.length === 0) {
     return (
@@ -21,22 +21,17 @@ export const PasswordList: React.FC<PasswordListProps> = ({
     );
   }
 
-  // 网格卡片布局
+  // 网格卡片布局 - 紧凑排列
   return (
-    <div className="grid grid-cols-1 sm: grid-cols-2 , lg:grid-cols-3,xl:grid-cols-4 gap-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
       {entries.map((entry) => (
-        <PasswordCard key={entry.id} entry={entry}
-          onSelect={onSelectEntry} isSelected={selectedEntry?.id === entry.id}
+        <PasswordCard
+          key={entry.id}
+          entry={entry}
+          onSelect={onSelectEntry}
+          isSelected={selectedEntry?.id === entry.id}
         />
       ))}
     </div>
   );
 };
-
-
-
-
-
-
-
-

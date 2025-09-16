@@ -20,7 +20,7 @@ export const CompactTaskItem: React.FC<CompactTaskItemProps> = ({
   projects,
   onUpdate,
   onDelete,
-  showProject = true
+  showProject = true,
 }) => {
   const { toggleTaskStatus } = useTaskBoxStore();
 
@@ -36,12 +36,13 @@ export const CompactTaskItem: React.FC<CompactTaskItemProps> = ({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-
   // 查找任务关联的项目
-  const project = projects.find(p => p.id === task.project_id);
+  const project = projects.find((p) => p.id === task.project_id);
 
   // 检查任务是否逾期
-  const isOverdue = task.due_date ? new Date(task.due_date) < new Date() && task.status !== 'completed' : false;
+  const isOverdue = task.due_date
+    ? new Date(task.due_date) < new Date() && task.status !== 'completed'
+    : false;
 
   // 自动聚焦到编辑输入框
   useEffect(() => {
@@ -84,7 +85,7 @@ export const CompactTaskItem: React.FC<CompactTaskItemProps> = ({
     try {
       await toggleTaskStatus(task.id!);
     } catch (error) {
-      console.error("Error:", error);
+      console.error('Error:', error);
     }
   };
 
@@ -136,11 +137,11 @@ export const CompactTaskItem: React.FC<CompactTaskItemProps> = ({
     }
   };
 
-    // 取消编辑
-    const handleCancelEdit = () => {
-      setEditField(null);
-      setEditValue('');
-    };
+  // 取消编辑
+  const handleCancelEdit = () => {
+    setEditField(null);
+    setEditValue('');
+  };
 
   // 处理键盘事件
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -171,58 +172,58 @@ export const CompactTaskItem: React.FC<CompactTaskItemProps> = ({
 
   // 格式化日期显示
   const formatDate = (dateString: string) => {
-        if (!dateString) return '';
+    if (!dateString) return '';
 
-        const date = new Date(dateString);
+    const date = new Date(dateString);
 
-        // 检查日期是否有效
-        if (isNaN(date.getTime())) {
-          return dateString;
-        }
+    // 检查日期是否有效
+    if (isNaN(date.getTime())) {
+      return dateString;
+    }
 
-        const today = new Date();
-        const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
-        const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+    const today = new Date();
+    const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+    const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
 
-        try {
-          if (date.toDateString() === today.toDateString()) {
-            return '今天';
-          } else if (date.toDateString() === yesterday.toDateString()) {
-            return '昨天';
-          } else if (date.toDateString() === tomorrow.toDateString()) {
-            return '明天';
-          } else {
-            return date.toLocaleDateString('zh-CN', {
-              month: 'short',
-              day: 'numeric',
-              year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined
-            });
-          }
-        } catch (error) {
-          console.error('formatDate error:', error);
-          return dateString;
-        }
-      };
+    try {
+      if (date.toDateString() === today.toDateString()) {
+        return '今天';
+      } else if (date.toDateString() === yesterday.toDateString()) {
+        return '昨天';
+      } else if (date.toDateString() === tomorrow.toDateString()) {
+        return '明天';
+      } else {
+        return date.toLocaleDateString('zh-CN', {
+          month: 'short',
+          day: 'numeric',
+          year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined,
+        });
+      }
+    } catch (error) {
+      console.error('formatDate error:', error);
+      return dateString;
+    }
+  };
 
   // 获取优先级选项
   const priorityOptions: { value: TaskPriority; label: string }[] = [
     { value: 'urgent', label: '紧急' },
     { value: 'high', label: '高' },
     { value: 'medium', label: '中' },
-    { value: 'low', label: '低' }
+    { value: 'low', label: '低' },
   ];
 
-      // statusOptions removed - was not used
+  // statusOptions removed - was not used
 
   // 获取任务项样式 - 底部边框样式
   const getItemClassName = () => {
-    let baseClass = "group flex items-center gap-3 p-3 transition-all duration-200";
+    let baseClass = 'group flex items-center gap-3 p-3 transition-all duration-200';
 
     // 状态特定样式
     if (isOverdue) {
-      baseClass += " opacity-90";
+      baseClass += ' opacity-90';
     } else if (task.status === 'completed') {
-      baseClass += " opacity-70";
+      baseClass += ' opacity-70';
     }
 
     return baseClass;
@@ -230,11 +231,11 @@ export const CompactTaskItem: React.FC<CompactTaskItemProps> = ({
 
   return (
     <div className={`${getItemClassName()} feather-glass-bottom-border`}>
-          {/* 复选框 */}
-          <div className="flex-shrink-0">
-        <input 
+      {/* 复选框 */}
+      <div className="flex-shrink-0">
+        <input
           type="checkbox"
-          checked={task.status === 'completed'} 
+          checked={task.status === 'completed'}
           onChange={handleToggleComplete}
           className={`w-4 h-4 bg-transparent border-2 theme-border rounded focus:ring-2 focus:ring-offset-0 ${
             isOverdue
@@ -242,20 +243,20 @@ export const CompactTaskItem: React.FC<CompactTaskItemProps> = ({
               : 'theme-text-accent focus:theme-ring-accent'
           }`}
         />
-          </div>
-          <div className="flex-1 min-w-0">
-            {editField === 'title' ? (
-            <input 
-              ref={inputRef} 
-              type="text"
-              value={editValue} 
-              onChange={(e) => setEditValue(e.target.value)}
-              onKeyDown={handleKeyDown} 
-              onBlur={handleSaveEdit}
-              className="w-full px-3 py-2 text-sm font-medium rounded-lg focus:outline-none focus:ring-2 focus:theme-ring-accent transition-all theme-text-primary placeholder:theme-text-tertiary feather-glass-deco"
-            />
-            ) : (
-          <span 
+      </div>
+      <div className="flex-1 min-w-0">
+        {editField === 'title' ? (
+          <input
+            ref={inputRef}
+            type="text"
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onBlur={handleSaveEdit}
+            className="w-full px-3 py-2 text-sm font-medium rounded-lg focus:outline-none focus:ring-2 focus:theme-ring-accent transition-all theme-text-primary placeholder:theme-text-tertiary feather-glass-deco"
+          />
+        ) : (
+          <span
             className={`text-sm font-medium cursor-pointer px-2 py-1 rounded-md transition-all duration-200 hover:shadow-sm truncate block ${
               task.status === 'completed'
                 ? 'line-through theme-text-tertiary'
@@ -263,75 +264,78 @@ export const CompactTaskItem: React.FC<CompactTaskItemProps> = ({
                   ? 'theme-text-error'
                   : 'theme-text-primary'
             }`}
-            onClick={() => handleStartEdit('title', task.title)} 
+            onClick={() => handleStartEdit('title', task.title)}
             title={`${task.title} (点击编辑标题)`}
           >
             {task.title}
           </span>
         )}
       </div>
-      
+
       {/* 项目标签 */}
       {showProject && (
-          <div className="flex-shrink-0 w-28 relative" ref={projectPickerRef}>
-            {editField === 'project' ? (
-              <>
-              <button 
+        <div className="flex-shrink-0 w-28 relative" ref={projectPickerRef}>
+          {editField === 'project' ? (
+            <>
+              <button
                 className="w-full flex items-center gap-1 px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-200 text-xs"
                 onClick={() => setShowProjectPicker(!showProjectPicker)}
               >
                 {editValue ? (
-                    (() => {
-                      const selectedProject = projects.find(p => p.id?.toString() === editValue);
-                      return selectedProject ? (
-                        <>
-                          <span className="flex items-center justify-center w-3 h-3">
-                            {selectedProject.icon?.length === 1 ? (
-                              <span className="text-xs">{selectedProject.icon}</span>
-                            ) : (
-                              React.createElement(getIconComponent(selectedProject.icon || 'Folder'), {
+                  (() => {
+                    const selectedProject = projects.find((p) => p.id?.toString() === editValue);
+                    return selectedProject ? (
+                      <>
+                        <span className="flex items-center justify-center w-3 h-3">
+                          {selectedProject.icon?.length === 1 ? (
+                            <span className="text-xs">{selectedProject.icon}</span>
+                          ) : (
+                            React.createElement(
+                              getIconComponent(selectedProject.icon || 'Folder'),
+                              {
                                 theme: 'outline',
                                 size: 12,
                                 fill: 'currentColor',
                                 strokeWidth: 2,
-                                className: 'theme-text-secondary'
-                              })
-                            )}
-                          </span>
-                          <span className="theme-text-primary truncate">{selectedProject.name}</span>
-                        </>
-                      ) : (
-                        <span className="theme-text-tertiary">无项目</span>
-                      );
-                    })()
-                  ) : (
-                    <span className="theme-text-tertiary">无项目</span>
-                  )}
+                                className: 'theme-text-secondary',
+                              }
+                            )
+                          )}
+                        </span>
+                        <span className="theme-text-primary truncate">{selectedProject.name}</span>
+                      </>
+                    ) : (
+                      <span className="theme-text-tertiary">无项目</span>
+                    );
+                  })()
+                ) : (
+                  <span className="theme-text-tertiary">无项目</span>
+                )}
                 <ChevronDown size={10} className="theme-text-secondary ml-auto" />
               </button>
-                {showProjectPicker && (
-                  <div className="absolute bottom-full left-0 mb-1 w-full max-h-32 overflow-y-auto rounded-lg shadow-xl z-50 feather-glass-deco">
-                    <button
-                      onClick={() => {
-                        const completeUpdates = {
-                          title: task.title,
-                          description: task.description,
-                          priority: task.priority,
-                          status: task.status,
-                          due_date: task.due_date,
-                          project_id: null,
-                          completed_at: task.completed_at
-                        };
-                        setEditValue('');
-                        onUpdate(completeUpdates);
-                        setEditField(null);
-                        setShowProjectPicker(false);
-                      }}
-                      className="w-full flex items-center gap-1 px-2 py-1.5 hover:bg-white/10 transition-all duration-200 text-left text-xs"
-                    >
+              {showProjectPicker && (
+                <div className="absolute bottom-full left-0 mb-1 w-full max-h-32 overflow-y-auto rounded-lg shadow-xl z-50 feather-glass-deco">
+                  <button
+                    onClick={() => {
+                      const completeUpdates = {
+                        title: task.title,
+                        description: task.description,
+                        priority: task.priority,
+                        status: task.status,
+                        due_date: task.due_date,
+                        project_id: null,
+                        completed_at: task.completed_at,
+                      };
+                      setEditValue('');
+                      onUpdate(completeUpdates);
+                      setEditField(null);
+                      setShowProjectPicker(false);
+                    }}
+                    className="w-full flex items-center gap-1 px-2 py-1.5 hover:bg-white/10 transition-all duration-200 text-left text-xs"
+                  >
                     <span className="theme-text-tertiary">无项目</span>
                   </button>
-                  {projects.map(proj => (
+                  {projects.map((proj) => (
                     <button
                       key={proj.id}
                       onClick={() => {
@@ -342,7 +346,7 @@ export const CompactTaskItem: React.FC<CompactTaskItemProps> = ({
                           status: task.status,
                           due_date: task.due_date,
                           project_id: proj.id,
-                          completed_at: task.completed_at
+                          completed_at: task.completed_at,
                         };
                         setEditValue(proj.id?.toString() || '');
                         onUpdate(completeUpdates);
@@ -351,54 +355,53 @@ export const CompactTaskItem: React.FC<CompactTaskItemProps> = ({
                       }}
                       className="w-full flex items-center gap-1 px-2 py-1.5 hover:bg-white/10 transition-all duration-200 text-left text-xs"
                     >
-                <span className="flex items-center justify-center w-3 h-3">
-                  {proj.icon?.length === 1 ? (
-                    <span className="text-xs">{proj.icon}</span>
-                  ) : (
-                    React.createElement(getIconComponent(proj.icon || 'Folder'), {
-                      theme: 'outline',
-                      size: 12,
-                      fill: 'currentColor',
-                      strokeWidth: 2,
-                      className: 'theme-text-secondary'
-                    })
-                  )}
-                </span>
-                <span className="theme-text-primary truncate">{proj.name}</span>
-              </button>
+                      <span className="flex items-center justify-center w-3 h-3">
+                        {proj.icon?.length === 1 ? (
+                          <span className="text-xs">{proj.icon}</span>
+                        ) : (
+                          React.createElement(getIconComponent(proj.icon || 'Folder'), {
+                            theme: 'outline',
+                            size: 12,
+                            fill: 'currentColor',
+                            strokeWidth: 2,
+                            className: 'theme-text-secondary',
+                          })
+                        )}
+                      </span>
+                      <span className="theme-text-primary truncate">{proj.name}</span>
+                    </button>
                   ))}
-          </div>
-                )
-              }
+                </div>
+              )}
             </>
           ) : (
-            <span 
+            <span
               className="inline-flex items-center px-2 py-1 text-xs theme-text-secondary rounded-full cursor-pointer transition-all duration-200 hover:shadow-sm truncate bg-white/10 hover:bg-white/20 project-tag font-medium"
-              onClick={() => handleStartEdit('project', task.project_id?.toString() || '')} 
+              onClick={() => handleStartEdit('project', task.project_id?.toString() || '')}
               title={`点击编辑项目 ${project ? `(当前: ${project.name})` : '(无项目)'}`}
             >
-    {project ? (
-      <>
-        <span className="mr-1.5 flex items-center justify-center w-4 h-4">
-          {project.icon?.length === 1 ? (
-            // 如果是单个字符（emoji），直接显示
-            <span className="text-sm">{project.icon}</span>
-          ) : (
-            // 如果是图标名称，渲染对应的图标组件
-            React.createElement(getIconComponent(project.icon || 'Folder'), {
-              theme: 'outline',
-              size: 14,
-              fill: 'currentColor',
-              strokeWidth: 2,
-              className: 'theme-text-secondary'
-            })
-          )}
-        </span>
-        <span className="font-medium">{project.name}</span>
-      </>
-    ) : (
-      <span className="theme-text-tertiary italic">无项目</span>
-    )}
+              {project ? (
+                <>
+                  <span className="mr-1.5 flex items-center justify-center w-4 h-4">
+                    {project.icon?.length === 1 ? (
+                      // 如果是单个字符（emoji），直接显示
+                      <span className="text-sm">{project.icon}</span>
+                    ) : (
+                      // 如果是图标名称，渲染对应的图标组件
+                      React.createElement(getIconComponent(project.icon || 'Folder'), {
+                        theme: 'outline',
+                        size: 14,
+                        fill: 'currentColor',
+                        strokeWidth: 2,
+                        className: 'theme-text-secondary',
+                      })
+                    )}
+                  </span>
+                  <span className="font-medium">{project.name}</span>
+                </>
+              ) : (
+                <span className="theme-text-tertiary italic">无项目</span>
+              )}
             </span>
           )}
         </div>
@@ -408,7 +411,7 @@ export const CompactTaskItem: React.FC<CompactTaskItemProps> = ({
       <div className="flex-shrink-0 w-auto">
         {editField === 'priority' ? (
           <div className="flex gap-0.5">
-            {priorityOptions.map(option => (
+            {priorityOptions.map((option) => (
               <button
                 key={option.value}
                 type="button"
@@ -420,7 +423,7 @@ export const CompactTaskItem: React.FC<CompactTaskItemProps> = ({
                     status: task.status,
                     due_date: task.due_date,
                     project_id: task.project_id,
-                    completed_at: task.completed_at
+                    completed_at: task.completed_at,
                   };
                   setEditValue(option.value);
                   onUpdate(completeUpdates);
@@ -438,22 +441,22 @@ export const CompactTaskItem: React.FC<CompactTaskItemProps> = ({
             ))}
           </div>
         ) : (
-          <span 
+          <span
             onClick={() => handleStartEdit('priority', task.priority)}
             className="inline-flex items-center px-2 py-1 text-xs theme-text-accent rounded-full cursor-pointer transition-all duration-200 hover:shadow-sm bg-white/10 hover:bg-white/20 font-medium"
             title="点击编辑优先级"
           >
-            {priorityOptions.find(p => p.value === task.priority)?.label || '中'}
+            {priorityOptions.find((p) => p.value === task.priority)?.label || '中'}
           </span>
         )}
       </div>
-      
+
       {/* 截止日期 */}
       <div className="flex-shrink-0 w-28">
         {editField === 'due_date' ? (
           <div className="w-full">
-            <DatePicker 
-              value={editValue} 
+            <DatePicker
+              value={editValue}
               onChange={(newValue) => {
                 setEditValue(newValue);
                 // 立即保存，不需要等关闭
@@ -465,7 +468,7 @@ export const CompactTaskItem: React.FC<CompactTaskItemProps> = ({
                     status: task.status,
                     due_date: newValue && newValue.trim() ? newValue.trim() : undefined,
                     project_id: task.project_id,
-                    completed_at: task.completed_at
+                    completed_at: task.completed_at,
                   };
                   onUpdate(completeUpdates);
                   setEditField(null);
@@ -479,17 +482,20 @@ export const CompactTaskItem: React.FC<CompactTaskItemProps> = ({
               }}
               placeholder="选择日期"
               size="sm"
-              showShortcuts={true} 
+              showShortcuts={true}
               shortcuts={[
                 { label: '今天', value: () => formatDateUtil(new Date()) },
-                { label: '明天', value: () => formatDateUtil(new Date(Date.now() + 24 * 60 * 60 * 1000)) },
-                { label: '清除', value: '' }
+                {
+                  label: '明天',
+                  value: () => formatDateUtil(new Date(Date.now() + 24 * 60 * 60 * 1000)),
+                },
+                { label: '清除', value: '' },
               ]}
               className="w-full"
             />
           </div>
         ) : (
-          <span 
+          <span
             className={`inline-flex items-center gap-1.5 px-2 py-1 text-xs rounded-full cursor-pointer transition-all duration-200 hover:shadow-sm font-medium ${
               isOverdue
                 ? 'theme-text-error bg-white/10 hover:bg-white/20'
@@ -497,7 +503,7 @@ export const CompactTaskItem: React.FC<CompactTaskItemProps> = ({
                   ? 'theme-text-secondary bg-white/10 hover:bg-white/20'
                   : 'theme-text-tertiary bg-white/10 hover:bg-white/20'
             }`}
-            onClick={() => handleStartEdit('due_date', task.due_date || '')} 
+            onClick={() => handleStartEdit('due_date', task.due_date || '')}
             title="点击编辑截止日期"
           >
             <Calendar size={16} />
@@ -507,18 +513,18 @@ export const CompactTaskItem: React.FC<CompactTaskItemProps> = ({
           </span>
         )}
       </div>
-      
+
       {/* 操作按钮 */}
       <div className="flex-shrink-0 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-all duration-200">
-        <button 
+        <button
           onClick={() => handleStartEdit('title', task.title)}
           className="p-1.5 theme-text-tertiary transition-all duration-200 rounded-md hover:shadow-sm hover:theme-text-accent hover:bg-white/20"
           title="编辑任务"
         >
           <Edit2 size={16} />
         </button>
-        
-        <button 
+
+        <button
           onClick={handleDelete}
           className="p-1.5 theme-text-tertiary transition-all duration-200 rounded-md hover:shadow-sm hover:theme-text-error hover:bg-white/20"
           title="删除任务"
@@ -526,9 +532,9 @@ export const CompactTaskItem: React.FC<CompactTaskItemProps> = ({
           <Trash2 size={16} />
         </button>
       </div>
-      
+
       {/* 删除确认弹窗 */}
-      <ConfirmDeleteModal 
+      <ConfirmDeleteModal
         isOpen={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
         onConfirm={handleConfirmDelete}

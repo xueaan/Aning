@@ -27,7 +27,9 @@ export const Timeline: React.FC = () => {
 
   // 删除确认状态
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState<{ id: string | number; time: string } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string | number; time: string } | null>(
+    null
+  );
   const [isDeleting, setIsDeleting] = useState(false);
 
   // 3日视图的日期
@@ -72,7 +74,7 @@ export const Timeline: React.FC = () => {
               const timelineEntries: TimelineEntry[] = dbEntries.map((entry: any) => ({
                 id: entry.id?.toString() || `db-${Date.now()}-${Math.random()}`,
                 content: entry.content,
-                created_at: entry.created_at
+                created_at: entry.created_at,
               }));
               setEntries(timelineEntries);
             } else {
@@ -127,7 +129,7 @@ export const Timeline: React.FC = () => {
         currentEntry = {
           id: `temp-${timeMatch[1]}-${Date.now()}`,
           content: '',
-          created_at: `2025-01-01 ${timeMatch[1]}:00`
+          created_at: `2025-01-01 ${timeMatch[1]}:00`,
         };
       } else if (currentEntry && line.trim()) {
         // 添加内容到当前条目
@@ -152,7 +154,8 @@ export const Timeline: React.FC = () => {
 
     // 添加保存中的状态
     const saveButton = document.querySelector('button[title="Ctrl+Enter"]') as HTMLButtonElement;
-    const originalButtonContent = saveButton?.innerHTML || '记录<span class="text-xs opacity-75"></span>';
+    const originalButtonContent =
+      saveButton?.innerHTML || '记录<span class="text-xs opacity-75"></span>';
 
     if (saveButton) {
       saveButton.disabled = true;
@@ -175,19 +178,12 @@ export const Timeline: React.FC = () => {
       const dateStr = formatDate(currentDate);
       const time = getCurrentTime();
 
-
       // 保存到SQLite数据库（添加超时）
       await Promise.race([
-        DatabaseAPI.createTimelineEntry(
-          dateStr,
-          time,
-          inputValue.trim(),
-          undefined,
-          undefined
-        ),
+        DatabaseAPI.createTimelineEntry(dateStr, time, inputValue.trim(), undefined, undefined),
         new Promise<never>((_, reject) =>
           setTimeout(() => reject(new Error('数据库保存超时')), 4000)
-        )
+        ),
       ]);
 
       // 重新加载显示
@@ -224,7 +220,8 @@ export const Timeline: React.FC = () => {
     setIsDeleting(true);
     try {
       // 确保ID是数字类型
-      const numericId = typeof deleteTarget.id === 'string' ? parseInt(deleteTarget.id, 10) : deleteTarget.id;
+      const numericId =
+        typeof deleteTarget.id === 'string' ? parseInt(deleteTarget.id, 10) : deleteTarget.id;
       if (isNaN(numericId)) {
         throw new Error('无效的ID格式');
       }
@@ -297,9 +294,13 @@ export const Timeline: React.FC = () => {
           {/* 输入区域 - 完全融入背景 */}
           <div className="relative mb-8">
             {/* 使用 React.lazy Suspense 延迟加载重量级组件 */}
-            <React.Suspense fallback={<div className="bg-transparent border rounded-lg p-4 min-h-[120px] flex items-center text-text-muted">
-              记录此刻的想法...
-            </div>}>
+            <React.Suspense
+              fallback={
+                <div className="bg-transparent border rounded-lg p-4 min-h-[120px] flex items-center text-text-muted">
+                  记录此刻的想法...
+                </div>
+              }
+            >
               <LineEditor
                 value={inputValue}
                 onChange={setInputValue}
@@ -314,32 +315,44 @@ export const Timeline: React.FC = () => {
               />
             </React.Suspense>
           </div>
-          
+
           {viewMode === 'three' ? (
             // 3日视图
             <div className="grid grid-cols-3 gap-4 h-full">
               {[
-                { date: yesterday, entries: yesterdayEntries, label: `${yesterday.getMonth() + 1}月${yesterday.getDate()}日 星期${['日', '一', '二', '三', '四', '五', '六'][yesterday.getDay()]}` },
-                { date: currentDate, entries: entries, label: `${currentDate.getMonth() + 1}月${currentDate.getDate()}日 星期${['日', '一', '二', '三', '四', '五', '六'][currentDate.getDay()]}` },
-                { date: tomorrow, entries: tomorrowEntries, label: `${tomorrow.getMonth() + 1}月${tomorrow.getDate()}日 星期${['日', '一', '二', '三', '四', '五', '六'][tomorrow.getDay()]}` },
+                {
+                  date: yesterday,
+                  entries: yesterdayEntries,
+                  label: `${yesterday.getMonth() + 1}月${yesterday.getDate()}日 星期${['日', '一', '二', '三', '四', '五', '六'][yesterday.getDay()]}`,
+                },
+                {
+                  date: currentDate,
+                  entries: entries,
+                  label: `${currentDate.getMonth() + 1}月${currentDate.getDate()}日 星期${['日', '一', '二', '三', '四', '五', '六'][currentDate.getDay()]}`,
+                },
+                {
+                  date: tomorrow,
+                  entries: tomorrowEntries,
+                  label: `${tomorrow.getMonth() + 1}月${tomorrow.getDate()}日 星期${['日', '一', '二', '三', '四', '五', '六'][tomorrow.getDay()]}`,
+                },
               ].map(({ entries: dayEntries, label }, idx) => (
-                <div key={idx}
-                  className="rounded-lg overflow-hidden flex flex-col feather-glass-deco">
+                <div
+                  key={idx}
+                  className="rounded-lg overflow-hidden flex flex-col feather-glass-deco"
+                >
                   <div className="p-3 border-b border-white/10 bg-transparent backdrop-blur-sm">
-                    <h3 className="text-sm font-medium text-text-primary text-center">
-                      {label}
-                    </h3>
+                    <h3 className="text-sm font-medium text-text-primary text-center">{label}</h3>
                   </div>
                   <div className="flex-1 overflow-y-auto p-3">
                     {dayEntries.length === 0 ? (
-                      <div className="text-center text-text-muted py-4 text-xs">
-                        暂无记录
-                      </div>
+                      <div className="text-center text-text-muted py-4 text-xs">暂无记录</div>
                     ) : (
                       <div className="space-y-3">
                         {dayEntries.map((entry, index) => (
-                          <div key={index}
-                            className="opacity-75 hover:opacity-100 border-l-2 border-white/20 pl-3 py-2 rounded-r transition-all hover:shadow-lg hover:border-white/40 feather-glass-deco">
+                          <div
+                            key={index}
+                            className="opacity-75 hover:opacity-100 border-l-2 border-white/20 pl-3 py-2 rounded-r transition-all hover:shadow-lg hover:border-white/40 feather-glass-deco"
+                          >
                             <div className="text-xs font-medium mb-1 text-accent px-1.5 py-0.5 rounded bg-white/10">
                               {extractTimeFromCreatedAt(entry.created_at)}
                             </div>
@@ -377,16 +390,17 @@ export const Timeline: React.FC = () => {
                       <div className="flex-1 rounded-lg px-2.5 py-1 mb-4 transition-all relative group hover:shadow-lg feather-glass-deco">
                         <div className="absolute top-1/2 right-2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-50">
                           <button
-                            onClick={() => handleDelete(entry.id, extractTimeFromCreatedAt(entry.created_at))}
+                            onClick={() =>
+                              handleDelete(entry.id, extractTimeFromCreatedAt(entry.created_at))
+                            }
                             className="w-6 h-6 rounded-lg flex items-center justify-center bg-red-500/80 text-red-100 hover:bg-red-500/90 transition-all shadow-md"
-                            title="删除此记录">
+                            title="删除此记录"
+                          >
                             <X size={14} />
                           </button>
                         </div>
                         <div className="text-text-primary text-sm">
-                          <ReactMarkdown>
-                            {entry.content}
-                          </ReactMarkdown>
+                          <ReactMarkdown>{entry.content}</ReactMarkdown>
                         </div>
                       </div>
                     </div>
@@ -397,7 +411,7 @@ export const Timeline: React.FC = () => {
           )}
         </div>
       </div>
-      
+
       <ConfirmDeleteModal
         isOpen={showDeleteConfirm}
         onClose={() => {

@@ -11,7 +11,7 @@ interface CreateKnowledgeBaseModalProps {
 
 export const CreateKnowledgeBaseModal: React.FC<CreateKnowledgeBaseModalProps> = ({
   isOpen,
-  onClose
+  onClose,
 }) => {
   const { createKnowledgeBase, setCurrentKnowledgeBase } = useKnowledgeOperations();
 
@@ -47,7 +47,7 @@ export const CreateKnowledgeBaseModal: React.FC<CreateKnowledgeBaseModalProps> =
         name: name.trim(),
         icon: selectedIcon,
         created_at: Date.now(),
-        updated_at: Date.now()
+        updated_at: Date.now(),
       };
       setCurrentKnowledgeBase(newKB);
       handleClose();
@@ -73,9 +73,7 @@ export const CreateKnowledgeBaseModal: React.FC<CreateKnowledgeBaseModalProps> =
         >
           {/* 头部 - 简化设计 */}
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-medium theme-text-primary">
-              创建知识库
-            </h2>
+            <h2 className="text-lg font-medium theme-text-primary">创建知识库</h2>
             <button
               onClick={handleClose}
               className="p-1.5 rounded-lg transition-all hover:scale-105 theme-text-secondary hover:theme-text-primary"
@@ -146,12 +144,3 @@ export const CreateKnowledgeBaseModal: React.FC<CreateKnowledgeBaseModalProps> =
     </AnimatePresence>
   );
 };
-
-
-
-
-
-
-
-
-

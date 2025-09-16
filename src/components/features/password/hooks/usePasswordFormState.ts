@@ -9,11 +9,11 @@ interface UsePasswordFormStateProps {
   categories: Category[];
 }
 
-export const usePasswordFormState = ({ 
-  isCreating, 
-  isEditing, 
-  editingEntry, 
-  categories 
+export const usePasswordFormState = ({
+  isCreating,
+  isEditing,
+  editingEntry,
+  categories,
 }: UsePasswordFormStateProps) => {
   const { getDecryptedPassword, checkPasswordStrength } = usePasswordStore();
 
@@ -28,7 +28,7 @@ export const usePasswordFormState = ({
     db_username: '',
     app_name: '',
     category_id: undefined,
-    is_favorite: false
+    is_favorite: false,
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -51,28 +51,33 @@ export const usePasswordFormState = ({
         db_username: editingEntry.db_username || '',
         app_name: editingEntry.app_name || '',
         category_id: (() => {
-          if (editingEntry.category_id && categories.find(c => c.id === editingEntry.category_id)) {
+          if (
+            editingEntry.category_id &&
+            categories.find((c) => c.id === editingEntry.category_id)
+          ) {
             return editingEntry.category_id;
           }
-          if (editingEntry.url) return categories.find(c => c.name === '网站')?.id;
-          if (editingEntry.app_name) return categories.find(c => c.name === '应用软件')?.id;
-          if (editingEntry.ip) return categories.find(c => c.name === '服务器')?.id;
-          if (editingEntry.db_type) return categories.find(c => c.name === '数据库')?.id;
+          if (editingEntry.url) return categories.find((c) => c.name === '网站')?.id;
+          if (editingEntry.app_name) return categories.find((c) => c.name === '应用软件')?.id;
+          if (editingEntry.ip) return categories.find((c) => c.name === '服务器')?.id;
+          if (editingEntry.db_type) return categories.find((c) => c.name === '数据库')?.id;
           return categories.length > 0 ? categories[0].id : undefined;
         })(),
-        is_favorite: false
+        is_favorite: false,
       };
       setFormData(editData);
 
       // 异步获取现有密码
       if (editingEntry.id) {
-        getDecryptedPassword(editingEntry.id).then(password => {
-          if (password) {
-            setFormData(prev => ({ ...prev, password }));
-          }
-        }).catch(error => {
-          console.error('Failed to load existing password:', error);
-        });
+        getDecryptedPassword(editingEntry.id)
+          .then((password) => {
+            if (password) {
+              setFormData((prev) => ({ ...prev, password }));
+            }
+          })
+          .catch((error) => {
+            console.error('Failed to load existing password:', error);
+          });
       }
     } else if (isCreating) {
       setFormData({
@@ -86,7 +91,7 @@ export const usePasswordFormState = ({
         db_username: '',
         app_name: '',
         category_id: undefined,
-        is_favorite: false
+        is_favorite: false,
       });
     }
   }, [isCreating, isEditing, editingEntry, categories, getDecryptedPassword]);
@@ -94,7 +99,7 @@ export const usePasswordFormState = ({
   // 检查密码强度
   useEffect(() => {
     if (formData.password) {
-      checkPasswordStrength(formData.password).then(strength => {
+      checkPasswordStrength(formData.password).then((strength) => {
         setPasswordStrength(strength);
       });
     } else {
@@ -103,7 +108,7 @@ export const usePasswordFormState = ({
   }, [formData.password, checkPasswordStrength]);
 
   const updateField = (field: keyof PasswordEntry, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   return {
@@ -116,6 +121,6 @@ export const usePasswordFormState = ({
     passwordStrength,
     isSubmitting,
     setIsSubmitting,
-    updateField
+    updateField,
   };
 };

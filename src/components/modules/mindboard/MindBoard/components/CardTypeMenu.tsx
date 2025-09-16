@@ -19,30 +19,29 @@ const cardTypeOptions: CardTypeOption[] = [
     type: 'textCard',
     label: '添加文本',
     icon: <Plus className="w-4 h-4" />,
-    description: '创建文字卡片'
+    description: '创建文字卡片',
   },
   {
     type: 'noteCard',
     label: '添加笔记',
     icon: <FileText className="w-4 h-4" />,
-    description: '创建笔记卡片'
+    description: '创建笔记卡片',
   },
   {
     type: 'imageCard',
     label: '添加图片',
     icon: <Image className="w-4 h-4" />,
-    description: '创建图片卡片'
+    description: '创建图片卡片',
   },
   {
     type: 'stickyNote',
     label: '添加便签',
     icon: <StickyNote className="w-4 h-4" />,
-    description: '创建便签卡片'
-  }
+    description: '创建便签卡片',
+  },
 ];
 
 export const CardTypeMenu: React.FC<CardTypeMenuProps> = ({ position, onSelect, onClose }) => {
-
   React.useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -72,7 +71,7 @@ export const CardTypeMenu: React.FC<CardTypeMenuProps> = ({ position, onSelect, 
       style={{
         left: position.x,
         top: position.y,
-        transform: 'translate(-50%, -50%)'
+        transform: 'translate(-50%, -50%)',
       }}
     >
       <div className="space-y-1">
@@ -82,9 +81,7 @@ export const CardTypeMenu: React.FC<CardTypeMenuProps> = ({ position, onSelect, 
             onClick={() => onSelect(option.type)}
             className="w-full flex items-center gap-3 px-3 py-2 text-left text-sm rounded-lg hover:bg-white/20 dark:hover:bg-white/20 transition-colors text-black dark:text-white"
           >
-            <div className="flex-shrink-0 text-blue-400">
-              {option.icon}
-            </div>
+            <div className="flex-shrink-0 text-blue-400">{option.icon}</div>
             <div className="flex-1">
               <div className="font-medium">{option.label}</div>
             </div>

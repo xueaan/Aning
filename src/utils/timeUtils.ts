@@ -38,7 +38,7 @@ export function extractTimeFromCreatedAt(created_at: string | number): string {
     const date = new Date(created_at);
     return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
   }
-  
+
   // created_at 格式: "2025-08-28,13:58:14"
   return created_at.split(' ')[1]?.substring(0, 5) || created_at;
 }
@@ -50,30 +50,30 @@ export function extractTimeFromCreatedAt(created_at: string | number): string {
  */
 export function formatRelativeTime(timestamp: number | string): string {
   let actualTimestamp: number;
-  
+
   if (typeof timestamp === 'string') {
     actualTimestamp = new Date(timestamp).getTime();
   } else {
     // 如果时间戳是秒级的，转换为毫秒级
     actualTimestamp = timestamp < 10000000000 ? timestamp * 1000 : timestamp;
   }
-  
+
   if (!actualTimestamp || actualTimestamp <= 0 || isNaN(actualTimestamp)) {
     return '未知时间';
   }
-  
+
   const now = Date.now();
   const diff = now - actualTimestamp;
-  
+
   if (diff < 0) {
     return '刚刚';
   }
-  
+
   const seconds = Math.floor(diff / 1000);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
-  
+
   if (seconds < 60) {
     return '刚刚';
   } else if (minutes < 60) {
@@ -94,30 +94,35 @@ export function formatRelativeTime(timestamp: number | string): string {
  * @param includeTime 是否包含时间
  * @returns 格式化的时间字符串
  */
-export function formatAbsoluteTime(timestamp: number | string, includeTime: boolean = true): string {
+export function formatAbsoluteTime(
+  timestamp: number | string,
+  includeTime: boolean = true
+): string {
   let actualTimestamp: number;
-  
+
   if (typeof timestamp === 'string') {
     actualTimestamp = new Date(timestamp).getTime();
   } else {
     // 如果时间戳是秒级的，转换为毫秒级
     actualTimestamp = timestamp < 10000000000 ? timestamp * 1000 : timestamp;
   }
-  
+
   if (!actualTimestamp || actualTimestamp <= 0 || isNaN(actualTimestamp)) {
     return '未知时间';
   }
-  
+
   const date = new Date(actualTimestamp);
   const now = new Date();
-  
+
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
   const targetDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  
-  const timeStr = includeTime ? ` ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}` : '';
-  
+
+  const timeStr = includeTime
+    ? ` ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
+    : '';
+
   if (targetDate.getTime() === today.getTime()) {
     return `今天${timeStr}`;
   } else if (targetDate.getTime() === yesterday.getTime()) {
@@ -137,18 +142,18 @@ export function formatAbsoluteTime(timestamp: number | string, includeTime: bool
  */
 export function formatSmartTime(timestamp: number | string): string {
   let actualTimestamp: number;
-  
+
   if (typeof timestamp === 'string') {
     actualTimestamp = new Date(timestamp).getTime();
   } else {
     // 如果时间戳是秒级的，转换为毫秒级
     actualTimestamp = timestamp < 10000000000 ? timestamp * 1000 : timestamp;
   }
-  
+
   if (!actualTimestamp || actualTimestamp <= 0 || isNaN(actualTimestamp)) {
     return '未知时间';
   }
-  
+
   const now = Date.now();
   const diff = now - actualTimestamp;
 
@@ -156,7 +161,7 @@ export function formatSmartTime(timestamp: number | string): string {
   if (diff < 60 * 60 * 1000) {
     return formatRelativeTime(actualTimestamp);
   }
-  
+
   // 超过1小时显示绝对时间
   return formatAbsoluteTime(actualTimestamp);
 }
@@ -170,7 +175,7 @@ export function normalizeTimestamp(timestamp: number): number {
   if (!timestamp || timestamp <= 0) {
     return Date.now();
   }
-  
+
   // 如果是秒级时间戳（小于10位数），转换为毫秒级
   return timestamp < 10000000000 ? timestamp * 1000 : timestamp;
 }
@@ -185,8 +190,6 @@ export function isValidTimestamp(timestamp: number | string): boolean {
     const date = new Date(timestamp);
     return !isNaN(date.getTime());
   }
-  
+
   return timestamp > 0 && timestamp < Date.now() + 365 * 24 * 60 * 60 * 1000; // 未来一年内
 }
-
-

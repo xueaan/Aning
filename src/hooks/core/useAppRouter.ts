@@ -9,7 +9,7 @@ export const useAppRouter = () => {
     setCurrentModule,
     navigateBack,
     navigateForward,
-    clearHistory
+    clearHistory,
   } = useAppStore();
 
   const navigateTo = (module: AppModule) => {
@@ -27,6 +27,6 @@ export const useAppRouter = () => {
     navigateForward,
     clearHistory,
     canGoBack,
-    canGoForward
+    canGoForward,
   };
 };

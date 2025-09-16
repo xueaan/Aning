@@ -13,7 +13,7 @@ declare module '@tiptap/core' {
     codeBlock: {
       setCodeBlock: (attributes?: { language: string }) => ReturnType;
       toggleCodeBlock: (attributes?: { language: string }) => ReturnType;
-    }
+    };
   }
 }
 
@@ -33,7 +33,7 @@ export const BlockExtension = Node.create<BlockExtensionOptions>({
     return {
       defaultLanguage: '',
       HTMLAttributes: {},
-      languageClassPrefix: 'language-'
+      languageClassPrefix: 'language-',
     };
   },
 
@@ -55,16 +55,18 @@ export const BlockExtension = Node.create<BlockExtensionOptions>({
 
           return language;
         },
-        rendered: false
-      }
+        rendered: false,
+      },
     };
   },
 
   parseHTML() {
-    return [{
-      tag: 'pre',
-      preserveWhitespace: 'full'
-    }];
+    return [
+      {
+        tag: 'pre',
+        preserveWhitespace: 'full',
+      },
+    ];
   },
 
   renderHTML({ node, HTMLAttributes }) {
@@ -72,14 +74,12 @@ export const BlockExtension = Node.create<BlockExtensionOptions>({
       'pre',
       {
         ...this.options.HTMLAttributes,
-        ...HTMLAttributes
+        ...HTMLAttributes,
       },
       [
         'code',
         {
-          class: node.attrs.language
-            ? `language-${node.attrs.language}`
-            : null
+          class: node.attrs.language ? `language-${node.attrs.language}` : null,
         },
         0,
       ],
@@ -97,7 +97,7 @@ export const BlockExtension = Node.create<BlockExtensionOptions>({
         (attributes?: { language?: string }) =>
         ({ commands }: { commands: any }) => {
           return commands.toggleNode(this.name, 'paragraph', attributes);
-        }
+        },
     };
   },
 
@@ -186,11 +186,11 @@ export const BlockExtension = Node.create<BlockExtensionOptions>({
         }
 
         return editor.commands.selectParentNode();
-      }
+      },
     };
   },
 
   addNodeView() {
     return ReactNodeViewRenderer(CodeBlockComponent);
-  }
+  },
 });

@@ -9,7 +9,11 @@
 
 .theme-button-primary {
   /* 渐变背景 - 主品牌色到次品牌色 */
-  background: linear-gradient(135deg, rgba(var(--color-primary), 1), rgba(var(--color-secondary), 1));
+  background: linear-gradient(
+    135deg,
+    rgba(var(--color-primary), 1),
+    rgba(var(--color-secondary), 1)
+  );
   color: rgba(var(--text-inverse), 1);
   border: none;
   border-radius: var(--radius-md);

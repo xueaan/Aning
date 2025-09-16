@@ -15,7 +15,7 @@ export function VirtualList<T>({
   containerHeight,
   renderItem,
   overscan = 5,
-  className = ''
+  className = '',
 }: VirtualListProps<T>) {
   const [scrollTop, setScrollTop] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -29,7 +29,7 @@ export function VirtualList<T>({
 
     return {
       start: Math.max(0, startIndex - overscan),
-      end: endIndex
+      end: endIndex,
     };
   }, [scrollTop, itemHeight, containerHeight, items.length, overscan]);
 
@@ -58,14 +58,11 @@ export function VirtualList<T>({
             position: 'absolute',
             top: 0,
             left: 0,
-            right: 0
+            right: 0,
           }}
         >
           {visibleItems.map((item, index) => (
-            <div
-              key={visibleRange.start + index}
-              style={{ height: itemHeight }}
-            >
+            <div key={visibleRange.start + index} style={{ height: itemHeight }}>
               {renderItem(item, visibleRange.start + index)}
             </div>
           ))}

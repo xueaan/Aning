@@ -17,7 +17,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
   onClose,
   onConfirm,
   project = null,
-  title = '新建项目'
+  title = '新建项目',
 }) => {
   const [name, setName] = useState('');
   const [icon, setIcon] = useState('Folder');
@@ -31,7 +31,9 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
     if (isOpen) {
       if (project) {
         setName(project.name);
-        setIcon(project.icon?.length === 1 ? convertEmojiToIcon(project.icon) : (project.icon || 'Folder'));
+        setIcon(
+          project.icon?.length === 1 ? convertEmojiToIcon(project.icon) : project.icon || 'Folder'
+        );
       } else {
         setName('');
         setIcon('Folder');
@@ -77,7 +79,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
     try {
       await onConfirm({
         name: name.trim(),
-        icon: icon
+        icon: icon,
       });
       onClose();
     } catch (error) {
@@ -99,92 +101,86 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
 
   return (
     <div className="feather-glass-modal-backdrop" onClick={handleClose}>
-
       {/* Modal */}
-      <div 
+      <div
         ref={modalRef}
         className="rounded-xl shadow-2xl max-w-sm w-full feather-glass-deco"
         onClick={(e) => e.stopPropagation()}
       >
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-white/10">
-        <div className="flex items-center gap-3">
-          <div className="p-2 theme-bg-accent/20 rounded-lg">
-            {project ? (
-              <Edit2 size={18} 
-                className="theme-text-accent" />
-            ) : (
-              <Plus size={18} 
-                className="theme-text-accent" />
-            )}
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-white/10">
+          <div className="flex items-center gap-3">
+            <div className="p-2 theme-bg-accent/20 rounded-lg">
+              {project ? (
+                <Edit2 size={18} className="theme-text-accent" />
+              ) : (
+                <Plus size={18} className="theme-text-accent" />
+              )}
+            </div>
+            <h2 className="text-lg font-medium theme-text-primary">
+              {project ? '编辑项目' : title}
+            </h2>
           </div>
-          <h2 className="text-lg font-medium theme-text-primary">
-            {project ? '编辑项目' : title}
-          </h2>
+          <button
+            onClick={handleClose}
+            disabled={isLoading}
+            className="p-1.5 rounded-lg transition-all hover:scale-105 theme-text-secondary hover:theme-text-primary disabled:opacity-50 feather-glass-deco"
+          >
+            <X size={16} />
+          </button>
         </div>
-        <button 
-          onClick={handleClose} 
-          disabled={isLoading}
-          className="p-1.5 rounded-lg transition-all hover:scale-105 theme-text-secondary hover:theme-text-primary disabled:opacity-50 feather-glass-deco"
-        >
-        <X size={16} />
-      </button>
-    </div>
-      {/* Content */}
-      <div className="p-4 space-y-4">
-        {/* Project Name */}
-        <div>
-      <input ref={nameInputRef} type="text"
-      value={name} onChange={(e) => setName(e.target.value)}
-      onKeyDown={handleKeyDown} placeholder="输入项目名称..."
-      maxLength={50}
-            className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:theme-ring-accent transition-all theme-text-primary placeholder:theme-text-tertiary feather-glass-deco"
-      disabled={isLoading}
-      required
-              autoFocus />
-    </div>
-    <div>
-      <label className="block text-sm font-medium theme-text-secondary mb-2">
-        选择图标
-      </label>
-      <div className="rounded-lg p-3 feather-glass-deco">
-        <IconPicker selectedIcon={icon} onIconSelect={setIcon}
-        mode="inline"
-        size="sm"
-        showSearch={false} maxHeight="max-h-48"
+        {/* Content */}
+        <div className="p-4 space-y-4">
+          {/* Project Name */}
+          <div>
+            <input
+              ref={nameInputRef}
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="输入项目名称..."
+              maxLength={50}
+              className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:theme-ring-accent transition-all theme-text-primary placeholder:theme-text-tertiary feather-glass-deco"
+              disabled={isLoading}
+              required
+              autoFocus
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium theme-text-secondary mb-2">选择图标</label>
+            <div className="rounded-lg p-3 feather-glass-deco">
+              <IconPicker
+                selectedIcon={icon}
+                onIconSelect={setIcon}
+                mode="inline"
+                size="sm"
+                showSearch={false}
+                maxHeight="max-h-48"
               />
-      </div>
-    </div>
-
-      </div>
-      {/* Footer */}
+            </div>
+          </div>
+        </div>
+        {/* Footer */}
         <div className="flex gap-3 p-4">
-          <button type="button"
+          <button
+            type="button"
             onClick={handleClose}
             className="flex-1 px-4 py-3 rounded-lg transition-all hover:scale-[1.02] theme-text-secondary feather-glass-deco"
             disabled={isLoading}
           >
             取消
           </button>
-          <button type="button"
+          <button
+            type="button"
             onClick={handleConfirm}
             className="flex-1 px-4 py-3 theme-button-primary rounded-lg transition-all hover:scale-[1.02] disabled:opacity-50"
             disabled={isLoading || !name.trim()}
           >
-            {isLoading ? '创建中...' : (project ? '保存修改' : '创建项目')}
+            {isLoading ? '创建中...' : project ? '保存修改' : '创建项目'}
           </button>
         </div>
       </div>
     </div>
   );
 };
-
-
-
-
-
-
-
-
-
-

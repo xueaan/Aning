@@ -11,7 +11,12 @@ interface KnowledgeBaseState {
 interface KnowledgeBaseActions {
   loadKnowledgeBases: () => Promise<void>;
   createKnowledgeBase: (name: string, icon?: string, description?: string) => Promise<string>;
-  updateKnowledgeBase: (id: string, name?: string, icon?: string, description?: string) => Promise<void>;
+  updateKnowledgeBase: (
+    id: string,
+    name?: string,
+    icon?: string,
+    description?: string
+  ) => Promise<void>;
   deleteKnowledgeBase: (id: string) => Promise<void>;
   setCurrentKnowledgeBase: (knowledgeBase: KnowledgeBase | null) => void;
 }
@@ -45,13 +50,13 @@ export const useKnowledgeBaseStore = create<KnowledgeBaseStore>((set) => ({
         icon,
         description,
         created_at: Date.now(),
-        updated_at: Date.now()
+        updated_at: Date.now(),
       };
-      
-      set(state => ({
-        knowledgeBases: [...state.knowledgeBases, newKB]
+
+      set((state) => ({
+        knowledgeBases: [...state.knowledgeBases, newKB],
       }));
-      
+
       return id;
     } catch (error) {
       console.error('创建知识库失败:', error);
@@ -62,16 +67,28 @@ export const useKnowledgeBaseStore = create<KnowledgeBaseStore>((set) => ({
   updateKnowledgeBase: async (id: string, name?: string, icon?: string, description?: string) => {
     try {
       await DatabaseAPI.updateKnowledgeBase(id, name, icon, description);
-      
-      set(state => ({
-        knowledgeBases: state.knowledgeBases.map(kb =>
+
+      set((state) => ({
+        knowledgeBases: state.knowledgeBases.map((kb) =>
           kb.id === id
-            ? { ...kb, name: name || kb.name, icon: icon || kb.icon, description: description || kb.description, updated_at: Date.now() }
+            ? {
+                ...kb,
+                name: name || kb.name,
+                icon: icon || kb.icon,
+                description: description || kb.description,
+                updated_at: Date.now(),
+              }
             : kb
         ),
-        currentKnowledgeBase: state.currentKnowledgeBase?.id === id
-          ? { ...state.currentKnowledgeBase, name: name || state.currentKnowledgeBase.name, icon: icon || state.currentKnowledgeBase.icon, description: description || state.currentKnowledgeBase.description }
-          : state.currentKnowledgeBase
+        currentKnowledgeBase:
+          state.currentKnowledgeBase?.id === id
+            ? {
+                ...state.currentKnowledgeBase,
+                name: name || state.currentKnowledgeBase.name,
+                icon: icon || state.currentKnowledgeBase.icon,
+                description: description || state.currentKnowledgeBase.description,
+              }
+            : state.currentKnowledgeBase,
       }));
     } catch (error) {
       console.error('更新知识库失败:', error);
@@ -82,10 +99,11 @@ export const useKnowledgeBaseStore = create<KnowledgeBaseStore>((set) => ({
   deleteKnowledgeBase: async (id: string) => {
     try {
       await DatabaseAPI.deleteKnowledgeBase(id);
-      
-      set(state => ({
-        knowledgeBases: state.knowledgeBases.filter(kb => kb.id !== id),
-        currentKnowledgeBase: state.currentKnowledgeBase?.id === id ? null : state.currentKnowledgeBase
+
+      set((state) => ({
+        knowledgeBases: state.knowledgeBases.filter((kb) => kb.id !== id),
+        currentKnowledgeBase:
+          state.currentKnowledgeBase?.id === id ? null : state.currentKnowledgeBase,
       }));
     } catch (error) {
       console.error('删除知识库失败:', error);
@@ -95,5 +113,5 @@ export const useKnowledgeBaseStore = create<KnowledgeBaseStore>((set) => ({
 
   setCurrentKnowledgeBase: (knowledgeBase: KnowledgeBase | null) => {
     set({ currentKnowledgeBase: knowledgeBase });
-  }
+  },
 }));

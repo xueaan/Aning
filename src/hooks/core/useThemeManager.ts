@@ -12,11 +12,12 @@ export const useThemeManager = () => {
     setGradientTheme,
     setNoiseLevel,
     setGradientAngle,
-    setBlendMode
+    setBlendMode,
   } = useAppStore();
 
-  const isDark = theme === 'dark' || (theme === 'auto' && 
-    window.matchMedia('(prefers-color-scheme: dark)').matches);
+  const isDark =
+    theme === 'dark' ||
+    (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
   const applyTheme = (newTheme: 'light' | 'dark' | 'auto') => {
     setTheme(newTheme);
@@ -34,6 +35,6 @@ export const useThemeManager = () => {
     setGradientTheme,
     setNoiseLevel,
     setGradientAngle,
-    setBlendMode
+    setBlendMode,
   };
 };

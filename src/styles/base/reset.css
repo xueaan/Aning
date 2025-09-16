@@ -19,21 +19,23 @@ body,
 /* 主体样式设定 */
 body {
   /* 使用系统默认字体栈 */
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
-  
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+
   /* 字体渲染优化 */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  
+
   /* 使用主题颜色 */
   color: rgba(var(--text-primary), 1);
-  
+
   /* 防止页面滚动 (Tauri应用特性) */
   overflow: hidden;
-  
+
   /* 主题切换动画 */
-  transition: background-color var(--duration-slow) ease-in-out,
-              color var(--duration-slow) ease-in-out;
+  transition:
+    background-color var(--duration-slow) ease-in-out,
+    color var(--duration-slow) ease-in-out;
 }
 
 /* =================
@@ -83,10 +85,3 @@ body {
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }
-
-
-
-
-
-
-

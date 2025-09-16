@@ -23,7 +23,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   confirmText = '确认',
   cancelText = '取消',
   type = 'danger',
-  isLoading = false
+  isLoading = false,
 }) => {
   const dialogRef = useRef<HTMLDivElement>(null);
 
@@ -72,28 +72,28 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
           iconBg: 'bg-status-error/10',
           iconColor: 'text-status-error',
           confirmBg: 'bg-status-error hover:bg-status-error/80',
-          confirmText: 'text-white'
+          confirmText: 'text-white',
         };
       case 'warning':
         return {
           iconBg: 'bg-status-warning/10',
           iconColor: 'text-status-warning',
           confirmBg: 'bg-status-warning hover:bg-status-warning/80',
-          confirmText: 'text-white'
+          confirmText: 'text-white',
         };
       case 'info':
         return {
           iconBg: 'bg-status-info/10',
           iconColor: 'text-status-info',
           confirmBg: 'bg-status-info hover:bg-status-info/80',
-          confirmText: 'text-white'
+          confirmText: 'text-white',
         };
       default:
         return {
           iconBg: 'bg-status-error/10',
           iconColor: 'text-status-error',
           confirmBg: 'bg-status-error hover:bg-status-error/80',
-          confirmText: 'text-white'
+          confirmText: 'text-white',
         };
     }
   };
@@ -108,7 +108,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
 
       {/* Dialog */}
-      <div 
+      <div
         ref={dialogRef}
         className="relative bg-bg-secondary border border-border-primary rounded-xl shadow-2xl max-w-sm w-full mx-auto"
       >
@@ -117,18 +117,11 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
           <div className="flex items-start gap-4">
             {/* Icon */}
             <div className={`flex-shrink-0 p-2.5 rounded-full ${config.iconBg}`}>
-              <AlertTriangle 
-                size={20}
-                className={config.iconColor} 
-              />
+              <AlertTriangle size={20} className={config.iconColor} />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-lg font-semibold text-text-primary mb-2">
-                {title}
-              </h3>
-              <p className="theme-text-secondary text-sm leading-relaxed">
-                {message}
-              </p>
+              <h3 className="text-lg font-semibold text-text-primary mb-2">{title}</h3>
+              <p className="theme-text-secondary text-sm leading-relaxed">{message}</p>
             </div>
           </div>
         </div>
@@ -136,15 +129,15 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         {/* Actions */}
         <div className="px-6 py-4 border-t border-border-primary bg-bg-tertiary rounded-b-xl">
           <div className="flex items-center justify-end gap-3">
-            <button 
-              onClick={onClose} 
+            <button
+              onClick={onClose}
               disabled={isLoading}
               className="px-4 py-2 theme-text-secondary hover:text-text-primary transition-colors disabled:opacity-50"
             >
               {cancelText}
             </button>
-            <button 
-              onClick={onConfirm} 
+            <button
+              onClick={onConfirm}
               disabled={isLoading}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${config.confirmBg} ${config.confirmText}`}
             >

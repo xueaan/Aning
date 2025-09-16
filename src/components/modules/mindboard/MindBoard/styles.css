@@ -25,7 +25,7 @@
 }
 
 /* 深色模式 - 更亮的网格点 */
-[data-theme="dark"] .react-flow__background svg {
+[data-theme='dark'] .react-flow__background svg {
   fill: rgba(148, 163, 184, 0.4) !important;
 }
 
@@ -75,19 +75,78 @@
   background: #10b981;
 }
 
+/* 基础连线样式 - 使用渐变和阴影效果 */
 .react-flow__edge-path {
-  stroke: #64748b;
-  stroke-width: 2;
+  stroke: url(#edge-gradient);
+  stroke-width: 2.5;
+  filter: drop-shadow(0 2px 4px rgba(59, 130, 246, 0.15));
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
+/* 悬停效果 - 增强视觉反馈 */
 .react-flow__edge-path:hover {
-  stroke: #3b82f6;
-  stroke-width: 3;
+  stroke: url(#edge-gradient-hover);
+  stroke-width: 3.5;
+  filter: drop-shadow(0 4px 8px rgba(59, 130, 246, 0.25));
+  cursor: pointer;
 }
 
+/* 选中状态 - 突出显示 */
 .react-flow__edge.selected .react-flow__edge-path {
-  stroke: #3b82f6;
-  stroke-width: 3;
+  stroke: url(#edge-gradient-selected);
+  stroke-width: 4;
+  filter: drop-shadow(0 4px 12px rgba(59, 130, 246, 0.4));
+}
+
+/* 深色模式下的连线样式 */
+[data-theme='dark'] .react-flow__edge-path {
+  stroke: url(#edge-gradient-dark);
+  filter: drop-shadow(0 2px 6px rgba(59, 130, 246, 0.25));
+}
+
+[data-theme='dark'] .react-flow__edge-path:hover {
+  stroke: url(#edge-gradient-dark-hover);
+  filter: drop-shadow(0 4px 12px rgba(59, 130, 246, 0.35));
+}
+
+[data-theme='dark'] .react-flow__edge.selected .react-flow__edge-path {
+  stroke: url(#edge-gradient-dark-selected);
+  filter: drop-shadow(0 4px 16px rgba(59, 130, 246, 0.5));
+}
+
+/* 连线创建时的脉冲动画 */
+@keyframes edge-pulse {
+  0% {
+    stroke-opacity: 0.5;
+    filter: drop-shadow(0 0 0 rgba(59, 130, 246, 0));
+  }
+  50% {
+    stroke-opacity: 1;
+    filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.4));
+  }
+  100% {
+    stroke-opacity: 0.8;
+    filter: drop-shadow(0 2px 4px rgba(59, 130, 246, 0.15));
+  }
+}
+
+/* 新创建的连线播放动画 */
+.react-flow__edge.edge-animated .react-flow__edge-path {
+  animation: edge-pulse 1s ease-out;
+}
+
+/* 连接线（正在拖拽创建的线）样式增强 */
+.react-flow__connectionline {
+  stroke-dasharray: 5, 5;
+  animation: dash 1s linear infinite;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -10;
+  }
 }
 
 /* 节点样式 */
@@ -119,7 +178,6 @@
   outline: none !important;
   box-shadow: none !important;
 }
-
 
 /* 优化 Controls 组件样式 */
 .react-flow__controls {
@@ -155,16 +213,16 @@
 }
 
 /* 深色模式适配 */
-[data-theme="dark"] .react-flow__controls {
+[data-theme='dark'] .react-flow__controls {
   background: rgba(0, 0, 0, 0.2) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
-[data-theme="dark"] .react-flow__controls button {
+[data-theme='dark'] .react-flow__controls button {
   color: rgba(255, 255, 255, 0.9) !important;
 }
 
-[data-theme="dark"] .react-flow__controls button:hover {
+[data-theme='dark'] .react-flow__controls button:hover {
   background: rgba(255, 255, 255, 0.1) !important;
 }
 
@@ -192,6 +250,30 @@
   transform: scale(1.3) !important;
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2) !important;
   border-color: #2563eb !important;
+}
+
+/* MindMapEdge 专用样式 */
+.mind-map-edge {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mind-map-edge:hover {
+  stroke-width: 4 !important;
+  filter: drop-shadow(0 4px 8px rgba(59, 130, 246, 0.25)) !important;
+}
+
+.mind-map-edge-selected {
+  stroke-width: 4 !important;
+  filter: drop-shadow(0 4px 12px rgba(59, 130, 246, 0.4)) !important;
+}
+
+/* 深色模式下的 MindMapEdge */
+[data-theme='dark'] .mind-map-edge:hover {
+  filter: drop-shadow(0 4px 12px rgba(59, 130, 246, 0.35)) !important;
+}
+
+[data-theme='dark'] .mind-map-edge-selected {
+  filter: drop-shadow(0 4px 16px rgba(59, 130, 246, 0.5)) !important;
 }
 
 /* 隐藏 React Flow Attribution */

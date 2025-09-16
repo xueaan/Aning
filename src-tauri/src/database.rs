@@ -278,14 +278,22 @@ pub struct AiAgent {
 }
 
 pub struct Database {
-    conn: Mutex<Connection>,
+    pub conn: Mutex<Connection>,
 }
 
-impl Database {
+impl Database {    fn lock_conn(&self) -> std::sync::MutexGuard<'_, Connection> {
+        match self.conn.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => {
+                eprintln!("[Database] mutex poisoned; recovering");
+                poisoned.into_inner()
+            }
+        }
+    }
     // 提供访问数据库连接的公开方法
-    pub fn with_connection<T, F>(&self, f: F) -> Result<T, String>
+    pub fn with_connection<T, F>(&self, f: F) -> std::result::Result<T, String>
     where
-        F: FnOnce(&Connection) -> Result<T, rusqlite::Error>,
+        F: FnOnce(&Connection) -> rusqlite::Result<T>,
     {
         let conn = self.conn.lock().map_err(|e| format!("Database lock error: {}", e))?;
         f(&*conn).map_err(|e| format!("Database operation error: {}", e))
@@ -330,7 +338,7 @@ impl Database {
     }
     
     fn init_tables(&self) -> Result<()> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         
         // 直接删除旧的知识库相关表
         self.drop_legacy_tables(&conn)?;
@@ -340,8 +348,10 @@ impl Database {
         
         // 创建卡片盒表结构
         self.create_cardbox_tables(&conn)?;
-        
-        
+
+        // 创建书籍相关表结构
+        self.create_book_tables(&conn)?;
+
         // 创建其他表（保持不变）
         self.create_other_tables(&conn)?;
         
@@ -721,8 +731,145 @@ impl Database {
         println!("✅ 已创建卡片盒表结构");
         Ok(())
     }
-    
-    
+
+    fn create_book_tables(&self, conn: &Connection) -> Result<()> {
+        // 创建书籍表
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS books (
+                id TEXT PRIMARY KEY,
+                title TEXT NOT NULL,
+                author TEXT,
+                isbn TEXT,
+                cover TEXT,
+                status TEXT DEFAULT 'wanted' CHECK(status IN ('wanted', 'reading', 'finished')),
+                total_pages INTEGER,
+                current_page INTEGER DEFAULT 0,
+                rating INTEGER CHECK(rating >= 0 AND rating <= 5),
+                tags TEXT,
+                description TEXT,
+                start_date INTEGER,
+                finish_date INTEGER,
+                created_at INTEGER,
+                updated_at INTEGER
+            )",
+            [],
+        )?;
+
+        // 创建读书笔记表
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS reading_notes (
+                id TEXT PRIMARY KEY,
+                book_id TEXT NOT NULL,
+                chapter TEXT,
+                page_number INTEGER,
+                content TEXT NOT NULL,
+                note_type TEXT DEFAULT 'note' CHECK(note_type IN ('note', 'thought', 'summary')),
+                created_at INTEGER,
+                updated_at INTEGER,
+                FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE
+            )",
+            [],
+        )?;
+
+        // 创建书籍高亮表
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS book_highlights (
+                id TEXT PRIMARY KEY,
+                book_id TEXT NOT NULL,
+                note_id TEXT,
+                text TEXT NOT NULL,
+                page_number INTEGER,
+                color TEXT DEFAULT 'yellow' CHECK(color IN ('yellow', 'green', 'blue', 'red', 'purple')),
+                notes TEXT,
+                created_at INTEGER,
+                FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE,
+                FOREIGN KEY (note_id) REFERENCES reading_notes(id) ON DELETE SET NULL
+            )",
+            [],
+        )?;
+
+        // 创建书籍全文搜索表
+        conn.execute(
+            "CREATE VIRTUAL TABLE IF NOT EXISTS books_fts USING fts5(
+                title,
+                author,
+                description,
+                tags,
+                content='books',
+                content_rowid='rowid'
+            )",
+            [],
+        )?;
+
+        // 创建索引
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_books_status ON books(status)", [])?;
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_books_created ON books(created_at DESC)", [])?;
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_books_updated ON books(updated_at DESC)", [])?;
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_reading_notes_book ON reading_notes(book_id)", [])?;
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_reading_notes_created ON reading_notes(created_at DESC)", [])?;
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_book_highlights_book ON book_highlights(book_id)", [])?;
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_book_highlights_note ON book_highlights(note_id)", [])?;
+
+        // 创建触发器
+        conn.execute(
+            "CREATE TRIGGER IF NOT EXISTS update_books_timestamp
+             AFTER UPDATE ON books
+             FOR EACH ROW
+             BEGIN
+               UPDATE books SET updated_at = (strftime('%s', 'now') * 1000) WHERE id = NEW.id;
+             END",
+            [],
+        )?;
+
+        conn.execute(
+            "CREATE TRIGGER IF NOT EXISTS update_reading_notes_timestamp
+             AFTER UPDATE ON reading_notes
+             FOR EACH ROW
+             BEGIN
+               UPDATE reading_notes SET updated_at = (strftime('%s', 'now') * 1000) WHERE id = NEW.id;
+             END",
+            [],
+        )?;
+
+        // 全文搜索同步触发器
+        conn.execute(
+            "CREATE TRIGGER IF NOT EXISTS books_fts_insert
+             AFTER INSERT ON books
+             FOR EACH ROW
+             BEGIN
+               INSERT INTO books_fts(rowid, title, author, description, tags)
+               VALUES (NEW.rowid, NEW.title, NEW.author, NEW.description, NEW.tags);
+             END",
+            [],
+        )?;
+
+        conn.execute(
+            "CREATE TRIGGER IF NOT EXISTS books_fts_update
+             AFTER UPDATE ON books
+             FOR EACH ROW
+             BEGIN
+               UPDATE books_fts
+               SET title = NEW.title, author = NEW.author, description = NEW.description, tags = NEW.tags
+               WHERE rowid = NEW.rowid;
+             END",
+            [],
+        )?;
+
+        conn.execute(
+            "CREATE TRIGGER IF NOT EXISTS books_fts_delete
+             AFTER DELETE ON books
+             FOR EACH ROW
+             BEGIN
+               DELETE FROM books_fts WHERE rowid = OLD.rowid;
+             END",
+            [],
+        )?;
+
+        println!("✅ 已创建书籍相关表结构");
+        Ok(())
+    }
+
+
     fn create_other_tables(&self, conn: &Connection) -> Result<()> {
         
         // 创建标签表
@@ -1225,10 +1372,10 @@ impl Database {
     
     // 获取当前时间戳
     fn current_timestamp() -> i64 {
-        std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_secs() as i64
+        match std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH) {
+            Ok(dur) => dur.as_secs() as i64,
+            Err(_) => 0,
+        }
     }
     
     // 时光记相关操作
@@ -1241,7 +1388,7 @@ impl Database {
         mood: Option<&str>,
         timestamp: Option<i64>,
     ) -> Result<i64> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         
         let ts = timestamp.unwrap_or_else(|| {
             chrono::Local::now().timestamp_millis()
@@ -1260,7 +1407,7 @@ impl Database {
     }
     
     pub fn get_timeline_entries_by_date(&self, date: &str) -> Result<Vec<TimelineEntry>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let mut stmt = conn.prepare(
             "SELECT id, date, time, content, weather, mood, timestamp, created_at 
              FROM timeline_entries 
@@ -1289,7 +1436,7 @@ impl Database {
     }
     
     pub fn get_recent_timeline_entries(&self, limit: i32) -> Result<Vec<TimelineEntry>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let mut stmt = conn.prepare(
             "SELECT id, date, time, content, weather, mood, timestamp, created_at 
              FROM timeline_entries 
@@ -1318,14 +1465,14 @@ impl Database {
     }
     
     pub fn delete_timeline_entry(&self, id: i64) -> Result<()> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         conn.execute("DELETE FROM timeline_entries WHERE id = ?1", params![id])?;
         Ok(())
     }
     
     // AI对话相关操作
     pub fn save_ai_conversation(&self, conversation: &AiConversation) -> Result<()> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         conn.execute(
             "INSERT OR REPLACE INTO ai_conversations (id, title, provider, model, created_at, updated_at) 
              VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
@@ -1342,7 +1489,7 @@ impl Database {
     }
     
     pub fn save_ai_message(&self, message: &AiMessage) -> Result<()> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         conn.execute(
             "INSERT OR REPLACE INTO ai_messages (id, conversation_id, role, content, provider, model, error, timestamp, created_at) 
              VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
@@ -1362,7 +1509,7 @@ impl Database {
     }
     
     pub fn get_ai_conversations(&self, limit: Option<i32>) -> Result<Vec<AiConversation>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let sql = if let Some(limit) = limit {
             format!(
                 "SELECT id, title, provider, model, created_at, updated_at 
@@ -1397,7 +1544,7 @@ impl Database {
     }
     
     pub fn get_ai_messages(&self, conversation_id: &str) -> Result<Vec<AiMessage>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let mut stmt = conn.prepare(
             "SELECT id, conversation_id, role, content, provider, model, error, timestamp, created_at 
              FROM ai_messages 
@@ -1427,7 +1574,7 @@ impl Database {
     }
     
     pub fn delete_ai_conversation(&self, conversation_id: &str) -> Result<()> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         conn.execute(
             "DELETE FROM ai_conversations WHERE id = ?1",
             params![conversation_id],
@@ -1436,7 +1583,7 @@ impl Database {
     }
     
     pub fn update_ai_conversation_title(&self, conversation_id: &str, title: &str) -> Result<()> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         conn.execute(
             "UPDATE ai_conversations SET title = ?1, updated_at = DATETIME('now') WHERE id = ?2",
             params![title, conversation_id],
@@ -1445,7 +1592,7 @@ impl Database {
     }
     
     pub fn search_ai_conversations(&self, query: &str, limit: Option<i32>) -> Result<Vec<AiConversation>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let sql = if let Some(limit) = limit {
             format!(
                 "SELECT DISTINCT c.id, c.title, c.provider, c.model, c.created_at, c.updated_at
@@ -1487,7 +1634,7 @@ impl Database {
     }
     
     pub fn cleanup_old_ai_conversations(&self, days_to_keep: i32) -> Result<usize> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let cutoff_date = format!("datetime('now', '-{} days')", days_to_keep);
         let count = conn.execute(
             &format!("DELETE FROM ai_conversations WHERE updated_at < {}", cutoff_date),
@@ -1498,7 +1645,7 @@ impl Database {
 
     // AI提供商配置相关方法
     pub fn save_ai_provider(&self, provider: &AiProvider) -> Result<()> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         
         // 如果设置为当前提供商，先清除其他提供商的当前状态
         if provider.is_current == 1 {
@@ -1530,7 +1677,7 @@ impl Database {
     }
 
     pub fn get_ai_providers(&self) -> Result<Vec<AiProvider>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let mut stmt = conn.prepare(
             "SELECT id, provider, api_key, base_url, model, temperature, max_tokens, system_prompt, enabled, is_current, created_at, updated_at 
              FROM ai_providers 
@@ -1563,7 +1710,7 @@ impl Database {
     }
 
     pub fn get_ai_provider(&self, provider_name: &str) -> Result<Option<AiProvider>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let mut stmt = conn.prepare(
             "SELECT id, provider, api_key, base_url, model, temperature, max_tokens, system_prompt, enabled, is_current, created_at, updated_at 
              FROM ai_providers 
@@ -1595,7 +1742,7 @@ impl Database {
     }
 
     pub fn delete_ai_provider(&self, provider_name: &str) -> Result<()> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         conn.execute(
             "DELETE FROM ai_providers WHERE provider = ?1",
             params![provider_name],
@@ -1604,7 +1751,7 @@ impl Database {
     }
 
     pub fn set_current_ai_provider(&self, provider_name: &str) -> Result<()> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         
         // 先清除所有提供商的当前状态
         conn.execute("UPDATE ai_providers SET is_current = 0", [])?;
@@ -1620,7 +1767,7 @@ impl Database {
 
     // AI智能体配置相关方法
     pub fn save_ai_agent(&self, agent: &AiAgent) -> Result<()> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         
         // 如果设置为当前智能体，先清除其他智能体的当前状态
         if agent.is_current == 1 {
@@ -1654,7 +1801,7 @@ impl Database {
     }
 
     pub fn get_ai_agents(&self) -> Result<Vec<AiAgent>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let mut stmt = conn.prepare(
             "SELECT id, agent_id, name, description, icon, system_prompt, temperature, max_tokens, provider, model, is_builtin, is_current, created_at, updated_at 
              FROM ai_agents 
@@ -1689,7 +1836,7 @@ impl Database {
     }
 
     pub fn get_ai_agent(&self, agent_id: &str) -> Result<Option<AiAgent>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let mut stmt = conn.prepare(
             "SELECT id, agent_id, name, description, icon, system_prompt, temperature, max_tokens, provider, model, is_builtin, is_current, created_at, updated_at 
              FROM ai_agents 
@@ -1723,7 +1870,7 @@ impl Database {
     }
 
     pub fn delete_ai_agent(&self, agent_id: &str) -> Result<()> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         
         // 不能删除内置智能体
         let is_builtin: i32 = conn.query_row(
@@ -1744,7 +1891,7 @@ impl Database {
     }
 
     pub fn set_current_ai_agent(&self, agent_id: &str) -> Result<()> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         
         // 先清除所有智能体的当前状态
         conn.execute("UPDATE ai_agents SET is_current = 0", [])?;
@@ -1760,7 +1907,7 @@ impl Database {
     
     // 创建知识库
     pub fn create_knowledge_base(&self, name: &str, icon: &str, description: Option<&str>) -> Result<String> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let id = Self::generate_uuid();
         let now = Self::current_timestamp();
         
@@ -1775,7 +1922,7 @@ impl Database {
 
     // 获取所有知识库
     pub fn get_knowledge_bases(&self) -> Result<Vec<KnowledgeBase>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let mut stmt = conn.prepare(
             "SELECT id, name, icon, description, created_at, updated_at 
              FROM knowledge_bases 
@@ -1802,7 +1949,7 @@ impl Database {
 
     // 删除知识库
     pub fn delete_knowledge_base(&self, id: &str) -> Result<()> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         
         // 先删除所有关联的页面（包括已标记删除的）
         // 这会通过级联删除自动删除相关的 blocks、resources、page_versions 等
@@ -1822,7 +1969,7 @@ impl Database {
     
     // 创建页面
     pub fn create_page(&self, kb_id: &str, title: &str, parent_id: Option<&str>) -> Result<String> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let id = Self::generate_uuid();
         let now = Self::current_timestamp();
         
@@ -1855,7 +2002,7 @@ impl Database {
     // 获取页面树
     #[allow(dead_code)]
     pub fn get_page_tree(&self, kb_id: &str) -> Result<Vec<Page>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let mut stmt = conn.prepare(
             "WITH RECURSIVE page_tree AS (
                 SELECT id, kb_id, title, parent_id, sort_order, is_deleted, created_at, updated_at
@@ -1895,7 +2042,7 @@ impl Database {
     
     // 创建块
     pub fn create_block(&self, page_id: &str, block_type: &str, content: &str, data: &str, parent_id: Option<&str>) -> Result<String> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let id = Self::generate_uuid();
         let now = Self::current_timestamp();
         
@@ -1932,7 +2079,7 @@ impl Database {
     // 获取页面的所有块
     #[allow(dead_code)]
     pub fn get_page_blocks(&self, page_id: &str) -> Result<Vec<Block>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let mut stmt = conn.prepare(
             "SELECT id, page_id, type, content, data, parent_id, sort_order, created_at, updated_at 
              FROM blocks 
@@ -1964,7 +2111,7 @@ impl Database {
     // 搜索内容
     #[allow(dead_code)]
     pub fn search_content(&self, kb_id: &str, query: &str) -> Result<Vec<serde_json::Value>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let mut stmt = conn.prepare(
             "SELECT si.id, si.type, si.title, snippet(search_index, 3, '<b>', '</b>', '...', 32) as snippet
              FROM search_index si
@@ -1995,7 +2142,7 @@ impl Database {
     
     // 获取数据库统计信息
     pub fn get_stats(&self) -> Result<serde_json::Value> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         
         // 统计知识库相关表的记录数
         let kb_count: i32 = conn.query_row("SELECT COUNT(*) FROM knowledge_bases", [], |row| row.get(0))?;
@@ -2063,7 +2210,7 @@ impl Database {
         println!("  due_date is_empty: {}", due_date.map_or(false, |s| s.is_empty()));
         println!("  project_id: {:?}", project_id);
         
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let sql = "INSERT INTO tasks (title, description, status, priority, due_date, project_id)
                    VALUES (?1, ?2, ?3, ?4, ?5, ?6)";
         println!("[Database] Executing SQL: {}", sql);
@@ -2086,7 +2233,7 @@ impl Database {
     }
 
     pub fn get_all_tasks(&self) -> Result<Vec<Task>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let mut stmt = conn.prepare(
             "SELECT id, title, description, status, priority, due_date, completed_at, project_id, 
                     created_at, updated_at, deleted_at
@@ -2119,7 +2266,7 @@ impl Database {
     }
 
     pub fn get_tasks_by_status(&self, status: &str) -> Result<Vec<Task>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let mut stmt = conn.prepare(
             "SELECT id, title, description, status, priority, due_date, completed_at, project_id, 
                     created_at, updated_at, deleted_at
@@ -2152,7 +2299,7 @@ impl Database {
     }
 
     pub fn get_tasks_by_project(&self, project_id: i64) -> Result<Vec<Task>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let mut stmt = conn.prepare(
             "SELECT id, title, description, status, priority, due_date, completed_at, project_id, 
                     created_at, updated_at, deleted_at
@@ -2185,7 +2332,7 @@ impl Database {
     }
 
     pub fn get_tasks_by_date_range(&self, start_date: Option<&str>, end_date: Option<&str>) -> Result<Vec<Task>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let (query, params): (&str, Vec<&str>) = match (start_date, end_date) {
             (Some(start), Some(end)) => (
                 "SELECT id, title, description, status, priority, due_date, completed_at, project_id, 
@@ -2263,7 +2410,7 @@ impl Database {
         println!("  completed_at: {:?}", completed_at);
         println!("  project_id: {:?}", project_id);
         
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         
         // Build dynamic update query
         let mut updates = Vec::new();
@@ -2295,8 +2442,7 @@ impl Database {
         // 1. None = don't update (field not provided)
         // 2. Some("") = clear the field (set to NULL)
         // 3. Some(value) = set to value
-        if due_date.is_some() {
-            let due_val = due_date.unwrap();
+        if let Some(due_val) = due_date {
             println!("[Database] Processing due_date update: '{}'", due_val);
             println!("[Database] due_date is_empty: {}", due_val.is_empty());
             
@@ -2361,7 +2507,7 @@ impl Database {
     }
 
     pub fn delete_task(&self, id: i64, soft: bool) -> Result<()> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         if soft {
             conn.execute(
                 "UPDATE tasks SET deleted_at = DATETIME('now') WHERE id = ?1",
@@ -2374,7 +2520,7 @@ impl Database {
     }
 
     pub fn search_tasks(&self, query: &str) -> Result<Vec<Task>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let search_pattern = format!("%{}%", query);
         let mut stmt = conn.prepare(
             "SELECT id, title, description, status, priority, due_date, completed_at, project_id, 
@@ -2417,7 +2563,7 @@ impl Database {
         color: Option<&str>, 
         description: Option<&str>
     ) -> Result<i64> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         conn.execute(
             "INSERT INTO task_projects (name, icon, color, description)
              VALUES (?1, ?2, ?3, ?4)",
@@ -2427,7 +2573,7 @@ impl Database {
     }
 
     pub fn get_all_task_projects(&self) -> Result<Vec<TaskProject>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let mut stmt = conn.prepare(
             "SELECT id, name, icon, color, description, created_at, updated_at
              FROM task_projects 
@@ -2461,7 +2607,7 @@ impl Database {
         color: Option<&str>, 
         description: Option<&str>
     ) -> Result<()> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         
         if let Some(name_val) = name {
             conn.execute("UPDATE task_projects SET name = ?1 WHERE id = ?2", params![name_val, id])?;
@@ -2480,7 +2626,7 @@ impl Database {
     }
 
     pub fn delete_task_project(&self, id: i64) -> Result<()> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         
         // First, set project_id to NULL for all tasks in this project
         conn.execute(
@@ -2494,7 +2640,7 @@ impl Database {
     }
 
     pub fn get_task_project_by_id(&self, id: i64) -> Result<Option<TaskProject>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let mut stmt = conn.prepare(
             "SELECT id, name, icon, color, description, created_at, updated_at
              FROM task_projects 
@@ -2520,7 +2666,7 @@ impl Database {
     }
 
     pub fn get_task_project_stats(&self, project_id: i64) -> Result<(i32, i32, i32)> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         
         // 获取项目的总任务数
         let total_tasks: i32 = conn.query_row(
@@ -2558,7 +2704,7 @@ impl Database {
         frequency: &str,
         target_count: i64,
     ) -> Result<i64> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         
         // 使用本地时间创建 created_at 和 updated_at 字段
         let local_datetime = chrono::Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
@@ -2572,7 +2718,7 @@ impl Database {
     }
 
     pub fn get_habits(&self) -> Result<Vec<Habit>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let mut stmt = conn.prepare(
             "SELECT id, name, description, icon, color, frequency, target_count, is_active, created_at, updated_at
              FROM habits
@@ -2602,7 +2748,7 @@ impl Database {
     }
 
     pub fn get_habit_by_id(&self, id: i64) -> Result<Option<Habit>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let mut stmt = conn.prepare(
             "SELECT id, name, description, icon, color, frequency, target_count, is_active, created_at, updated_at
              FROM habits
@@ -2641,7 +2787,7 @@ impl Database {
         target_count: i64,
         is_active: bool,
     ) -> Result<()> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         conn.execute(
             "UPDATE habits 
              SET name = ?1, description = ?2, icon = ?3, color = ?4, frequency = ?5, 
@@ -2653,7 +2799,7 @@ impl Database {
     }
 
     pub fn delete_habit(&self, id: i64) -> Result<()> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         conn.execute("DELETE FROM habits WHERE id = ?1", params![id])?;
         Ok(())
     }
@@ -2667,7 +2813,7 @@ impl Database {
         completed_count: i64,
         notes: Option<&str>,
     ) -> Result<i64> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         
         // 使用本地时间创建 created_at 和 updated_at 字段
         let local_datetime = chrono::Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
@@ -2681,7 +2827,7 @@ impl Database {
     }
 
     pub fn get_habit_records(&self, habit_id: Option<i64>, start_date: Option<&str>, end_date: Option<&str>) -> Result<Vec<HabitRecord>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         
         let mut query = String::from(
             "SELECT id, habit_id, date, completed_count, notes, created_at, updated_at
@@ -2735,13 +2881,13 @@ impl Database {
     }
 
     pub fn delete_habit_record(&self, id: i64) -> Result<()> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         conn.execute("DELETE FROM habit_records WHERE id = ?1", params![id])?;
         Ok(())
     }
 
     pub fn delete_habit_record_by_habit_date(&self, habit_id: i64, date: &str) -> Result<()> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         conn.execute(
             "DELETE FROM habit_records WHERE habit_id = ?1 AND date = ?2",
             params![habit_id, date]
@@ -2750,7 +2896,7 @@ impl Database {
     }
 
     pub fn get_habit_stats(&self, habit_id: i64) -> Result<(i64, i64, i64, i64, f64)> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         
         // 简化版本：先返回基础统计，避免复杂的日期计算
         let completed_days: i64 = conn.query_row(
@@ -2798,7 +2944,7 @@ impl Database {
 
     #[allow(dead_code)]
     fn get_habit_current_streak(&self, habit_id: i64) -> Result<i64> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let mut stmt = conn.prepare(
             "SELECT date FROM habit_records 
              WHERE habit_id = ?1 
@@ -2834,7 +2980,7 @@ impl Database {
 
     #[allow(dead_code)]
     fn get_habit_longest_streak(&self, habit_id: i64) -> Result<i64> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let mut stmt = conn.prepare(
             "SELECT date FROM habit_records 
              WHERE habit_id = ?1 
@@ -2875,7 +3021,7 @@ impl Database {
 
     // 更新知识库
     pub fn update_knowledge_base(&self, id: &str, name: Option<&str>, icon: Option<&str>, description: Option<&str>) -> Result<()> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let now = Self::current_timestamp();
         
         if let Some(name) = name {
@@ -2893,7 +3039,7 @@ impl Database {
 
     // 搜索知识库
     pub fn search_knowledge_bases(&self, query: &str) -> Result<Vec<KnowledgeBase>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let mut stmt = conn.prepare(
             "SELECT id, name, icon, description, created_at, updated_at 
              FROM knowledge_bases 
@@ -2921,7 +3067,7 @@ impl Database {
 
     // 获取页面列表
     pub fn get_pages(&self, kb_id: &str, parent_id: Option<&str>) -> Result<Vec<Page>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let mut stmt = conn.prepare(
             "SELECT id, kb_id, title, content, parent_id, sort_order, is_deleted, created_at, updated_at 
              FROM pages 
@@ -2953,7 +3099,7 @@ impl Database {
 
     // 获取知识库的所有页面（用于构建树结构）
     pub fn get_all_pages(&self, kb_id: &str) -> Result<Vec<Page>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let mut stmt = conn.prepare(
             "SELECT id, kb_id, title, parent_id, sort_order, is_deleted, created_at, updated_at 
              FROM pages 
@@ -2984,7 +3130,7 @@ impl Database {
 
     // 根据ID获取页面
     pub fn get_page_by_id(&self, id: &str) -> Result<Option<Page>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let mut stmt = conn.prepare(
             "SELECT id, kb_id, title, parent_id, sort_order, is_deleted, created_at, updated_at 
              FROM pages WHERE id = ?1"
@@ -3013,7 +3159,7 @@ impl Database {
 
     // 更新页面
     pub fn update_page(&self, id: &str, title: Option<&str>, parent_id: Option<&str>, order_index: Option<i64>) -> Result<()> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let now = Self::current_timestamp();
         
         if let Some(title) = title {
@@ -3033,7 +3179,7 @@ impl Database {
     pub fn delete_page(&self, id: &str) -> Result<()> {
         // 先获取子页面，然后释放连接锁
         let child_pages = {
-            let conn = self.conn.lock().unwrap();
+            let conn = self.lock_conn();
             let mut stmt = conn.prepare(
                 "SELECT id, kb_id, title, parent_id, sort_order, is_deleted, created_at, updated_at 
                  FROM pages 
@@ -3068,7 +3214,7 @@ impl Database {
         
         // 删除当前页面和相关的块
         {
-            let conn = self.conn.lock().unwrap();
+            let conn = self.lock_conn();
             let now = Self::current_timestamp();
             
             // 删除当前页面
@@ -3084,7 +3230,7 @@ impl Database {
     // 获取子页面
     #[allow(dead_code)]
     fn get_child_pages(&self, parent_id: &str) -> Result<Vec<Page>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let mut stmt = conn.prepare(
             "SELECT id, kb_id, title, parent_id, sort_order, is_deleted, created_at, updated_at 
              FROM pages 
@@ -3114,7 +3260,7 @@ impl Database {
 
     // 搜索页面（支持标题和内容）
     pub fn search_pages(&self, kb_id: &str, query: &str) -> Result<Vec<Page>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         // 搜索页面标题和内容（通过块数据）
         let mut stmt = conn.prepare(
             "SELECT DISTINCT p.id, p.kb_id, p.title, p.parent_id, p.sort_order, p.is_deleted, p.created_at, p.updated_at 
@@ -3149,7 +3295,7 @@ impl Database {
 
     // 移动页面
     pub fn move_page(&self, page_id: &str, new_parent_id: Option<&str>, new_order_index: i64) -> Result<()> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let now = Self::current_timestamp();
         
         conn.execute(
@@ -3162,7 +3308,7 @@ impl Database {
 
     // 获取页面面包屑
     pub fn get_page_breadcrumb(&self, page_id: &str) -> Result<Vec<Page>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let mut stmt = conn.prepare(
             "WITH RECURSIVE breadcrumb(id, kb_id, title, parent_id, sort_order, is_deleted, created_at, updated_at, level) AS (
                 SELECT id, kb_id, title, parent_id, sort_order, is_deleted, created_at, updated_at, 0 as level
@@ -3199,7 +3345,7 @@ impl Database {
 
     // 获取块列表
     pub fn get_blocks(&self, page_id: &str, parent_id: Option<&str>) -> Result<Vec<Block>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let mut stmt = conn.prepare(
             "SELECT id, page_id, type, content, data, parent_id, sort_order, created_at, updated_at 
              FROM blocks 
@@ -3230,7 +3376,7 @@ impl Database {
 
     // 根据ID获取块
     pub fn get_block_by_id(&self, id: &str) -> Result<Option<Block>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let mut stmt = conn.prepare(
             "SELECT id, page_id, type, content, data, parent_id, sort_order, created_at, updated_at 
              FROM blocks WHERE id = ?1"
@@ -3259,7 +3405,7 @@ impl Database {
 
     // 更新块
     pub fn update_block(&self, id: &str, content: Option<&str>, parent_id: Option<&str>, order_index: Option<i64>) -> Result<()> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let now = Self::current_timestamp();
         
         if let Some(content) = content {
@@ -3279,7 +3425,7 @@ impl Database {
 
     // 删除块
     pub fn delete_block(&self, id: &str) -> Result<()> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         
         conn.execute("DELETE FROM blocks WHERE id = ?1", params![id])?;
         conn.execute("DELETE FROM search_index WHERE id = ?1", params![id])?;
@@ -3289,7 +3435,7 @@ impl Database {
 
     // 搜索块
     pub fn search_blocks(&self, page_id: &str, query: &str) -> Result<Vec<Block>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let mut stmt = conn.prepare(
             "SELECT id, page_id, type, content, data, parent_id, sort_order, created_at, updated_at 
              FROM blocks 
@@ -3320,7 +3466,7 @@ impl Database {
 
     // 移动块
     pub fn move_block(&self, block_id: &str, new_parent_id: Option<&str>, new_order_index: i64) -> Result<()> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         let now = Self::current_timestamp();
         
         conn.execute(
@@ -3335,10 +3481,10 @@ impl Database {
     #[allow(dead_code)]
     pub fn save_page_content(&self, page_id: &str, content: &str, version: Option<i32>) -> Result<String, String> {
         self.with_connection(|conn| {
-            let now = std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_secs() as i64;
+            let now = match std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH) {
+                Ok(dur) => dur.as_secs() as i64,
+                Err(_) => 0,
+            };
 
             // 更新页面内容
             let rows_affected = conn.execute(
@@ -3381,7 +3527,7 @@ impl Database {
 
     // 清理"未命名页面"的历史数据
     pub fn cleanup_unnamed_pages(&self) -> Result<u32> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.lock_conn();
         
         // 查找所有标题为"未命名页面"的页面
         let mut stmt = conn.prepare(
@@ -3425,3 +3571,5 @@ impl Database {
         Ok(updated_count)
     }
 }
+
+

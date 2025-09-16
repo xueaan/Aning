@@ -12,7 +12,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   images,
   onImagesChange,
   maxImages = 4,
-  maxSize = 10
+  maxSize = 10,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
@@ -84,9 +84,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
 
     // 转换为base64
     try {
-      const base64Images = await Promise.all(
-        validFiles.map(file => fileToBase64(file))
-      );
+      const base64Images = await Promise.all(validFiles.map((file) => fileToBase64(file)));
 
       onImagesChange([...images, ...base64Images]);
     } catch (error) {
@@ -142,7 +140,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   // 粘贴处理
   const handlePaste = async (e: React.ClipboardEvent) => {
     const items = Array.from(e.clipboardData.items);
-    const imageItems = items.filter(item => item.type.startsWith('image/'));
+    const imageItems = items.filter((item) => item.type.startsWith('image/'));
 
     if (imageItems.length === 0) return;
 
@@ -153,19 +151,22 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
 
     try {
       const files = await Promise.all(
-        imageItems.map(item => new Promise<File>((resolve, reject) => {
-          const file = item.getAsFile();
-          if (file) {
-            resolve(file);
-          } else {
-            reject(new Error('无法获取粘贴的图片'));
-          }
-        }))
+        imageItems.map(
+          (item) =>
+            new Promise<File>((resolve, reject) => {
+              const file = item.getAsFile();
+              if (file) {
+                resolve(file);
+              } else {
+                reject(new Error('无法获取粘贴的图片'));
+              }
+            })
+        )
       );
 
       await handleFiles(files);
       setPasteSuccessMessage(`成功粘贴 ${files.length} 张图片`);
-      
+
       // 3秒后清除成功消息
       setTimeout(() => {
         setPasteSuccessMessage(null);
@@ -180,21 +181,26 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   return (
     <div className="space-y-4">
       {/* 上传区域 */}
-      <div className={`
+      <div
+        className={`
           relative border-2 border-dashed rounded-xl p-6 transition-all duration-200
-          ${dragOver 
-            ? 'border-accent theme-bg-accent/10 scale-[1.02]' 
-            : 'border-white/20 hover:border-white/30'
+          ${
+            dragOver
+              ? 'border-accent theme-bg-accent/10 scale-[1.02]'
+              : 'border-white/20 hover:border-white/30'
           }
           ${uploadError ? 'border-red-400 theme-bg-red-50' : ''}
           feather-glass-content cursor-pointer
         `}
-        onClick={handleUploadClick} onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave} onDrop={handleDrop}
-        onPaste={handlePaste} tabIndex={0}
+        onClick={handleUploadClick}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        onPaste={handlePaste}
+        tabIndex={0}
       >
-        <input 
-          ref={fileInputRef} 
+        <input
+          ref={fileInputRef}
           type="file"
           accept="image/*"
           multiple
@@ -224,9 +230,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                 <p className="theme-text-secondary text-sm">
                   支持拖拽、粘贴上传，最大 {maxSize}MB，最多 {maxImages} 张
                 </p>
-                <p className="theme-text-tertiary text-xs">
-                  支持 JPG、PNG、GIF、WebP 格式
-                </p>
+                <p className="theme-text-tertiary text-xs">支持 JPG、PNG、GIF、WebP 格式</p>
               </div>
             </>
           )}
@@ -255,13 +259,13 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
           {images.map((image, index) => (
             <div key={index} className="relative group">
               <div className="aspect-square rounded-lg overflow-hidden feather-glass-content border border-white/20">
-                <img 
-                  src={image} 
+                <img
+                  src={image}
                   alt={`上传的图片 ${index + 1}`}
                   className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
                 />
               </div>
-              <button 
+              <button
                 onClick={(e) => {
                   e.stopPropagation();
                   handleRemoveImage(index);
@@ -281,4 +285,3 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
     </div>
   );
 };
-

@@ -3,7 +3,15 @@ import { Plus, Clock, ChevronDown, Trash2, Bot, Edit3 } from 'lucide-react';
 import { useAppStore } from '@/stores';
 import { useResponsive } from '@/hooks/useResponsive';
 import { sendAiMessageStream } from '@/utils/aiUtils';
-import { AiMessage, AI_PROVIDERS, UNIFIED_MODELS, UnifiedModel, getUnifiedModel, getCurrentAgent, AiAgent } from '@/types/aiConfig';
+import {
+  AiMessage,
+  AI_PROVIDERS,
+  UNIFIED_MODELS,
+  UnifiedModel,
+  getUnifiedModel,
+  getCurrentAgent,
+  AiAgent,
+} from '@/types/aiConfig';
 import { AiDatabaseSync } from '@/utils/aiDatabaseSync';
 import { TypewriterMessage } from '@/components/common/TypewriterMessage';
 import { ImageUpload } from '@/components/common/ImageUpload';
@@ -43,17 +51,17 @@ export const DialogueRoom: React.FC = () => {
     updateAiConfig,
     setSettingsModalOpen,
     setCurrentAgent,
-    updateConversationTitle
+    updateConversationTitle,
   } = useAppStore();
 
   // Context dialogue store
-  const {
-    activeContexts,
-  } = useDialogueContextStore();
+  const { activeContexts } = useDialogueContextStore();
 
   const currentProvider = aiConfig.currentProvider;
   const currentConfig = aiConfig[currentProvider];
-  const currentConversation = aiChat.conversations.find(c => c.id === aiChat.currentConversationId);
+  const currentConversation = aiChat.conversations.find(
+    (c) => c.id === aiChat.currentConversationId
+  );
   const currentAgent = getCurrentAgent(aiConfig);
   const isLoadingConversation = aiChat.isLoadingConversation;
 
@@ -77,10 +85,18 @@ export const DialogueRoom: React.FC = () => {
         }
       }
 
-      if (showModelDropdown && modelDropdownRef.current && !modelDropdownRef.current.contains(target as Node)) {
+      if (
+        showModelDropdown &&
+        modelDropdownRef.current &&
+        !modelDropdownRef.current.contains(target as Node)
+      ) {
         setShowModelDropdown(false);
       }
-      if (showAgentDropdown && agentDropdownRef.current && !agentDropdownRef.current.contains(target as Node)) {
+      if (
+        showAgentDropdown &&
+        agentDropdownRef.current &&
+        !agentDropdownRef.current.contains(target as Node)
+      ) {
         setShowAgentDropdown(false);
       }
     };
@@ -115,7 +131,7 @@ export const DialogueRoom: React.FC = () => {
                 reader.onload = (e) => {
                   const base64 = e.target?.result as string;
                   if (base64) {
-                    setSelectedImages(prev => [...prev, base64]);
+                    setSelectedImages((prev) => [...prev, base64]);
                     setShowImageUpload(true);
                   }
                 };
@@ -158,7 +174,11 @@ export const DialogueRoom: React.FC = () => {
   };
 
   // 编辑对话标题相关函数
-  const handleStartEditing = (conversationId: string, currentTitle: string, event: React.MouseEvent) => {
+  const handleStartEditing = (
+    conversationId: string,
+    currentTitle: string,
+    event: React.MouseEvent
+  ) => {
     event.stopPropagation();
     event.preventDefault();
     setEditingConversationId(conversationId);
@@ -210,12 +230,19 @@ export const DialogueRoom: React.FC = () => {
     // 构建包含上下文的完整消息内容
     let fullMessageContent = messageText;
     if (contextData && contextData.length > 0) {
-      const contextText = contextData.map(ctx => {
-        const typeLabel = ctx.type === 'task_list' ? '任务列表' :
-                         ctx.type === 'task' ? '任务' :
-                         ctx.type === 'knowledge_page' ? '知识库页面' : '上下文';
-        return `[${typeLabel}: ${ctx.title}]\n${ctx.content}`;
-      }).join('\n\n---\n\n');
+      const contextText = contextData
+        .map((ctx) => {
+          const typeLabel =
+            ctx.type === 'task_list'
+              ? '任务列表'
+              : ctx.type === 'task'
+                ? '任务'
+                : ctx.type === 'knowledge_page'
+                  ? '知识库页面'
+                  : '上下文';
+          return `[${typeLabel}: ${ctx.title}]\n${ctx.content}`;
+        })
+        .join('\n\n---\n\n');
 
       fullMessageContent = `以下是相关的上下文信息：\n\n${contextText}\n\n---\n\n用户问题: ${messageText}`;
     }
@@ -244,30 +271,27 @@ export const DialogueRoom: React.FC = () => {
     addMessage(userMessage);
 
     try {
-
       setIsStreaming(true);
       setStreamingResponse('');
       setAiChatError(null);
 
       // 构建消息历史
-      let previousMessages = currentConversation?.messages.map(msg => ({
-        role: msg.role as 'user' | 'assistant' | 'system',
-        content: msg.content
-      })) || [];
-
+      let previousMessages =
+        currentConversation?.messages.map((msg) => ({
+          role: msg.role as 'user' | 'assistant' | 'system',
+          content: msg.content,
+        })) || [];
 
       // 如果有当前智能体且有系统提示词，在开头添加系统消息
       if (currentAgent?.systemPrompt) {
-
         previousMessages = [
           {
             role: 'system' as const,
-            content: currentAgent.systemPrompt
+            content: currentAgent.systemPrompt,
           },
-          ...previousMessages
+          ...previousMessages,
         ];
       }
-
 
       await sendAiMessageStream(
         currentProvider,
@@ -276,15 +300,13 @@ export const DialogueRoom: React.FC = () => {
         images || [],
         previousMessages,
         (token: string) => {
-
           // 应用流式内容过滤
           const filteredToken = filterStreamChunk(token, streamingResponse, currentAgent);
           if (filteredToken) {
-            setStreamingResponse(prev => prev + filteredToken);
+            setStreamingResponse((prev) => prev + filteredToken);
           }
         },
         (fullResponse: string) => {
-
           // 应用完整内容过滤
           const filteredResponse = filterAIResponse(fullResponse, currentAgent);
 
@@ -295,8 +317,7 @@ export const DialogueRoom: React.FC = () => {
             timestamp: Date.now(),
           };
 
-          // 同时更新流式显示为过滤后的内容
-          setStreamingResponse(filteredResponse);
+          // 先添加消息，然后清空流式响应
           addMessage(aiMessage);
           setStreamingResponse('');
           setIsStreaming(false);
@@ -305,9 +326,12 @@ export const DialogueRoom: React.FC = () => {
           const updatedConversation = {
             ...currentConversation!,
             messages: [...(currentConversation?.messages || []), userMessage, aiMessage],
-            updatedAt: Date.now()
+            updatedAt: Date.now(),
           };
-          AiDatabaseSync.syncConversationWithMessages(updatedConversation, updatedConversation.messages);
+          AiDatabaseSync.syncConversationWithMessages(
+            updatedConversation,
+            updatedConversation.messages
+          );
         },
         (error: string) => {
           console.error('AI streaming request failed:', error);
@@ -357,34 +381,40 @@ export const DialogueRoom: React.FC = () => {
     const isUser = message.role === 'user';
 
     return (
-      <div key={message.id} className={`flex gap-3 mb-4 ${isMobile ? 'px-2' : 'px-4'} ${isUser ? 'flex-row-reverse' : ''}`}>
+      <div
+        key={message.id}
+        className={`flex gap-3 mb-4 ${isMobile ? 'px-2' : 'px-4'} ${isUser ? 'flex-row-reverse' : ''}`}
+      >
         {/* 头像 */}
-        <div className="flex-shrink-0">
-          {renderAvatar(message)}
-        </div>
+        <div className="flex-shrink-0">{renderAvatar(message)}</div>
 
         {/* 消息内容 */}
-        <div className={`flex-1 ${isMobile ? 'max-w-[85%]' : isTablet ? 'max-w-[80%]' : 'max-w-[75%]'} ${isUser ? 'flex flex-col items-end' : ''}`}>
-          <div className={`inline-block p-2.5 rounded-xl ${isUser
-            ? 'bg-accent text-white rounded-br-sm'
-            : 'feather-glass-deco rounded-bl-sm'
-          }`}>
-            <div className="prose max-w-none">
-              <div className={`whitespace-pre-wrap break-words ${isUser ? 'text-white' : 'theme-text-primary'}`}>
-                <TypewriterMessage content={message.content} enableTypewriter={false} speed={25} />
+        <div
+          className={`flex-1 ${isMobile ? 'max-w-[85%]' : isTablet ? 'max-w-[80%]' : 'max-w-[75%]'} ${isUser ? 'flex flex-col items-end' : ''}`}
+        >
+          <div
+            className={`inline-block p-2.5 rounded-xl ${
+              isUser ? 'bg-accent text-white rounded-br-sm' : 'feather-glass-deco rounded-bl-sm'
+            }`}
+          >
+            <TypewriterMessage
+              content={message.content}
+              enableTypewriter={false}
+              speed={25}
+              className={isUser ? 'text-white' : ''}
+            />
+            {/* 图片显示 */}
+            {message.hasImages && (
+              <div className={`mt-2 text-sm ${isUser ? 'text-white/80' : 'theme-text-tertiary'}`}>
+                📷 包含 {message.imageCount || 1} 张图片
               </div>
-
-              {/* 图片显示 */}
-              {message.hasImages && (
-                <div className={`mt-2 text-sm ${isUser ? 'text-white/80' : 'theme-text-tertiary'}`}>
-                  📷 包含 {message.imageCount || 1} 张图片
-                </div>
-              )}
-            </div>
+            )}
           </div>
 
           {/* 时间戳 */}
-          <div className={`text-xs theme-text-tertiary mt-1 ${isUser ? 'text-right' : 'text-left'}`}>
+          <div
+            className={`text-xs theme-text-tertiary mt-1 ${isUser ? 'text-right' : 'text-left'}`}
+          >
             {new Date(message.timestamp).toLocaleTimeString()}
           </div>
         </div>
@@ -429,7 +459,11 @@ export const DialogueRoom: React.FC = () => {
           style={{ zIndex: 9999 }}
           onClick={() => setShowConversationHistory(false)}
         >
-          <div className="w-96 max-h-[80vh] feather-glass-modal rounded-lg overflow-hidden" onClick={e => e.stopPropagation()} data-conversation-history>
+          <div
+            className="w-96 max-h-[80vh] feather-glass-modal rounded-lg overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+            data-conversation-history
+          >
             {/* 标题栏 */}
             <div className="p-4 border-b theme-border-primary">
               <h3 className="text-lg font-medium theme-text-primary">对话历史</h3>
@@ -438,7 +472,7 @@ export const DialogueRoom: React.FC = () => {
             {/* 对话列表 */}
             <div className="flex-1 overflow-y-auto max-h-96 p-2">
               {aiChat.conversations.length > 0 ? (
-                aiChat.conversations.map(conv => {
+                aiChat.conversations.map((conv) => {
                   const isActive = conv.id === aiChat.currentConversationId;
                   return (
                     <div
@@ -470,12 +504,13 @@ export const DialogueRoom: React.FC = () => {
                             onClick={(e) => e.stopPropagation()}
                           />
                         ) : (
-                          <div className="truncate">
-                            {conv.title}
-                          </div>
+                          <div className="truncate">{conv.title}</div>
                         )}
-                        <div className={`text-xs mt-1 ${isActive ? 'theme-text-on-accent/70' : 'theme-text-secondary'}`}>
-                          {conv.messages.length} 消息 · {new Date(conv.updatedAt).toLocaleDateString()}
+                        <div
+                          className={`text-xs mt-1 ${isActive ? 'theme-text-on-accent/70' : 'theme-text-secondary'}`}
+                        >
+                          {conv.messages.length} 消息 ·{' '}
+                          {new Date(conv.updatedAt).toLocaleDateString()}
                         </div>
                       </div>
 
@@ -486,9 +521,13 @@ export const DialogueRoom: React.FC = () => {
                           className="flex-shrink-0 p-1 hover:bg-blue-500/20 rounded transition-all"
                           title="编辑标题"
                         >
-                          <Edit3 size={14} className={isActive ? 'text-white/70' : 'text-blue-500'} />
+                          <Edit3
+                            size={14}
+                            className={isActive ? 'text-white/70' : 'text-blue-500'}
+                          />
                         </button>
-                        <button onClick={(e) => {
+                        <button
+                          onClick={(e) => {
                             e.stopPropagation();
                             deleteConversation(conv.id);
                           }}
@@ -541,13 +580,24 @@ export const DialogueRoom: React.FC = () => {
                     <Bot size={16} className="theme-text-accent" />
                   </div>
                 </div>
-                <div className={`flex-1 ${isMobile ? 'max-w-[90%]' : isTablet ? 'max-w-[85%]' : 'max-w-[75%]'}`}>
+                <div
+                  className={`flex-1 ${isMobile ? 'max-w-[90%]' : isTablet ? 'max-w-[85%]' : 'max-w-[75%]'}`}
+                >
                   <div className="inline-block p-2.5 rounded-xl feather-glass-deco">
                     <div className="flex items-center gap-2">
                       <div className="flex items-center space-x-1">
-                        <div className="w-1.5 h-1.5 theme-bg-accent rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                        <div className="w-1.5 h-1.5 theme-bg-accent rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                        <div className="w-1.5 h-1.5 theme-bg-accent rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                        <div
+                          className="w-1.5 h-1.5 theme-bg-accent rounded-full animate-bounce"
+                          style={{ animationDelay: '0ms' }}
+                        ></div>
+                        <div
+                          className="w-1.5 h-1.5 theme-bg-accent rounded-full animate-bounce"
+                          style={{ animationDelay: '150ms' }}
+                        ></div>
+                        <div
+                          className="w-1.5 h-1.5 theme-bg-accent rounded-full animate-bounce"
+                          style={{ animationDelay: '300ms' }}
+                        ></div>
                       </div>
                       <span className="text-xs theme-text-secondary">正在思考..</span>
                     </div>
@@ -564,12 +614,15 @@ export const DialogueRoom: React.FC = () => {
                     <Bot size={16} className="theme-text-accent" />
                   </div>
                 </div>
-                <div className={`flex-1 ${isMobile ? 'max-w-[90%]' : isTablet ? 'max-w-[85%]' : 'max-w-[75%]'}`}>
+                <div
+                  className={`flex-1 ${isMobile ? 'max-w-[90%]' : isTablet ? 'max-w-[85%]' : 'max-w-[75%]'}`}
+                >
                   <div className="inline-block p-2.5 rounded-xl feather-glass-deco">
                     <TypewriterMessage
                       content={streamingResponse}
                       enableTypewriter={false}
                       speed={25}
+                      className=""
                     />
                   </div>
                 </div>
@@ -588,12 +641,8 @@ export const DialogueRoom: React.FC = () => {
                 </div>
               </div>
               <div className="space-y-3">
-                <div className="theme-text-primary text-lg font-medium">
-                  欢迎来到对话室
-                </div>
-                <div className="text-sm theme-text-secondary">
-                  发送消息开始对话，探索更多可能性
-                </div>
+                <div className="theme-text-primary text-lg font-medium">欢迎来到对话室</div>
+                <div className="text-sm theme-text-secondary">发送消息开始对话，探索更多可能性</div>
               </div>
             </div>
           </div>
@@ -607,7 +656,8 @@ export const DialogueRoom: React.FC = () => {
             <span className="theme-text-error">⚠️</span>
             <span>{aiChat.error}</span>
           </div>
-          <button onClick={() => setAiChatError(null)}
+          <button
+            onClick={() => setAiChatError(null)}
             className="ml-2 p-1 hover:theme-bg-error/10 rounded theme-text-error transition-colors"
           >
             ×
@@ -624,7 +674,11 @@ export const DialogueRoom: React.FC = () => {
             onChange={setMessage}
             onSend={handleSend}
             disabled={isStreaming}
-            placeholder={selectedImages.length > 0 ? "描述一下这些图片.." : "输入消息，使用 @ 添加知识库页面或任务到上下文..."}
+            placeholder={
+              selectedImages.length > 0
+                ? '描述一下这些图片..'
+                : '输入消息，使用 @ 添加知识库页面或任务到上下文...'
+            }
             showImageUpload={showImageUpload}
             onImageUploadToggle={() => setShowImageUpload(!showImageUpload)}
           />
@@ -635,71 +689,92 @@ export const DialogueRoom: React.FC = () => {
             <div className="flex items-center gap-2">
               {(aiConfig.agents || []).length > 0 ? (
                 <div className="flex items-center gap-1">
-                  {(aiConfig.agents || []).slice(0, isMobile ? 3 : isTablet ? 4 : 6).map(agent => {
-                    const isSelected = currentAgent?.id === agent.id;
-                    return (
-                      <button key={agent.id} onClick={() => handleAgentSelect(agent)}
-                        className={`p-2 rounded-lg text-sm transition-all duration-200 relative group ${isSelected
-                          ? 'theme-bg-accent theme-text-on-accent shadow-lg shadow-accent/25 ring-2 ring-accent/30 scale-105'
-                          : 'feather-glass-button hover:scale-[1.02]'
-                        }`}
-                      >
-                        {React.createElement(getIconComponent(agent.icon.length === 1 ? convertEmojiToIcon(agent.icon) : agent.icon), {
-                          theme: 'outline',
-                          size: 16,
-                          fill: 'currentColor',
-                          strokeWidth: 2
-                        })}
-                        {/* 选中状态指示器 */}
-                        {isSelected && (
-                          <div className="absolute -bottom-0.5 left-1/2 transform -translate-x-1/2 w-4 h-0.5 rounded-full theme-bg-accent" />
-                        )}
+                  {(aiConfig.agents || [])
+                    .slice(0, isMobile ? 3 : isTablet ? 4 : 6)
+                    .map((agent) => {
+                      const isSelected = currentAgent?.id === agent.id;
+                      return (
+                        <button
+                          key={agent.id}
+                          onClick={() => handleAgentSelect(agent)}
+                          className={`p-2 rounded-lg text-sm transition-all duration-200 relative group ${
+                            isSelected
+                              ? 'theme-bg-accent/20 theme-text-accent shadow-sm ring-1 ring-accent/20'
+                              : 'feather-glass-button hover:scale-[1.02]'
+                          }`}
+                        >
+                          {React.createElement(
+                            getIconComponent(
+                              agent.icon.length === 1 ? convertEmojiToIcon(agent.icon) : agent.icon
+                            ),
+                            {
+                              theme: 'outline',
+                              size: 16,
+                              fill: 'currentColor',
+                              strokeWidth: 2,
+                            }
+                          )}
 
-                        {/* Tooltip 显示在上方 */}
-                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs rounded shadow-lg bg-black/80 text-white whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                          {agent.name}
-                        </div>
-                      </button>
-                    );
-                  })}
+                          {/* Tooltip 显示在上方 */}
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs rounded shadow-lg bg-black/80 text-white whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                            {agent.name}
+                          </div>
+                        </button>
+                      );
+                    })}
 
                   {/* 更多智能体按钮*/}
                   {(aiConfig.agents || []).length > (isMobile ? 3 : isTablet ? 4 : 6) && (
                     <div className="relative" ref={agentDropdownRef}>
-                      <button onClick={() => setShowAgentDropdown(!showAgentDropdown)}
+                      <button
+                        onClick={() => setShowAgentDropdown(!showAgentDropdown)}
                         className="p-2 rounded-lg text-sm feather-glass-button transition-colors"
                         title="更多智能体"
                       >
-                        <ChevronDown size={16}
-                          className={`transition-transform ${showAgentDropdown ? 'rotate-180' : ''}`} />
+                        <ChevronDown
+                          size={16}
+                          className={`transition-transform ${showAgentDropdown ? 'rotate-180' : ''}`}
+                        />
                       </button>
 
                       {showAgentDropdown && (
                         <div className="absolute bottom-full left-0 mb-2 rounded-xl shadow-lg z-[9999] min-w-[200px] max-h-64 overflow-y-auto feather-glass-dropdown">
                           <div className="p-2">
-                            {(aiConfig.agents || []).map(agent => {
+                            {(aiConfig.agents || []).map((agent) => {
                               const isSelected = currentAgent?.id === agent.id;
                               return (
-                                <button key={agent.id} onClick={() => handleAgentSelect(agent)}
+                                <button
+                                  key={agent.id}
+                                  onClick={() => handleAgentSelect(agent)}
                                   className={`w-full px-3 py-2 text-sm text-left hover:theme-bg-secondary/50 transition-all duration-200 rounded-lg flex items-center gap-2 ${isSelected ? 'theme-bg-accent/20 theme-text-accent border-l-2 theme-border-accent font-medium' : 'theme-text-primary hover:theme-text-accent'}`}
                                 >
                                   <div className="flex-shrink-0">
-                                    {React.createElement(getIconComponent(agent.icon.length === 1 ? convertEmojiToIcon(agent.icon) : agent.icon), {
-                                      theme: 'outline',
-                                      size: 16,
-                                      fill: 'currentColor',
-                                      strokeWidth: 2
-                                    })}
+                                    {React.createElement(
+                                      getIconComponent(
+                                        agent.icon.length === 1
+                                          ? convertEmojiToIcon(agent.icon)
+                                          : agent.icon
+                                      ),
+                                      {
+                                        theme: 'outline',
+                                        size: 16,
+                                        fill: 'currentColor',
+                                        strokeWidth: 2,
+                                      }
+                                    )}
                                   </div>
                                   <span className="font-medium truncate">{agent.name}</span>
-                                  {isSelected && <span className="text-xs theme-text-accent">已选中</span>}
+                                  {isSelected && (
+                                    <span className="text-xs theme-text-accent">已选中</span>
+                                  )}
                                 </button>
                               );
                             })}
                           </div>
 
                           <div className="border-t theme-border p-2">
-                            <button onClick={() => {
+                            <button
+                              onClick={() => {
                                 setSettingsModalOpen(true);
                                 setShowAgentDropdown(false);
                               }}
@@ -715,7 +790,8 @@ export const DialogueRoom: React.FC = () => {
                   )}
                 </div>
               ) : (
-                <button onClick={() => setSettingsModalOpen(true)}
+                <button
+                  onClick={() => setSettingsModalOpen(true)}
                   className="flex items-center gap-2 px-3 py-2 text-xs feather-glass-button rounded-lg transition-colors"
                 >
                   <Bot size={16} />
@@ -726,14 +802,18 @@ export const DialogueRoom: React.FC = () => {
 
             {/* 右侧：模型选择器 */}
             <div className="relative" ref={modelDropdownRef}>
-              <button onClick={() => setShowModelDropdown(!showModelDropdown)}
+              <button
+                onClick={() => setShowModelDropdown(!showModelDropdown)}
                 className="flex items-center gap-2 px-3 py-2 feather-glass-button rounded-lg text-sm theme-text-primary transition-colors"
               >
                 <span className="text-base">{getCurrentUnifiedModel()?.icon || '🤖'}</span>
                 {!isMobile && (
-                  <span className="text-left truncate max-w-[120px]">{getCurrentUnifiedModel()?.name || 'DeepSeek Chat'}</span>
+                  <span className="text-left truncate max-w-[120px]">
+                    {getCurrentUnifiedModel()?.name || 'DeepSeek Chat'}
+                  </span>
                 )}
-                <ChevronDown size={16}
+                <ChevronDown
+                  size={16}
                   className={`theme-text-secondary transition-transform ${showModelDropdown ? 'rotate-180' : ''}`}
                 />
               </button>
@@ -742,23 +822,28 @@ export const DialogueRoom: React.FC = () => {
               {showModelDropdown && (
                 <div className="absolute bottom-full right-0 mb-2 rounded-xl shadow-lg z-[9999] min-w-[200px] feather-glass-dropdown">
                   <div className="p-2 space-y-1">
-                    {UNIFIED_MODELS.map(model => {
+                    {UNIFIED_MODELS.map((model) => {
                       const isSelected = getCurrentUnifiedModel()?.id === model.id;
                       const isEnabled = aiConfig[model.provider]?.enabled;
 
                       return (
-                        <button key={model.id} onClick={() => {
+                        <button
+                          key={model.id}
+                          onClick={() => {
                             if (!isEnabled) {
-                              setAiChatError(`${AI_PROVIDERS[model.provider].name} 未配置，请先在设置中配置 API`);
+                              setAiChatError(
+                                `${AI_PROVIDERS[model.provider].name} 未配置，请先在设置中配置 API`
+                              );
                               return;
                             }
                             handleModelSelect(model);
                           }}
-                          className={`w-full px-3 py-2 text-sm text-left hover:theme-bg-secondary/50 transition-colors rounded-lg flex items-center gap-2 ${isSelected
-                            ? 'theme-bg-secondary theme-text-accent'
-                            : isEnabled
-                              ? 'theme-text-primary'
-                              : 'theme-text-secondary opacity-50 hover:opacity-75'
+                          className={`w-full px-3 py-2 text-sm text-left hover:theme-bg-secondary/50 transition-colors rounded-lg flex items-center gap-2 ${
+                            isSelected
+                              ? 'theme-bg-secondary theme-text-accent'
+                              : isEnabled
+                                ? 'theme-text-primary'
+                                : 'theme-text-secondary opacity-50 hover:opacity-75'
                           }`}
                         >
                           <span className="text-base">{model.icon}</span>
@@ -770,7 +855,8 @@ export const DialogueRoom: React.FC = () => {
                   </div>
 
                   <div className="border-t theme-border p-2">
-                    <button onClick={() => {
+                    <button
+                      onClick={() => {
                         setSettingsModalOpen(true);
                         setShowModelDropdown(false);
                       }}
@@ -786,11 +872,7 @@ export const DialogueRoom: React.FC = () => {
 
           {/* 图片上传组件 - 条件显示 */}
           {(selectedImages.length > 0 || showImageUpload) && (
-            <ImageUpload
-              images={selectedImages}
-              onImagesChange={setSelectedImages}
-              maxImages={5}
-            />
+            <ImageUpload images={selectedImages} onImagesChange={setSelectedImages} maxImages={5} />
           )}
         </div>
       </div>

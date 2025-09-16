@@ -1,10 +1,10 @@
-import { invoke } from '@tauri-apps/api/core';
+import { invokeTauri } from '@/utils/tauriWrapper';
 import {
   MentionSuggestion,
   SuggestionGroups,
   SuggestionGroup,
   ContextSearchOptions,
-  DEFAULT_CONTEXT_CONFIG
+  DEFAULT_CONTEXT_CONFIG,
 } from '@/types/dialogue';
 import { MentionEngine } from '@/utils/mentionEngine';
 import { Task } from '@/types';
@@ -19,19 +19,19 @@ interface CacheEntry<T> {
 // 搜索结果缓存
 class SearchCache {
   private cache = new Map<string, CacheEntry<any>>();
-  
+
   set<T>(key: string, data: T, ttl: number = DEFAULT_CONTEXT_CONFIG.CACHE_TTL): void {
     this.cache.set(key, {
       data,
       timestamp: Date.now(),
-      ttl
+      ttl,
     });
   }
 
   get<T>(key: string): T | null {
     const entry = this.cache.get(key);
     if (!entry) return null;
-    
+
     if (Date.now() - entry.timestamp > entry.ttl) {
       this.cache.delete(key);
       return null;
@@ -63,7 +63,7 @@ export class SuggestionService {
   private static instance: SuggestionService;
   private cache = new SearchCache();
   private debounceTimers = new Map<string, NodeJS.Timeout>();
-  
+
   private constructor() {}
 
   static getInstance(): SuggestionService {
@@ -72,7 +72,7 @@ export class SuggestionService {
     }
     return SuggestionService.instance;
   }
-  
+
   /**
    * 获取快捷提及建议
    * @param query 搜索查询
@@ -86,8 +86,8 @@ export class SuggestionService {
       preview: shortcut.description,
       type: 'shortcut' as const,
       metadata: {
-        tokens: 20 // 快捷方式估算token数
-      }
+        tokens: 20, // 快捷方式估算token数
+      },
     }));
   }
 
@@ -97,10 +97,7 @@ export class SuggestionService {
    * @param options 搜索选项
    * @returns 任务建议数组
    */
-  async searchTasks(
-    query: string,
-    options?: ContextSearchOptions
-  ): Promise<MentionSuggestion[]> {
+  async searchTasks(query: string, options?: ContextSearchOptions): Promise<MentionSuggestion[]> {
     if (!query.trim()) {
       return this.getPendingTasks();
     }
@@ -112,14 +109,14 @@ export class SuggestionService {
     }
 
     try {
-      const results: TaskSearchResult[] = await invoke('search_tasks', {
+      const results: TaskSearchResult[] = await invokeTauri('search_tasks', {
         query: query.trim(),
         includeCompleted: false,
         projectId: options?.taskProject,
-        limit: options?.limit || DEFAULT_CONTEXT_CONFIG.SEARCH_LIMIT
+        limit: options?.limit || DEFAULT_CONTEXT_CONFIG.SEARCH_LIMIT,
       });
-      
-      const suggestions = results.map(task => ({
+
+      const suggestions = results.map((task) => ({
         label: task.title,
         value: `@task:${task.id}`,
         icon: this.getTaskIcon(task.status, task.priority),
@@ -131,26 +128,26 @@ export class SuggestionService {
           project: task.project_name,
           due_date: task.due_date,
           score: task.score || 1,
-          tokens: this.estimateTaskTokens(task)
-        }
+          tokens: this.estimateTaskTokens(task),
+        },
       }));
-      
+
       // 缓存结果
       this.cache.set(cacheKey, suggestions);
-      
+
       return suggestions;
     } catch (error) {
       console.error('搜索任务失败:', error);
       return [];
     }
   }
-  
+
   /**
    * 获取最近编辑的页面
    * @param limit 限制数量
    * @returns 页面建议数组
    */
-  
+
   /**
    * 获取待办任务
    * @param limit 限制数量
@@ -164,9 +161,9 @@ export class SuggestionService {
     }
 
     try {
-      const results: TaskSearchResult[] = await invoke('get_pending_tasks', { limit });
-      
-      const suggestions = results.map(task => ({
+      const results: TaskSearchResult[] = await invokeTauri('get_pending_tasks', { limit });
+
+      const suggestions = results.map((task) => ({
         label: task.title,
         value: `@task:${task.id}`,
         icon: this.getTaskIcon(task.status, task.priority),
@@ -176,10 +173,10 @@ export class SuggestionService {
           status: task.status,
           priority: task.priority,
           due_date: task.due_date,
-          tokens: this.estimateTaskTokens(task)
-        }
+          tokens: this.estimateTaskTokens(task),
+        },
       }));
-      
+
       this.cache.set(cacheKey, suggestions, 2 * 60 * 1000); // 2分钟缓存
       return suggestions;
     } catch (error) {
@@ -187,7 +184,7 @@ export class SuggestionService {
       return [];
     }
   }
-  
+
   /**
    * 获取组合的搜索建议
    * @param query 搜索查询
@@ -199,7 +196,7 @@ export class SuggestionService {
     options?: ContextSearchOptions
   ): Promise<SuggestionGroups> {
     const groups: SuggestionGroup[] = [];
-    
+
     // 如果查询为空或很短，优先显示快捷方式
     if (!query.trim() || query.length < 2) {
       const shortcuts = this.getShortcuts(query);
@@ -208,58 +205,58 @@ export class SuggestionService {
           type: 'shortcuts',
           title: '快捷方式',
           icon: '⚡',
-          items: shortcuts
+          items: shortcuts,
         });
       }
-      
+
       // 显示待办任务
       const pendingTasks = await this.getPendingTasks(5);
-      
+
       if (pendingTasks.length > 0) {
         groups.push({
           type: 'tasks',
           title: '待办任务',
           icon: '📋',
-          items: pendingTasks
+          items: pendingTasks,
         });
       }
     } else {
       // 执行搜索
       const [shortcuts, tasks] = await Promise.all([
-        Promise.resolve(this.getShortcuts(query)), 
-        this.searchTasks(query, options)
+        Promise.resolve(this.getShortcuts(query)),
+        this.searchTasks(query, options),
       ]);
-      
+
       // 快捷方式匹配
       if (shortcuts.length > 0) {
         groups.push({
           type: 'shortcuts',
           title: '快捷方式',
           icon: '⚡',
-          items: shortcuts
+          items: shortcuts,
         });
       }
-      
+
       // 任务结果
       if (tasks.length > 0) {
         groups.push({
           type: 'tasks',
           title: '任务',
           icon: '✅',
-          items: tasks.slice(0, 8) // 限制显示数量
+          items: tasks.slice(0, 8), // 限制显示数量
         });
       }
     }
 
     const totalItems = groups.reduce((sum, group) => sum + group.items.length, 0);
-    
+
     return {
       groups,
       total: totalItems,
-      hasMore: false // TODO: 实现分页
+      hasMore: false, // TODO: 实现分页
     };
   }
-  
+
   /**
    * 防抖搜索
    * @param query 搜索查询
@@ -278,7 +275,7 @@ export class SuggestionService {
     if (existingTimer) {
       clearTimeout(existingTimer);
     }
-    
+
     // 设置新的定时器
     const timer = setTimeout(async () => {
       try {
@@ -291,10 +288,10 @@ export class SuggestionService {
         this.debounceTimers.delete(key);
       }
     }, delay);
-    
+
     this.debounceTimers.set(key, timer);
   }
-  
+
   /**
    * 获取任务图标
    * @param status 任务状态
@@ -308,7 +305,7 @@ export class SuggestionService {
     if (priority === 'high') return '⚡';
     return '⏳';
   }
-  
+
   /**
    * 估算文本内容的token数量
    * @param content 文本内容
@@ -316,14 +313,14 @@ export class SuggestionService {
    */
   private estimateTextTokens(content: string): number {
     if (!content) return 30; // 基础元数据token
-    
+
     // 简单的token估算：中文字符 * 1.5 + 英文单词 * 1.3
     const chineseChars = (content.match(/[\u4e00-\u9fa5]/g) || []).length;
     const englishWords = (content.match(/[a-zA-Z]+/g) || []).length;
-    
+
     return Math.ceil(chineseChars * 1.5 + englishWords * 1.3) + 30;
   }
-  
+
   /**
    * 估算任务的token数量
    * @param task 任务对象
@@ -331,7 +328,7 @@ export class SuggestionService {
    */
   private estimateTaskTokens(task: TaskSearchResult): number {
     let tokens = 50; // 基础元数据
-    
+
     if (task.title) {
       tokens += this.estimateTextTokens(task.title);
     }
@@ -342,7 +339,7 @@ export class SuggestionService {
 
     return tokens;
   }
-  
+
   /**
    * 清理缓存
    * @param pattern 可选的模式匹配
@@ -350,7 +347,7 @@ export class SuggestionService {
   clearCache(_pattern?: string): void {
     this.cache.clear();
   }
-  
+
   /**
    * 获取缓存统计信息
    * @returns 缓存统计
@@ -358,18 +355,18 @@ export class SuggestionService {
   getCacheStats(): { size: number; keys: string[] } {
     return {
       size: this.cache.size(),
-      keys: [] // TODO: 实现键名获取
+      keys: [], // TODO: 实现键名获取
     };
   }
-  
+
   /**
    * 取消所有防抖计时器
    */
   cancelAllDebounce(): void {
-    this.debounceTimers.forEach(timer => clearTimeout(timer));
+    this.debounceTimers.forEach((timer) => clearTimeout(timer));
     this.debounceTimers.clear();
   }
-  
+
   /**
    * 销毁服务实例
    */
@@ -385,9 +382,13 @@ export const suggestionService = SuggestionService.getInstance();
 
 // 导出便利方法
 export const getShortcutSuggestions = (query?: string) => suggestionService.getShortcuts(query);
-export const searchTasks = (query: string, options?: ContextSearchOptions) => 
+export const searchTasks = (query: string, options?: ContextSearchOptions) =>
   suggestionService.searchTasks(query, options);
-export const getCombinedSuggestions = (query: string, options?: ContextSearchOptions) => 
+export const getCombinedSuggestions = (query: string, options?: ContextSearchOptions) =>
   suggestionService.getCombinedSuggestions(query, options);
-export const debounceSearch = (query: string, callback: (results: SuggestionGroups) => void, delay?: number, key?: string) => 
-  suggestionService.debounceSearch(query, callback, delay, key);
+export const debounceSearch = (
+  query: string,
+  callback: (results: SuggestionGroups) => void,
+  delay?: number,
+  key?: string
+) => suggestionService.debounceSearch(query, callback, delay, key);

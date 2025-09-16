@@ -10,7 +10,3 @@ const CardBox: React.FC = () => {
 };
 
 export default CardBox;
-
-
-
-

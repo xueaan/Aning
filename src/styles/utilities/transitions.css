@@ -12,9 +12,10 @@
 }
 
 .transition-colors {
-  transition: color var(--duration-fast) ease,
-              background-color var(--duration-fast) ease,
-              border-color var(--duration-fast) ease;
+  transition:
+    color var(--duration-fast) ease,
+    background-color var(--duration-fast) ease,
+    border-color var(--duration-fast) ease;
 }
 
 .transition-opacity {
@@ -30,8 +31,9 @@
 }
 
 .transition-size {
-  transition: width var(--duration-normal) ease,
-              height var(--duration-normal) ease;
+  transition:
+    width var(--duration-normal) ease,
+    height var(--duration-normal) ease;
 }
 
 /* =================
@@ -50,23 +52,47 @@
   transition-duration: var(--duration-slow);
 }
 
-.duration-75 { transition-duration: 75ms; }
-.duration-100 { transition-duration: 100ms; }
-.duration-150 { transition-duration: 150ms; }
-.duration-200 { transition-duration: 200ms; }
-.duration-300 { transition-duration: 300ms; }
-.duration-500 { transition-duration: 500ms; }
-.duration-700 { transition-duration: 700ms; }
-.duration-1000 { transition-duration: 1000ms; }
+.duration-75 {
+  transition-duration: 75ms;
+}
+.duration-100 {
+  transition-duration: 100ms;
+}
+.duration-150 {
+  transition-duration: 150ms;
+}
+.duration-200 {
+  transition-duration: 200ms;
+}
+.duration-300 {
+  transition-duration: 300ms;
+}
+.duration-500 {
+  transition-duration: 500ms;
+}
+.duration-700 {
+  transition-duration: 700ms;
+}
+.duration-1000 {
+  transition-duration: 1000ms;
+}
 
 /* =================
    过渡缓动函数
    ================= */
 
-.ease-linear { transition-timing-function: linear; }
-.ease-in { transition-timing-function: cubic-bezier(0.4, 0, 1, 1); }
-.ease-out { transition-timing-function: cubic-bezier(0, 0, 0.2, 1); }
-.ease-in-out { transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+.ease-linear {
+  transition-timing-function: linear;
+}
+.ease-in {
+  transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
+}
+.ease-out {
+  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+}
+.ease-in-out {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
 
 /* 自定义缓动函数 - 已清理未使用的缓动函数 */
 
@@ -75,16 +101,19 @@
    ================= */
 
 /* 过渡延迟 - 只保留项目中实际使用的 */
-.delay-300 { transition-delay: 300ms; } /* App.tsx中使用 */
+.delay-300 {
+  transition-delay: 300ms;
+} /* App.tsx中使用 */
 
 /* =================
    主题切换过渡
    ================= */
 
 .theme-transition {
-  transition: background-color var(--duration-slow) ease-in-out,
-              border-color var(--duration-slow) ease-in-out,
-              color var(--duration-slow) ease-in-out;
+  transition:
+    background-color var(--duration-slow) ease-in-out,
+    border-color var(--duration-slow) ease-in-out,
+    color var(--duration-slow) ease-in-out;
 }
 
 /* 主题切换时的平滑过渡 */
@@ -97,9 +126,10 @@ body,
 .theme-text-tertiary,
 .theme-border-primary,
 .theme-border-secondary {
-  transition: background-color var(--duration-slow) ease-in-out,
-              color var(--duration-slow) ease-in-out,
-              border-color var(--duration-slow) ease-in-out;
+  transition:
+    background-color var(--duration-slow) ease-in-out,
+    color var(--duration-slow) ease-in-out,
+    border-color var(--duration-slow) ease-in-out;
 }
 
 /* =================
@@ -127,8 +157,9 @@ body,
 
 /* 焦点过渡 */
 .focus-transition {
-  transition: outline var(--duration-fast) ease,
-              box-shadow var(--duration-fast) ease;
+  transition:
+    outline var(--duration-fast) ease,
+    box-shadow var(--duration-fast) ease;
 }
 
 .focus-transition:focus {
@@ -163,8 +194,9 @@ body,
 .card-enter {
   opacity: 0;
   transform: translateY(30px) scale(0.9);
-  transition: opacity var(--duration-normal) ease,
-              transform var(--duration-normal) cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition:
+    opacity var(--duration-normal) ease,
+    transform var(--duration-normal) cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .card-enter-active {
@@ -173,8 +205,9 @@ body,
 }
 
 .card-hover {
-  transition: transform var(--duration-fast) ease,
-              box-shadow var(--duration-fast) ease;
+  transition:
+    transform var(--duration-fast) ease,
+    box-shadow var(--duration-fast) ease;
 }
 
 .card-hover:hover {
@@ -189,8 +222,9 @@ body,
 .list-item-enter {
   opacity: 0;
   transform: translateX(-20px);
-  transition: opacity var(--duration-normal) ease,
-              transform var(--duration-normal) ease;
+  transition:
+    opacity var(--duration-normal) ease,
+    transform var(--duration-normal) ease;
 }
 
 .list-item-enter-active {
@@ -201,8 +235,9 @@ body,
 .list-item-exit {
   opacity: 1;
   transform: translateX(0);
-  transition: opacity var(--duration-fast) ease,
-              transform var(--duration-fast) ease;
+  transition:
+    opacity var(--duration-fast) ease,
+    transform var(--duration-fast) ease;
 }
 
 .list-item-exit-active {
@@ -217,8 +252,9 @@ body,
 .notification-enter {
   opacity: 0;
   transform: translateY(-100%) scale(0.9);
-  transition: opacity var(--duration-normal) ease,
-              transform var(--duration-normal) cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition:
+    opacity var(--duration-normal) ease,
+    transform var(--duration-normal) cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .notification-enter-active {
@@ -229,8 +265,9 @@ body,
 .notification-exit {
   opacity: 1;
   transform: translateY(0) scale(1);
-  transition: opacity var(--duration-fast) ease,
-              transform var(--duration-fast) ease;
+  transition:
+    opacity var(--duration-fast) ease,
+    transform var(--duration-fast) ease;
 }
 
 .notification-exit-active {
@@ -301,7 +338,7 @@ body,
   .theme-transition {
     transition-duration: 0.01ms !important;
   }
-  
+
   .page-enter,
   .page-exit,
   .modal-enter,
@@ -321,7 +358,7 @@ body,
   .loading-exit {
     transition: none !important;
   }
-  
+
   .skeleton {
     animation: none;
     background: rgba(var(--bg-tertiary), 0.8);

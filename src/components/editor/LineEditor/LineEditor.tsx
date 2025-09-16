@@ -25,7 +25,7 @@ export const LineEditor: React.FC<LineEditorProps> = ({
   minHeight = 120,
   height,
   onFocus,
-  onBlur
+  onBlur,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -70,12 +70,12 @@ export const LineEditor: React.FC<LineEditorProps> = ({
   return (
     <div className={cn('line-editor', className)}>
       <div className="textarea-container relative bg-transparent border-none">
-        <textarea 
-          ref={textareaRef} 
+        <textarea
+          ref={textareaRef}
           value={value}
-          onChange={handleChange} 
+          onChange={handleChange}
           onKeyDown={handleKeyDown}
-          onFocus={handleFocus} 
+          onFocus={handleFocus}
           onBlur={handleBlur}
           placeholder={placeholder}
           className={cn(
@@ -87,7 +87,7 @@ export const LineEditor: React.FC<LineEditorProps> = ({
           style={{
             minHeight: `${minHeight}px`,
             height: height ? `${height}px` : undefined,
-            lineHeight: '1.6'
+            lineHeight: '1.6',
           }}
         />
       </div>

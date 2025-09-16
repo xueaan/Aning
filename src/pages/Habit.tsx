@@ -16,7 +16,7 @@ const Habit: React.FC = () => {
     getTodayHabits,
     getOverallStats,
     recordHabitCompletion,
-    undoHabitCompletion
+    undoHabitCompletion,
   } = useHabitStore();
 
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -198,7 +198,9 @@ const Habit: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-text-muted text-sm">平均完成率</p>
-                <p className="text-2xl font-bold text-text-primary">{stats.averageCompletionRate}%</p>
+                <p className="text-2xl font-bold text-text-primary">
+                  {stats.averageCompletionRate}%
+                </p>
               </div>
               <div className="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center">
                 <TrendingUp size={20} className="text-purple-500" />
@@ -206,7 +208,6 @@ const Habit: React.FC = () => {
             </div>
           </div>
         </div>
-
       </div>
       <div className="flex-1 p-6">
         {currentView === 'list' && (
@@ -218,16 +219,18 @@ const Habit: React.FC = () => {
                 </div>
                 <h3 className="text-lg font-medium text-text-primary mb-2">暂无活跃习惯</h3>
                 <p className="text-text-muted mb-4">开始创建你的第一个习惯吧！</p>
-                <button onClick={() => setShowCreateForm(true)}
-                  className="px-6 py-2 rounded-lg theme-text-accent">
+                <button
+                  onClick={() => setShowCreateForm(true)}
+                  className="px-6 py-2 rounded-lg theme-text-accent"
+                >
                   新建习惯
                 </button>
               </div>
             ) : (
               <div className="grid gap-4">
                 {todayHabits.map((habit) => (
-                  <HabitCard 
-                    key={habit.id} 
+                  <HabitCard
+                    key={habit.id}
                     habit={habit}
                     onComplete={handleHabitComplete}
                     onUndo={handleUndoHabit}
@@ -241,16 +244,14 @@ const Habit: React.FC = () => {
           </div>
         )}
 
-        {currentView === 'stats' && (
-          <HabitStats />
-        )}
+        {currentView === 'stats' && <HabitStats />}
       </div>
 
       {/* 习惯表单模态框 */}
-      <HabitForm 
-        habit={editingHabit} 
+      <HabitForm
+        habit={editingHabit}
         isOpen={showCreateForm}
-        onClose={handleCloseForm} 
+        onClose={handleCloseForm}
         onSubmit={handleFormSubmit}
       />
     </div>
@@ -258,14 +259,3 @@ const Habit: React.FC = () => {
 };
 
 export default Habit;
-
-
-
-
-
-
-
-
-
-
-

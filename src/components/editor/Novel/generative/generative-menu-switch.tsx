@@ -1,10 +1,10 @@
-import { EditorBubble, useEditor } from "novel";
-import { Fragment, type ReactNode, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Bot } from "lucide-react";
-import { useAppStore } from "@/stores";
-import { getAiProviderStatus } from "@/utils/aiUtils";
-import { AISelector } from "./ai-selector";
+import { EditorBubble, useEditor } from 'novel';
+import { Fragment, type ReactNode, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Bot } from 'lucide-react';
+import { useAppStore } from '@/stores';
+import { getAiProviderStatus } from '@/utils/aiUtils';
+import { AISelector } from './ai-selector';
 
 interface GenerativeMenuSwitchProps {
   children: ReactNode;
@@ -27,15 +27,15 @@ const GenerativeMenuSwitch = ({ children, open, onOpenChange }: GenerativeMenuSw
   }, [open, editor]);
 
   return (
-    <EditorBubble 
+    <EditorBubble
       tippyOptions={{
-        placement: open ? "bottom-start" : "top",
+        placement: open ? 'bottom-start' : 'top',
         onHidden: () => {
           onOpenChange(false);
           if (editor) {
             editor.chain().unsetHighlight().run();
           }
-        }
+        },
       }}
       className="feather-glass-deco flex items-center gap-1 px-3 py-2 rounded-xl"
     >

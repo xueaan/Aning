@@ -38,9 +38,11 @@ export const KnowledgeBaseContextMenu: React.FC<KnowledgeBaseContextMenuProps> =
   onExport,
   onDuplicate,
   onSettings,
-  onRefresh
+  onRefresh,
 }) => {
-  const { /* theme */ } = useAppStore();
+  const {
+    /* theme */
+  } = useAppStore();
   const menuRef = useRef<HTMLDivElement>(null);
   const [adjustedPosition, setAdjustedPosition] = useState(position);
 
@@ -112,14 +114,14 @@ export const KnowledgeBaseContextMenu: React.FC<KnowledgeBaseContextMenuProps> =
       onClick: () => {
         onCreate();
         onClose();
-      }
+      },
     },
     {
       id: 'divider-1',
       label: '',
       icon: null,
       onClick: () => {},
-      divider: true
+      divider: true,
     },
     {
       id: 'edit',
@@ -128,7 +130,7 @@ export const KnowledgeBaseContextMenu: React.FC<KnowledgeBaseContextMenuProps> =
       onClick: () => {
         onEdit(knowledgeBase);
         onClose();
-      }
+      },
     },
     {
       id: 'duplicate',
@@ -137,7 +139,7 @@ export const KnowledgeBaseContextMenu: React.FC<KnowledgeBaseContextMenuProps> =
       onClick: () => {
         onDuplicate?.(knowledgeBase);
         onClose();
-      }
+      },
     },
     {
       id: 'settings',
@@ -146,14 +148,14 @@ export const KnowledgeBaseContextMenu: React.FC<KnowledgeBaseContextMenuProps> =
       onClick: () => {
         onSettings?.(knowledgeBase);
         onClose();
-      }
+      },
     },
     {
       id: 'divider-2',
       label: '',
       icon: null,
       onClick: () => {},
-      divider: true
+      divider: true,
     },
     {
       id: 'export',
@@ -162,7 +164,7 @@ export const KnowledgeBaseContextMenu: React.FC<KnowledgeBaseContextMenuProps> =
       onClick: () => {
         onExport?.(knowledgeBase);
         onClose();
-      }
+      },
     },
     {
       id: 'refresh',
@@ -171,14 +173,14 @@ export const KnowledgeBaseContextMenu: React.FC<KnowledgeBaseContextMenuProps> =
       onClick: () => {
         onRefresh?.();
         onClose();
-      }
+      },
     },
     {
       id: 'divider-3',
       label: '',
       icon: null,
       onClick: () => {},
-      divider: true
+      divider: true,
     },
     {
       id: 'delete',
@@ -188,24 +190,29 @@ export const KnowledgeBaseContextMenu: React.FC<KnowledgeBaseContextMenuProps> =
         onDelete(knowledgeBase);
         onClose();
       },
-      danger: true
-    }
+      danger: true,
+    },
   ];
 
   return (
-    <div ref={menuRef}
-            className={cn('fixed z-50 min-w-48 rounded-lg shadow-lg border backdrop-blur-sm',
+    <div
+      ref={menuRef}
+      className={cn(
+        'fixed z-50 min-w-48 rounded-lg shadow-lg border backdrop-blur-sm',
         'theme-bg-secondary/95 theme-border'
       )}
       style={{
         left: adjustedPosition.x,
-        top: adjustedPosition.y
+        top: adjustedPosition.y,
       }}
     >
       {/* 菜单头部 */}
-      <div className={cn('px-4 py-3 border-b text-sm font-medium truncate',
-        'theme-border theme-text-primary'
-      )}>
+      <div
+        className={cn(
+          'px-4 py-3 border-b text-sm font-medium truncate',
+          'theme-border theme-text-primary'
+        )}
+      >
         <div className="flex items-center gap-2">
           <span className="text-lg">{knowledgeBase.icon || '📚'}</span>
           <span className="truncate">{knowledgeBase.name}</span>
@@ -214,18 +221,13 @@ export const KnowledgeBaseContextMenu: React.FC<KnowledgeBaseContextMenuProps> =
       <div className="py-1">
         {menuItems.map((item) => {
           if (item.divider) {
-            return (
-              <div key={item.id}
-            className={cn(
-                  'mx-2 my-1 h-px',
-                  'theme-border'
-                )}
-              />
-            );
+            return <div key={item.id} className={cn('mx-2 my-1 h-px', 'theme-border')} />;
           }
 
           return (
-            <button key={item.id} onClick={item.onClick}
+            <button
+              key={item.id}
+              onClick={item.onClick}
               className={cn(
                 'w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
                 item.danger
@@ -238,16 +240,7 @@ export const KnowledgeBaseContextMenu: React.FC<KnowledgeBaseContextMenuProps> =
             </button>
           );
         })}
-    </div>
+      </div>
     </div>
   );
 };
-
-
-
-
-
-
-
-
-

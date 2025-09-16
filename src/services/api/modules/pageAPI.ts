@@ -1,8 +1,13 @@
-import { invoke } from '@tauri-apps/api/core';
+import { invokeTauri } from '@/utils/tauriWrapper';
 import type { Page } from '@/types';
 
 export class PageAPI {
-  static async createPage(knowledgeBaseId: string, title: string, parentId?: string, orderIndex?: number): Promise<string> {
+  static async createPage(
+    knowledgeBaseId: string,
+    title: string,
+    parentId?: string,
+    orderIndex?: number
+  ): Promise<string> {
     try {
       // Parameter validation
       if (!knowledgeBaseId || knowledgeBaseId.trim() === '') {
@@ -14,12 +19,12 @@ export class PageAPI {
       if (orderIndex !== undefined && orderIndex < 0) {
         throw new Error('Order index must be non-negative');
       }
-      
-      return await invoke('create_page', { 
-        knowledgeBaseId: knowledgeBaseId.trim(), 
-        title: title.trim(), 
-        parentId: parentId?.trim() || null, 
-        orderIndex: orderIndex || 0 
+
+      return await invokeTauri('create_page', {
+        knowledgeBaseId: knowledgeBaseId.trim(),
+        title: title.trim(),
+        parentId: parentId?.trim() || null,
+        orderIndex: orderIndex || 0,
       });
     } catch (error) {
       console.error('[PageAPI] createPage failed:', error);
@@ -33,10 +38,10 @@ export class PageAPI {
       if (!knowledgeBaseId || knowledgeBaseId.trim() === '') {
         throw new Error('Knowledge base ID is required and cannot be empty');
       }
-      
-      return await invoke('get_pages', { 
-        knowledgeBaseId: knowledgeBaseId.trim(), 
-        parentId: parentId?.trim() || null 
+
+      return await invokeTauri('get_pages', {
+        knowledgeBaseId: knowledgeBaseId.trim(),
+        parentId: parentId?.trim() || null,
       });
     } catch (error) {
       console.error('[PageAPI] getPages failed:', error);
@@ -46,7 +51,7 @@ export class PageAPI {
 
   static async getAllPages(knowledgeBaseId: string): Promise<Page[]> {
     try {
-      return await invoke('get_all_pages', { knowledgeBaseId: knowledgeBaseId });
+      return await invokeTauri('get_all_pages', { knowledgeBaseId: knowledgeBaseId });
     } catch (error) {
       console.error('[PageAPI] getAllPages failed:', error);
       throw error;
@@ -55,21 +60,28 @@ export class PageAPI {
 
   static async getPageById(id: string): Promise<Page | null> {
     try {
-      return await invoke('get_page_by_id', { id });
+      return await invokeTauri('get_page_by_id', { id });
     } catch (error) {
       console.error('[PageAPI] getPageById failed:', error);
       throw error;
     }
   }
 
-  static async updatePage(id: string, title?: string, parentId?: string, orderIndex?: number): Promise<void> {
+  static async updatePage(
+    id: string,
+    title?: string,
+    parentId?: string,
+    orderIndex?: number
+  ): Promise<void> {
     try {
       // Parameter validation
       if (!id || id.trim() === '') {
         throw new Error('Page ID is required and cannot be empty');
       }
       if (title === undefined && parentId === undefined && orderIndex === undefined) {
-        throw new Error('At least one field (title, parentId, or orderIndex) must be provided for update');
+        throw new Error(
+          'At least one field (title, parentId, or orderIndex) must be provided for update'
+        );
       }
       if (title !== undefined && title.trim() === '') {
         throw new Error('Page title cannot be empty');
@@ -77,12 +89,12 @@ export class PageAPI {
       if (orderIndex !== undefined && orderIndex < 0) {
         throw new Error('Order index must be non-negative');
       }
-      
-      await invoke('update_page', { 
-        id: id.trim(), 
-        title: title?.trim(), 
-        parentId: parentId?.trim() || null, 
-        orderIndex: orderIndex 
+
+      await invokeTauri('update_page', {
+        id: id.trim(),
+        title: title?.trim(),
+        parentId: parentId?.trim() || null,
+        orderIndex: orderIndex,
       });
     } catch (error) {
       console.error('[PageAPI] updatePage failed:', error);
@@ -92,7 +104,7 @@ export class PageAPI {
 
   static async deletePage(id: string): Promise<void> {
     try {
-      await invoke('delete_page', { id });
+      await invokeTauri('delete_page', { id });
     } catch (error) {
       console.error('[PageAPI] deletePage failed:', error);
       throw error;
@@ -101,16 +113,24 @@ export class PageAPI {
 
   static async searchPages(knowledgeBaseId: string, query: string): Promise<Page[]> {
     try {
-      return await invoke('search_pages', { knowledgeBaseId: knowledgeBaseId, query });
+      return await invokeTauri('search_pages', { knowledgeBaseId: knowledgeBaseId, query });
     } catch (error) {
       console.error('[PageAPI] searchPages failed:', error);
       throw error;
     }
   }
 
-  static async movePage(pageId: string, newParentId?: string, newOrderIndex: number = 0): Promise<void> {
+  static async movePage(
+    pageId: string,
+    newParentId?: string,
+    newOrderIndex: number = 0
+  ): Promise<void> {
     try {
-      await invoke('move_page', { pageId: pageId, newParentId: newParentId, newOrderIndex: newOrderIndex });
+      await invokeTauri('move_page', {
+        pageId: pageId,
+        newParentId: newParentId,
+        newOrderIndex: newOrderIndex,
+      });
     } catch (error) {
       console.error('[PageAPI] movePage failed:', error);
       throw error;
@@ -119,7 +139,7 @@ export class PageAPI {
 
   static async getPageBreadcrumb(pageId: string): Promise<Page[]> {
     try {
-      return await invoke('get_page_breadcrumb', { pageId: pageId });
+      return await invokeTauri('get_page_breadcrumb', { pageId: pageId });
     } catch (error) {
       console.error('[PageAPI] getPageBreadcrumb failed:', error);
       throw error;
@@ -147,7 +167,7 @@ export class PageAPI {
       }
       return {
         title: page.title,
-        content: '' // Content would typically come from blocks
+        content: '', // Content would typically come from blocks
       };
     } catch (error) {
       console.error('[PageAPI] getPageContent failed:', error);

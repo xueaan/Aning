@@ -24,9 +24,9 @@ const pulseVariants = {
     transition: {
       duration: 1.5,
       repeat: Infinity,
-      ease: "easeInOut" as const
-    }
-  }
+      ease: 'easeInOut' as const,
+    },
+  },
 };
 
 const waveVariants = {
@@ -36,23 +36,23 @@ const waveVariants = {
     transition: {
       duration: 1.5,
       repeat: Infinity,
-      ease: "easeInOut" as const
-    }
-  }
+      ease: 'easeInOut' as const,
+    },
+  },
 };
 
 const shimmerVariants = {
-  initial: { 
-    backgroundPosition: '-200px 0'
+  initial: {
+    backgroundPosition: '-200px 0',
   },
   animate: {
     backgroundPosition: 'calc(200px + 100%) 0',
     transition: {
       duration: 1.8,
       repeat: Infinity,
-      ease: "linear" as const
-    }
-  }
+      ease: 'linear' as const,
+    },
+  },
 };
 
 export const Skeleton: React.FC<SkeletonProps> = ({
@@ -61,11 +61,11 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   circle = false,
   className = '',
   animation = 'pulse',
-  animate = true
+  animate = true,
 }) => {
   const baseStyles = {
     width: typeof width === 'number' ? `${width}px` : width,
-    height: typeof height === 'number' ? `${height}px` : height
+    height: typeof height === 'number' ? `${height}px` : height,
   };
 
   const baseClassName = `
@@ -75,20 +75,17 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   `.trim();
 
   if (!animate) {
-    return (
-      <div className={baseClassName} style={baseStyles}
-      />
-    );
+    return <div className={baseClassName} style={baseStyles} />;
   }
 
   switch (animation) {
     case 'wave':
       return (
-        <div className={`relative overflow-hidden ${baseClassName}`}
-          style={baseStyles}
-        >
-          <motion.div className="absolute inset-0 bg-gradient-to-r from-transparent via-bg-secondary/20 to-transparent"
-            variants={waveVariants} initial="initial"
+        <div className={`relative overflow-hidden ${baseClassName}`} style={baseStyles}>
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-bg-secondary/20 to-transparent"
+            variants={waveVariants}
+            initial="initial"
             animate="animate"
           />
         </div>
@@ -96,7 +93,9 @@ export const Skeleton: React.FC<SkeletonProps> = ({
 
     case 'shimmer':
       return (
-        <motion.div className={baseClassName} style={{
+        <motion.div
+          className={baseClassName}
+          style={{
             ...baseStyles,
             background: `
               linear-gradient(
@@ -107,7 +106,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({
               )
             `,
             backgroundSize: '200px 100%',
-            backgroundRepeat: 'no-repeat'
+            backgroundRepeat: 'no-repeat',
           }}
           variants={shimmerVariants}
           initial="initial"
@@ -118,8 +117,11 @@ export const Skeleton: React.FC<SkeletonProps> = ({
     case 'pulse':
     default:
       return (
-        <motion.div className={baseClassName} style={baseStyles}
-          variants={pulseVariants} initial="initial"
+        <motion.div
+          className={baseClassName}
+          style={baseStyles}
+          variants={pulseVariants}
+          initial="initial"
           animate="animate"
         />
       );
@@ -141,21 +143,19 @@ export const SkeletonCard: React.FC<{ animate?: boolean }> = ({ animate = true }
   </div>
 );
 
-export const SkeletonList: React.FC<{ 
-  count?: number; 
+export const SkeletonList: React.FC<{
+  count?: number;
   animate?: boolean;
   itemHeight?: string | number;
-}> = ({ 
-  count = 5, 
-  animate = true,
-  itemHeight = "3rem"
-}) => (
+}> = ({ count = 5, animate = true, itemHeight = '3rem' }) => (
   <div className="space-y-2">
     {Array.from({ length: count }).map((_, index) => (
-      <motion.div key={index}
-            className="flex items-center gap-3 p-3 rounded-lg bg-bg-secondary/10"
-            style={{ minHeight: itemHeight }}
-        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+      <motion.div
+        key={index}
+        className="flex items-center gap-3 p-3 rounded-lg bg-bg-secondary/10"
+        style={{ minHeight: itemHeight }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.1 }}
       >
         <Skeleton circle width={32} height={32} animate={animate} />
@@ -168,26 +168,18 @@ export const SkeletonList: React.FC<{
   </div>
 );
 
-export const SkeletonText: React.FC<{ 
+export const SkeletonText: React.FC<{
   lines?: number;
   animate?: boolean;
 }> = ({ lines = 3, animate = true }) => (
   <div className="space-y-2">
     {Array.from({ length: lines }).map((_, index) => (
-      <Skeleton key={index} width={index === lines - 1 ? "70%" : "100%"}
+      <Skeleton
+        key={index}
+        width={index === lines - 1 ? '70%' : '100%'}
         height="1rem"
         animate={animate}
       />
     ))}
   </div>
 );
-
-
-
-
-
-
-
-
-
-

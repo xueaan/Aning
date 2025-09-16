@@ -51,10 +51,8 @@
    特定功能模块的专用样式
    ================= */
 
-
 /* 知识库模块样式 */
 @import './modules/knowledge.css';
-
 
 /* 编辑器模块样式 */
 @import './modules/editor.css';
@@ -104,11 +102,11 @@
 
 @layer utilities {
   /* 自定义工具类可以在这里添加 */
-  
+
   /* 滚动条隐藏工具类 - 已移除重复定义，参见theme.css */
-  
+
   /* 移除与theme.css重复的样式定义 - 保持单一源原则 */
-  
+
   /* 所有主题类定义已移至theme.css，遵循单一源原则 */
 }
 
@@ -123,8 +121,8 @@
     --bg-primary: #ffffff;
     --border-primary: #e2e8f0;
   }
-  
-  [data-theme="dark"] {
+
+  [data-theme='dark'] {
     --text-primary: #f8fafc;
     --bg-primary: #0f172a;
     --border-primary: #475569;
@@ -170,40 +168,53 @@
 }
 
 /* 语法高亮颜色 - 浅色主题 */
-.hljs-keyword, .hljs-selector-tag, .hljs-literal, .hljs-section, .hljs-link {
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-section,
+.hljs-link {
   color: #c586c0;
 }
 
-.hljs-string, .hljs-regexp, .hljs-template-string {
+.hljs-string,
+.hljs-regexp,
+.hljs-template-string {
   color: #ce9178;
 }
 
-.hljs-comment, .hljs-quote {
+.hljs-comment,
+.hljs-quote {
   color: #6a9955;
   font-style: italic;
 }
 
-.hljs-number, .hljs-symbol {
+.hljs-number,
+.hljs-symbol {
   color: #b5cea8;
 }
 
-.hljs-function, .hljs-title {
+.hljs-function,
+.hljs-title {
   color: #dcdcaa;
 }
 
-.hljs-variable, .hljs-template-variable {
+.hljs-variable,
+.hljs-template-variable {
   color: #9cdcfe;
 }
 
-.hljs-type, .hljs-class {
+.hljs-type,
+.hljs-class {
   color: #4ec9b0;
 }
 
-.hljs-built_in, .hljs-builtin-name {
+.hljs-built_in,
+.hljs-builtin-name {
   color: #569cd6;
 }
 
-.hljs-attribute, .hljs-name {
+.hljs-attribute,
+.hljs-name {
   color: #92c5f1;
 }
 
@@ -211,45 +222,59 @@
   color: #569cd6;
 }
 
-.hljs-operator, .hljs-punctuation {
+.hljs-operator,
+.hljs-punctuation {
   color: #d4d4d4;
 }
 
 /* 深色主题下的语法高亮 */
-.dark .hljs-keyword, .dark .hljs-selector-tag, .dark .hljs-literal, .dark .hljs-section, .dark .hljs-link {
+.dark .hljs-keyword,
+.dark .hljs-selector-tag,
+.dark .hljs-literal,
+.dark .hljs-section,
+.dark .hljs-link {
   color: #c586c0;
 }
 
-.dark .hljs-string, .dark .hljs-regexp, .dark .hljs-template-string {
+.dark .hljs-string,
+.dark .hljs-regexp,
+.dark .hljs-template-string {
   color: #ce9178;
 }
 
-.dark .hljs-comment, .dark .hljs-quote {
+.dark .hljs-comment,
+.dark .hljs-quote {
   color: #6a9955;
   font-style: italic;
 }
 
-.dark .hljs-number, .dark .hljs-symbol {
+.dark .hljs-number,
+.dark .hljs-symbol {
   color: #b5cea8;
 }
 
-.dark .hljs-function, .dark .hljs-title {
+.dark .hljs-function,
+.dark .hljs-title {
   color: #dcdcaa;
 }
 
-.dark .hljs-variable, .dark .hljs-template-variable {
+.dark .hljs-variable,
+.dark .hljs-template-variable {
   color: #9cdcfe;
 }
 
-.dark .hljs-type, .dark .hljs-class {
+.dark .hljs-type,
+.dark .hljs-class {
   color: #4ec9b0;
 }
 
-.dark .hljs-built_in, .dark .hljs-builtin-name {
+.dark .hljs-built_in,
+.dark .hljs-builtin-name {
   color: #569cd6;
 }
 
-.dark .hljs-attribute, .dark .hljs-name {
+.dark .hljs-attribute,
+.dark .hljs-name {
   color: #92c5f1;
 }
 
@@ -257,7 +282,8 @@
   color: #569cd6;
 }
 
-.dark .hljs-operator, .dark .hljs-punctuation {
+.dark .hljs-operator,
+.dark .hljs-punctuation {
   color: #cccccc;
 }
 
@@ -298,9 +324,9 @@
   .debug-border * {
     outline: 1px solid red !important;
   }
-  
+
   .debug-grid {
-    background-image: 
+    background-image:
       linear-gradient(rgba(255, 0, 0, 0.1) 1px, transparent 1px),
       linear-gradient(90deg, rgba(255, 0, 0, 0.1) 1px, transparent 1px);
     background-size: 20px 20px;

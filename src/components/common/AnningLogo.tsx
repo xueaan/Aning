@@ -6,29 +6,29 @@ interface AnningLogoProps {
   className?: string;
 }
 
-export const AnningLogo: React.FC<AnningLogoProps> = ({
-  className = ''
-}) => {
+export const AnningLogo: React.FC<AnningLogoProps> = ({ className = '' }) => {
   const { theme } = useAppStore();
   const [colorIndex, setColorIndex] = useState(0);
 
   // 动态颜色数组
   const isDark = theme === 'dark';
-  const colorPalette = isDark ? [
-    { color: '#E9D5FF', shadow: 'rgba(168, 85, 247, 0.5)' }, // 紫色
-    { color: '#FBBF24', shadow: 'rgba(251, 191, 36, 0.4)' }, // 金色
-    { color: '#34D399', shadow: 'rgba(52, 211, 153, 0.4)' }, // 绿色
-    { color: '#F87171', shadow: 'rgba(248, 113, 113, 0.4)' }, // 红色
-    { color: '#60A5FA', shadow: 'rgba(96, 165, 250, 0.4)' }, // 蓝色
-    { color: '#A78BFA', shadow: 'rgba(167, 139, 250, 0.4)' }, // 靛色
-  ] : [
-    { color: '#FBBF24', shadow: 'rgba(251, 191, 36, 0.5)' }, // 金色
-    { color: '#8B5CF6', shadow: 'rgba(139, 92, 246, 0.4)' }, // 紫色
-    { color: '#10B981', shadow: 'rgba(16, 185, 129, 0.4)' }, // 绿色
-    { color: '#EF4444', shadow: 'rgba(239, 68, 68, 0.4)' }, // 红色
-    { color: '#3B82F6', shadow: 'rgba(59, 130, 246, 0.4)' }, // 蓝色
-    { color: '#F97316', shadow: 'rgba(249, 115, 22, 0.4)' }, // 橙色
-  ];
+  const colorPalette = isDark
+    ? [
+        { color: '#E9D5FF', shadow: 'rgba(168, 85, 247, 0.5)' }, // 紫色
+        { color: '#FBBF24', shadow: 'rgba(251, 191, 36, 0.4)' }, // 金色
+        { color: '#34D399', shadow: 'rgba(52, 211, 153, 0.4)' }, // 绿色
+        { color: '#F87171', shadow: 'rgba(248, 113, 113, 0.4)' }, // 红色
+        { color: '#60A5FA', shadow: 'rgba(96, 165, 250, 0.4)' }, // 蓝色
+        { color: '#A78BFA', shadow: 'rgba(167, 139, 250, 0.4)' }, // 靛色
+      ]
+    : [
+        { color: '#FBBF24', shadow: 'rgba(251, 191, 36, 0.5)' }, // 金色
+        { color: '#8B5CF6', shadow: 'rgba(139, 92, 246, 0.4)' }, // 紫色
+        { color: '#10B981', shadow: 'rgba(16, 185, 129, 0.4)' }, // 绿色
+        { color: '#EF4444', shadow: 'rgba(239, 68, 68, 0.4)' }, // 红色
+        { color: '#3B82F6', shadow: 'rgba(59, 130, 246, 0.4)' }, // 蓝色
+        { color: '#F97316', shadow: 'rgba(249, 115, 22, 0.4)' }, // 橙色
+      ];
 
   const currentColors = colorPalette[colorIndex];
 
@@ -55,16 +55,16 @@ export const AnningLogo: React.FC<AnningLogoProps> = ({
 
   return (
     <div className={`w-full flex items-center justify-center select-none ${className}`}>
-      <motion.div 
+      <motion.div
         className="handwriting-container flex items-center justify-center relative"
         animate={{
           color: currentColors.color,
           textShadow: `0 0 20px ${currentColors.shadow}`,
-          filter: `drop-shadow(0 0 10px ${currentColors.shadow})`
+          filter: `drop-shadow(0 0 10px ${currentColors.shadow})`,
         }}
         transition={{
           duration: 1.5,
-          ease: "easeInOut"
+          ease: 'easeInOut',
         }}
         style={{
           fontFamily: '"Caveat", cursive',
@@ -72,7 +72,7 @@ export const AnningLogo: React.FC<AnningLogoProps> = ({
           fontWeight: 700,
           fontStyle: 'italic',
           letterSpacing: '4px',
-          transform: 'rotate(-3deg)'
+          transform: 'rotate(-3deg)',
         }}
       >
         {letters.map((letter, index) => {
@@ -81,38 +81,38 @@ export const AnningLogo: React.FC<AnningLogoProps> = ({
           const scales = [1, 0.95, 1.05, 0.9, 1.02, 1.08];
 
           return (
-            <motion.span key={`${letter}-${index}`}
-              
-            className="handwriting-letter"
+            <motion.span
+              key={`${letter}-${index}`}
+              className="handwriting-letter"
               initial={{
                 opacity: 0,
                 y: 40,
                 rotate: rotations[index] - 15,
-                scale: scales[index] * 0.7
+                scale: scales[index] * 0.7,
               }}
               animate={{
                 opacity: 1,
                 y: 0,
                 rotate: rotations[index],
-                scale: scales[index]
+                scale: scales[index],
               }}
               transition={{
                 duration: 1,
                 delay: index * 0.5 + 0.3,
                 ease: [0.25, 0.46, 0.45, 0.94],
-                type: "spring",
-                bounce: 0.3
+                type: 'spring',
+                bounce: 0.3,
               }}
               whileHover={{
                 scale: scales[index] * 1.1,
                 rotate: rotations[index] + (Math.random() - 0.5) * 10,
-                transition: { duration: 0.3, type: "spring", bounce: 0.4 }
+                transition: { duration: 0.3, type: 'spring', bounce: 0.4 },
               }}
               style={{
                 display: 'inline-block',
                 transformOrigin: 'center bottom',
                 marginRight: '6px',
-                position: 'relative'
+                position: 'relative',
               }}
             >
               {letter}
@@ -121,24 +121,25 @@ export const AnningLogo: React.FC<AnningLogoProps> = ({
         })}
 
         {/* 装饰星星 */}
-        <motion.span initial={{ opacity: 0, rotate: 0, scale: 0 }}
+        <motion.span
+          initial={{ opacity: 0, rotate: 0, scale: 0 }}
           animate={{
             opacity: 0.8,
             rotate: 360,
             scale: 1,
-            color: currentColors.color
+            color: currentColors.color,
           }}
           transition={{
             duration: 1.2,
             delay: 3.8,
-            ease: "backOut"
+            ease: 'backOut',
           }}
           style={{
             position: 'absolute',
             right: '10px',
             top: '-8px',
             fontSize: '14px',
-            filter: `drop-shadow(0 0 8px ${currentColors.shadow})`
+            filter: `drop-shadow(0 0 8px ${currentColors.shadow})`,
           }}
         >
           ✨
@@ -147,5 +148,3 @@ export const AnningLogo: React.FC<AnningLogoProps> = ({
     </div>
   );
 };
-
-

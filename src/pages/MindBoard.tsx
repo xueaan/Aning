@@ -4,4 +4,3 @@ import { MindBoard as MindBoardComponent } from '@/components/modules/mindboard/
 export const MindBoard: React.FC = () => {
   return <MindBoardComponent />;
 };
-

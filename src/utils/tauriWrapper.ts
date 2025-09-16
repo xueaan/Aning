@@ -6,6 +6,29 @@
 import { invoke } from '@tauri-apps/api/core';
 import { isTauriEnvironment, showBrowserLimitation } from './environmentUtils';
 
+// Convert camelCase to snake_case (top-level keys only)
+const toSnakeCase = (key: string): string => {
+  if (!/[A-Z]/.test(key)) return key;
+  return key
+    .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
+    .replace(/([A-Z])([A-Z][a-z])/g, '$1_$2')
+    .toLowerCase();
+};
+
+const mapKeysToSnakeCase = (args: any): any => {
+  if (!args || typeof args !== 'object' || Array.isArray(args)) return args;
+  const out: Record<string, any> = {};
+  for (const [k, v] of Object.entries(args)) {
+    out[toSnakeCase(k)] = v;
+  }
+  return out;
+};
+
+// Typed invoke with arg key normalization
+export const invokeTauri = async <T>(command: string, args?: any): Promise<T> => {
+  return invoke<T>(command, mapKeysToSnakeCase(args));
+};
+
 /**
  * 安全的 Tauri invoke 调用
  * 在浏览器环境中返回默认值而不是抛出异常
@@ -24,7 +47,7 @@ export const safeInvoke = async <T>(
   }
 
   try {
-    return await invoke<T>(command, args);
+    return await invoke<T>(command, mapKeysToSnakeCase(args));
   } catch (error) {
     console.error(`Tauri invoke "${command}" 失败:`, error);
     return fallbackValue ?? null;

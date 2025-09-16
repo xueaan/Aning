@@ -37,7 +37,7 @@ export const useDialogStore = create<DialogStore>((set, get) => ({
       cancelText: options.cancelText || '取消',
       type: options.type || 'info',
       onConfirm: options.onConfirm || (() => {}),
-      onCancel: options.onCancel || (() => {})
+      onCancel: options.onCancel || (() => {}),
     });
   },
 
@@ -55,9 +55,5 @@ export const useDialogStore = create<DialogStore>((set, get) => ({
     const { onCancel } = get();
     onCancel();
     set({ isOpen: false });
-  }
+  },
 }));
-
-
-
-

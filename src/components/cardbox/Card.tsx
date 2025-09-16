@@ -11,12 +11,7 @@ interface CardProps {
   className?: string;
 }
 
-export const Card: React.FC<CardProps> = ({
-  card,
-  onDelete,
-  onExpand,
-  className = ''
-}) => {
+export const Card: React.FC<CardProps> = ({ card, onDelete, onExpand, className = '' }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   // 格式化日期
@@ -33,7 +28,7 @@ export const Card: React.FC<CardProps> = ({
     } else {
       return date.toLocaleDateString('zh-CN', {
         month: 'short',
-        day: 'numeric'
+        day: 'numeric',
       });
     }
   };
@@ -77,7 +72,8 @@ export const Card: React.FC<CardProps> = ({
   return (
     <div
       className={cn(
-        'relative rounded-2xl p-6 cursor-pointer group h-[280px] flex flex-col feather-glass-deco transition-all duration-300',
+        'relative rounded-2xl p-6 cursor-pointer group h-[280px] flex flex-col bg-transparent border border-transparent hover:border-white/10 hover:backdrop-blur-sm transition-all duration-300',
+        'dark:hover:border-white/05',
         card.is_pinned && 'pinned',
         card.is_archived && 'opacity-60',
         className
@@ -86,7 +82,6 @@ export const Card: React.FC<CardProps> = ({
     >
       {/* 笔记内容区域 */}
       <div className="flex flex-col h-full">
-        
         {/* 顶部操作按钮区域 */}
         <div className="absolute top-3 right-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           {/* 展开按钮 */}
@@ -97,7 +92,7 @@ export const Card: React.FC<CardProps> = ({
           >
             <Maximize2 size={14} className="theme-text-secondary" />
           </button>
-          
+
           {/* 删除按钮 */}
           <button
             onClick={handleDeleteClick}
@@ -115,11 +110,7 @@ export const Card: React.FC<CardProps> = ({
 
         {/* 内容预览 */}
         <div className="text-sm theme-text-secondary mb-4 whitespace-pre-line line-clamp-6 leading-relaxed flex-1 overflow-hidden">
-          {card.preview || (
-            <span className="theme-text-tertiary italic">
-              暂无内容...
-            </span>
-          )}
+          {card.preview || <span className="theme-text-tertiary italic">暂无内容...</span>}
         </div>
 
         {/* 标签 */}

@@ -16,12 +16,12 @@ interface InlineTaskAddProps {
 }
 
 export const InlineTaskAdd: React.FC<InlineTaskAddProps> = ({
-  placeholder = "点击添加新任务...",
+  placeholder = '点击添加新任务...',
   defaultProjectId = null,
   defaultDueDate,
   onTaskAdded,
-  className = "",
-  showProject = true
+  className = '',
+  showProject = true,
 }) => {
   const { createTask, projects, currentView } = useTaskBoxStore();
 
@@ -96,7 +96,7 @@ export const InlineTaskAdd: React.FC<InlineTaskAddProps> = ({
         priority,
         due_date: finalDueDate && finalDueDate.trim() ? finalDueDate.trim() : undefined,
         project_id: projectId,
-        tags: []
+        tags: [],
       };
 
       await createTask(newTask);
@@ -133,11 +133,11 @@ export const InlineTaskAdd: React.FC<InlineTaskAddProps> = ({
     { value: 'urgent', label: '紧急' },
     { value: 'high', label: '高' },
     { value: 'medium', label: '中' },
-    { value: 'low', label: '低' }
+    { value: 'low', label: '低' },
   ];
 
   // 获取选中的项目
-  const selectedProject = projects.find(p => p.id === projectId);
+  const selectedProject = projects.find((p) => p.id === projectId);
 
   // 处理项目选择
   const handleProjectSelect = (project: any) => {
@@ -166,7 +166,7 @@ export const InlineTaskAdd: React.FC<InlineTaskAddProps> = ({
     // 非激活状态 - 毛玻璃风格
     return (
       <div className={`${className}`} ref={containerRef}>
-        <button 
+        <button
           onClick={handleActivate}
           className="w-full flex items-center gap-3 px-4 py-2 text-left rounded-lg transition-all duration-200 hover:shadow-sm theme-text-secondary hover:theme-text-primary feather-glass-deco"
         >
@@ -180,111 +180,114 @@ export const InlineTaskAdd: React.FC<InlineTaskAddProps> = ({
   // 激活状态 - 毛玻璃风格
   return (
     <div className={`${className} relative`} ref={containerRef}>
-    <div className="flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-200 shadow-sm feather-glass-deco">
-      {/* 占位复选框 */}
-      <div className="flex-shrink-0 w-4 h-4 border-2 border-white/20 rounded"></div>
-      <div className="flex-1 min-w-0">
-        <input 
-          ref={titleInputRef} 
-          type="text"
-          value={title} 
-          onChange={(e) => setTitle(e.target.value)}
-          onKeyDown={handleKeyDown} 
-          placeholder="输入任务标题..."
-          className="w-full text-sm font-medium bg-transparent border-none outline-none theme-text-primary theme-placeholder"
-        />
-      </div>
-      {showProject && (
-        <div className="flex-shrink-0 relative w-28">
-          <button 
-            className="w-full flex items-center gap-1 px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-200 text-xs"
-            onClick={() => setShowProjectPicker(!showProjectPicker)}
-          >
-            {selectedProject ? (
-              <>
-                <span className="flex items-center justify-center w-3 h-3">
-                  {selectedProject.icon?.length === 1 ? (
-                    <span className="text-xs">{selectedProject.icon}</span>
-                  ) : (
-                    React.createElement(getIconComponent(selectedProject.icon || 'Folder'), {
-                      theme: 'outline',
-                      size: 12,
-                      fill: 'currentColor',
-                      strokeWidth: 2,
-                      className: 'theme-text-secondary'
-                    })
-                  )}
-                </span>
-                <span className="theme-text-primary truncate">{selectedProject.name}</span>
-              </>
-            ) : (
-              <span className="theme-text-tertiary">无项目</span>
-            )}
-            <ChevronDown size={10} className="theme-text-secondary ml-auto" />
-          </button>
-          {showProjectPicker && (
-            <div className="absolute bottom-full left-0 mb-1 w-full max-h-32 overflow-y-auto rounded-lg shadow-xl z-50 feather-glass-deco">
-              <button 
-                onClick={() => handleProjectSelect({ id: null })}
-                className="w-full flex items-center gap-1 px-2 py-1.5 hover:bg-white/10 transition-all duration-200 text-left text-xs"
-              >
+      <div className="flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-200 shadow-sm feather-glass-deco">
+        {/* 占位复选框 */}
+        <div className="flex-shrink-0 w-4 h-4 border-2 border-white/20 rounded"></div>
+        <div className="flex-1 min-w-0">
+          <input
+            ref={titleInputRef}
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="输入任务标题..."
+            className="w-full text-sm font-medium bg-transparent border-none outline-none theme-text-primary theme-placeholder"
+          />
+        </div>
+        {showProject && (
+          <div className="flex-shrink-0 relative w-28">
+            <button
+              className="w-full flex items-center gap-1 px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-200 text-xs"
+              onClick={() => setShowProjectPicker(!showProjectPicker)}
+            >
+              {selectedProject ? (
+                <>
+                  <span className="flex items-center justify-center w-3 h-3">
+                    {selectedProject.icon?.length === 1 ? (
+                      <span className="text-xs">{selectedProject.icon}</span>
+                    ) : (
+                      React.createElement(getIconComponent(selectedProject.icon || 'Folder'), {
+                        theme: 'outline',
+                        size: 12,
+                        fill: 'currentColor',
+                        strokeWidth: 2,
+                        className: 'theme-text-secondary',
+                      })
+                    )}
+                  </span>
+                  <span className="theme-text-primary truncate">{selectedProject.name}</span>
+                </>
+              ) : (
                 <span className="theme-text-tertiary">无项目</span>
-              </button>
-                {projects.map(project => (
-              <button 
-                key={project.id} 
-                onClick={() => handleProjectSelect(project)}
-                className="w-full flex items-center gap-1 px-2 py-1.5 hover:bg-white/10 transition-all duration-200 text-left text-xs"
-              >
-                <span className="flex items-center justify-center w-3 h-3">
-                  {project.icon?.length === 1 ? (
-                    <span className="text-xs">{project.icon}</span>
-                  ) : (
-                    React.createElement(getIconComponent(project.icon || 'Folder'), {
-                      theme: 'outline',
-                      size: 12,
-                      fill: 'currentColor',
-                      strokeWidth: 2,
-                      className: 'theme-text-secondary'
-                    })
-                  )}
-                </span>
-                <span className="theme-text-primary truncate">{project.name}</span>
-              </button>
-            ))}
-            </div>
-          )}
+              )}
+              <ChevronDown size={10} className="theme-text-secondary ml-auto" />
+            </button>
+            {showProjectPicker && (
+              <div className="absolute bottom-full left-0 mb-1 w-full max-h-32 overflow-y-auto rounded-lg shadow-xl z-50 feather-glass-deco">
+                <button
+                  onClick={() => handleProjectSelect({ id: null })}
+                  className="w-full flex items-center gap-1 px-2 py-1.5 hover:bg-white/10 transition-all duration-200 text-left text-xs"
+                >
+                  <span className="theme-text-tertiary">无项目</span>
+                </button>
+                {projects.map((project) => (
+                  <button
+                    key={project.id}
+                    onClick={() => handleProjectSelect(project)}
+                    className="w-full flex items-center gap-1 px-2 py-1.5 hover:bg-white/10 transition-all duration-200 text-left text-xs"
+                  >
+                    <span className="flex items-center justify-center w-3 h-3">
+                      {project.icon?.length === 1 ? (
+                        <span className="text-xs">{project.icon}</span>
+                      ) : (
+                        React.createElement(getIconComponent(project.icon || 'Folder'), {
+                          theme: 'outline',
+                          size: 12,
+                          fill: 'currentColor',
+                          strokeWidth: 2,
+                          className: 'theme-text-secondary',
+                        })
+                      )}
+                    </span>
+                    <span className="theme-text-primary truncate">{project.name}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* 优先级选择 */}
+        <div className="flex-shrink-0 w-16">
+          <div className="relative">
+            <span className="inline-flex items-center px-2 py-1 text-xs rounded-full bg-white/10 theme-text-accent font-medium">
+              {priorityOptions.find((p) => p.value === priority)?.label || '中'}
+            </span>
+          </div>
         </div>
-      )}
 
-      {/* 优先级选择 */}
-      <div className="flex-shrink-0 w-16">
-        <div className="relative">
-          <span className="inline-flex items-center px-2 py-1 text-xs rounded-full bg-white/10 theme-text-accent font-medium">
-            {priorityOptions.find(p => p.value === priority)?.label || '中'}
-          </span>
+        {/* 截止日期 */}
+        <div className="flex-shrink-0 w-24">
+          <DatePicker
+            value={dueDate}
+            onChange={setDueDate}
+            placeholder="无日期"
+            size="sm"
+            showShortcuts={true}
+            shortcuts={[
+              { label: '今天', value: () => formatDate(new Date()) },
+              {
+                label: '明天',
+                value: () => formatDate(new Date(Date.now() + 24 * 60 * 60 * 1000)),
+              },
+              { label: '清除', value: '' },
+            ]}
+          />
         </div>
-      </div>
 
-      {/* 截止日期 */}
-      <div className="flex-shrink-0 w-24">
-        <DatePicker 
-          value={dueDate} 
-          onChange={setDueDate}
-          placeholder="无日期"
-          size="sm"
-          showShortcuts={true} 
-          shortcuts={[
-            { label: '今天', value: () => formatDate(new Date()) },
-            { label: '明天', value: () => formatDate(new Date(Date.now() + 24 * 60 * 60 * 1000)) },
-            { label: '清除', value: '' }
-          ]}
-        />
-      </div>
-
-      {/* 操作按钮 */}
-      <div className="flex-shrink-0 flex items-center gap-1">
-          <button 
+        {/* 操作按钮 */}
+        <div className="flex-shrink-0 flex items-center gap-1">
+          <button
             onClick={handleCancel}
             className="p-1 theme-text-secondary hover:theme-text-error hover:bg-white/10 transition-all duration-200 rounded"
             title="取消"
@@ -292,9 +295,9 @@ export const InlineTaskAdd: React.FC<InlineTaskAddProps> = ({
           >
             <X size={16} />
           </button>
-          
-          <button 
-            onClick={handleAddTask} 
+
+          <button
+            onClick={handleAddTask}
             disabled={!title.trim() || isLoading}
             className="p-1 theme-text-secondary hover:theme-text-accent hover:bg-white/10 transition-all duration-200 rounded disabled:opacity-50"
             title="添加任务"
@@ -305,24 +308,11 @@ export const InlineTaskAdd: React.FC<InlineTaskAddProps> = ({
               <Check size={16} />
             )}
           </button>
+        </div>
       </div>
-    </div>
 
       {/* 快捷键提示 */}
-      <div className="px-4 py-1 text-xs theme-text-tertiary">
-        按 Enter 添加任务，Esc 取消
-      </div>
+      <div className="px-4 py-1 text-xs theme-text-tertiary">按 Enter 添加任务，Esc 取消</div>
     </div>
   );
 };
-
-
-
-
-
-
-
-
-
-
-

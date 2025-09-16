@@ -37,7 +37,10 @@ class DatabaseInitializer {
         } catch (error) {
           const dbStartTime = performance.now();
           const initTime = performance.now() - dbStartTime;
-          console.error(`💾 Database initialization failed after ${initTime.toFixed(2)} ms:`, error);
+          console.error(
+            `💾 Database initialization failed after ${initTime.toFixed(2)} ms:`,
+            error
+          );
           // 重置状态，允许重试
           this.initPromise = null;
           this.isInitialized = false;
@@ -66,7 +69,3 @@ class DatabaseInitializer {
 }
 
 export { DatabaseInitializer };
-
-
-
-

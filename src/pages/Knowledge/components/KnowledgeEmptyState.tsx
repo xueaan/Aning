@@ -13,15 +13,20 @@ interface KnowledgeEmptyStateProps {
 export const KnowledgeEmptyState: React.FC<KnowledgeEmptyStateProps> = ({
   className = '',
   hasKnowledgeBases = false,
-  onCreateKnowledgeBase
+  onCreateKnowledgeBase,
 }) => {
   if (!hasKnowledgeBases) {
     // 没有知识库的空状态
     return (
-      <div className={cn('flex items-center justify-center h-full theme-bg-primary/50 backdrop-blur-sm', className)}>
+      <div
+        className={cn(
+          'flex items-center justify-center h-full theme-bg-primary/50 backdrop-blur-sm',
+          className
+        )}
+      >
         <div className="text-center max-w-md mx-auto p-8">
           {/* 创建知识库按钮 */}
-          <button 
+          <button
             onClick={onCreateKnowledgeBase}
             className={cn(
               'flex items-center justify-center gap-3 px-8 py-4 rounded-lg transition-all duration-200',

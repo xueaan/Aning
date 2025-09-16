@@ -17,7 +17,7 @@ interface CardBoxSelectorProps {
 export const CardBoxSelector: React.FC<CardBoxSelectorProps> = ({
   className = '',
   onCreateCardBox,
-  onEditCardBox
+  onEditCardBox,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -26,12 +26,7 @@ export const CardBoxSelector: React.FC<CardBoxSelectorProps> = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  const {
-    boxes,
-    activeBoxId,
-    selectBox,
-    deleteBox
-  } = useCardBoxStore();
+  const { boxes, activeBoxId, selectBox, deleteBox } = useCardBoxStore();
 
   // 删除确认相关状态
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -39,10 +34,10 @@ export const CardBoxSelector: React.FC<CardBoxSelectorProps> = ({
   const [isDeleting, setIsDeleting] = useState(false);
 
   // 获取当前选中的笔记盒
-  const currentBox = boxes.find(box => box.id === activeBoxId);
+  const currentBox = boxes.find((box) => box.id === activeBoxId);
 
   // 过滤笔记盒
-  const filteredBoxes = boxes.filter(box =>
+  const filteredBoxes = boxes.filter((box) =>
     box.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -70,7 +65,7 @@ export const CardBoxSelector: React.FC<CardBoxSelectorProps> = ({
       const rect = buttonRef.current.getBoundingClientRect();
       setDropdownPosition({
         top: rect.bottom + 4,
-        left: rect.left
+        left: rect.left,
       });
     }
   };
@@ -132,8 +127,12 @@ export const CardBoxSelector: React.FC<CardBoxSelectorProps> = ({
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
-      if (dropdownRef.current && !dropdownRef.current.contains(target) &&
-        buttonRef.current && !buttonRef.current.contains(target)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(target) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(target)
+      ) {
         closeDropdown();
       }
     };
@@ -154,7 +153,7 @@ export const CardBoxSelector: React.FC<CardBoxSelectorProps> = ({
   return (
     <div className={cn('relative', className)}>
       {/* 选择器按钮 */}
-      <button 
+      <button
         ref={buttonRef}
         onClick={toggleDropdown}
         className={cn(
@@ -176,7 +175,7 @@ export const CardBoxSelector: React.FC<CardBoxSelectorProps> = ({
             <span className="theme-text-primary">全部笔记</span>
           </>
         )}
-        <ChevronDown 
+        <ChevronDown
           className={cn(
             'w-4 h-4 theme-text-secondary transition-transform flex-shrink-0',
             isOpen && 'rotate-180'
@@ -184,131 +183,132 @@ export const CardBoxSelector: React.FC<CardBoxSelectorProps> = ({
         />
       </button>
 
-      {isOpen && createPortal(
-        <div 
-          ref={dropdownRef}
-          className="fixed z-[9999] rounded-xl shadow-2xl max-h-80 overflow-hidden w-80 feather-glass-deco"
-          style={{
-            top: `${dropdownPosition.top}px`,
-            left: `${dropdownPosition.left}px`
-          }}
-        >
-          {/* 搜索框 */}
-          <div className="p-3">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 theme-text-tertiary" />
-              <input 
-                ref={searchInputRef}
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="搜索笔记盒..."
-                className="w-full pl-10 pr-3 py-2 text-sm rounded-lg focus:outline-none focus:ring-2 focus:theme-ring-accent theme-text-primary placeholder:theme-text-tertiary transition-all duration-200 feather-glass-deco"
-              />
+      {isOpen &&
+        createPortal(
+          <div
+            ref={dropdownRef}
+            className="fixed z-[9999] rounded-xl shadow-2xl max-h-80 overflow-hidden w-80 feather-glass-deco"
+            style={{
+              top: `${dropdownPosition.top}px`,
+              left: `${dropdownPosition.left}px`,
+            }}
+          >
+            {/* 搜索框 */}
+            <div className="p-3">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 theme-text-tertiary" />
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="搜索笔记盒..."
+                  className="w-full pl-10 pr-3 py-2 text-sm rounded-lg focus:outline-none focus:ring-2 focus:theme-ring-accent theme-text-primary placeholder:theme-text-tertiary transition-all duration-200 feather-glass-deco"
+                />
+              </div>
             </div>
-          </div>
 
-          <div className="max-h-60 overflow-y-auto">
-            {/* 全部笔记选项 */}
-            <button 
-              onClick={() => handleSelectBox(null)}
-              className={cn(
-                'w-full flex items-center gap-3 px-4 py-1.5 text-sm text-left transition-all duration-200',
-                'hover:bg-white/10 dark:hover:bg-white/5',
-                activeBoxId === null && 'theme-bg-accent/20 theme-text-accent'
-              )}
-            >
-              <FileText className="w-4 h-4 theme-text-secondary flex-shrink-0" />
-              <div className="flex-1">
-                <span className="font-medium">全部笔记</span>
-                <div className="text-xs theme-text-tertiary mt-0.5">
-                  {boxes.reduce((sum, box) => sum + (box.cards_count || 0), 0)} 篇笔记
+            <div className="max-h-60 overflow-y-auto">
+              {/* 全部笔记选项 */}
+              <button
+                onClick={() => handleSelectBox(null)}
+                className={cn(
+                  'w-full flex items-center gap-3 px-4 py-1.5 text-sm text-left transition-all duration-200',
+                  'hover:bg-white/10 dark:hover:bg-white/5',
+                  activeBoxId === null && 'theme-bg-accent/20 theme-text-accent'
+                )}
+              >
+                <FileText className="w-4 h-4 theme-text-secondary flex-shrink-0" />
+                <div className="flex-1">
+                  <span className="font-medium">全部笔记</span>
+                  <div className="text-xs theme-text-tertiary mt-0.5">
+                    {boxes.reduce((sum, box) => sum + (box.cards_count || 0), 0)} 篇笔记
+                  </div>
                 </div>
-              </div>
-            </button>
+              </button>
 
-            {filteredBoxes.length > 0 ? (
-              filteredBoxes.map((box) => (
-                <div 
-                  key={box.id}
-                  className={cn(
-                    'w-full flex items-center gap-2 px-3 py-1.5 transition-all duration-200 group',
-                    'hover:bg-white/10 dark:hover:bg-white/5',
-                    activeBoxId === box.id && 'theme-bg-accent/20'
-                  )}
-                >
-                  <button 
-                    onClick={() => handleSelectBox(box.id)}
-                    className="flex-1 flex items-center gap-2 text-left min-w-0"
-                  >
-                    <div className="flex items-center justify-center flex-shrink-0">
-                      {renderIcon(box.icon)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <span className="text-sm font-medium theme-text-primary truncate block">
-                        {box.name}
-                      </span>
-                      {box.description && (
-                        <div className="text-xs theme-text-tertiary mt-0.5 truncate">
-                          {box.description}
-                        </div>
-                      )}
-                    </div>
-                    {activeBoxId === box.id && (
-                      <div className="w-1.5 h-1.5 rounded-full theme-bg-accent flex-shrink-0" />
+              {filteredBoxes.length > 0 ? (
+                filteredBoxes.map((box) => (
+                  <div
+                    key={box.id}
+                    className={cn(
+                      'w-full flex items-center gap-2 px-3 py-1.5 transition-all duration-200 group',
+                      'hover:bg-white/10 dark:hover:bg-white/5',
+                      activeBoxId === box.id && 'theme-bg-accent/20'
                     )}
-                  </button>
-                  
-                  <div className="flex items-center gap-1">
-                    {/* 编辑按钮 */}
-                    <button 
-                      onClick={(e) => handleEdit(e, box)}
-                      className="flex-shrink-0 p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity theme-text-tertiary hover:theme-text-accent hover:bg-white/10"
-                      title={`编辑笔记盒 "${box.name}"`}
+                  >
+                    <button
+                      onClick={() => handleSelectBox(box.id)}
+                      className="flex-1 flex items-center gap-2 text-left min-w-0"
                     >
-                      <Edit2 size={16} />
+                      <div className="flex items-center justify-center flex-shrink-0">
+                        {renderIcon(box.icon)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <span className="text-sm font-medium theme-text-primary truncate block">
+                          {box.name}
+                        </span>
+                        {box.description && (
+                          <div className="text-xs theme-text-tertiary mt-0.5 truncate">
+                            {box.description}
+                          </div>
+                        )}
+                      </div>
+                      {activeBoxId === box.id && (
+                        <div className="w-1.5 h-1.5 rounded-full theme-bg-accent flex-shrink-0" />
+                      )}
                     </button>
-                    <button 
-                      onClick={(e) => handleDelete(e, box)}
-                      className="flex-shrink-0 p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity theme-text-tertiary hover:theme-text-error hover:bg-white/10"
-                      title={`删除笔记盒 "${box.name}"`}
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </div>
-              ))
-            ) : searchQuery && filteredBoxes.length === 0 ? (
-              <div className="px-4 py-6 text-center">
-                <div className="text-sm theme-text-tertiary">没有找到匹配的笔记盒</div>
-              </div>
-            ) : null}
 
-            {/* 创建新笔记盒选项 */}
-            {onCreateCardBox && (
-              <>
-                <div className="border-t theme-border mx-2 my-2" />
-                <button 
-                  onClick={() => {
-                    onCreateCardBox();
-                    closeDropdown();
-                  }}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left transition-all duration-200 hover:bg-white/10 dark:hover:bg-white/5 theme-text-accent"
-                >
-                  <div className="w-4 h-4 rounded-md theme-bg-accent/20 flex items-center justify-center flex-shrink-0">
-                    <Plus size={12} />
+                    <div className="flex items-center gap-1">
+                      {/* 编辑按钮 */}
+                      <button
+                        onClick={(e) => handleEdit(e, box)}
+                        className="flex-shrink-0 p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity theme-text-tertiary hover:theme-text-accent hover:bg-white/10"
+                        title={`编辑笔记盒 "${box.name}"`}
+                      >
+                        <Edit2 size={16} />
+                      </button>
+                      <button
+                        onClick={(e) => handleDelete(e, box)}
+                        className="flex-shrink-0 p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity theme-text-tertiary hover:theme-text-error hover:bg-white/10"
+                        title={`删除笔记盒 "${box.name}"`}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
                   </div>
-                  <span className="font-medium">创建新笔记盒</span>
-                </button>
-              </>
-            )}
-          </div>
-        </div>,
-        document.body
-      )}
+                ))
+              ) : searchQuery && filteredBoxes.length === 0 ? (
+                <div className="px-4 py-6 text-center">
+                  <div className="text-sm theme-text-tertiary">没有找到匹配的笔记盒</div>
+                </div>
+              ) : null}
+
+              {/* 创建新笔记盒选项 */}
+              {onCreateCardBox && (
+                <>
+                  <div className="border-t theme-border mx-2 my-2" />
+                  <button
+                    onClick={() => {
+                      onCreateCardBox();
+                      closeDropdown();
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left transition-all duration-200 hover:bg-white/10 dark:hover:bg-white/5 theme-text-accent"
+                  >
+                    <div className="w-4 h-4 rounded-md theme-bg-accent/20 flex items-center justify-center flex-shrink-0">
+                      <Plus size={12} />
+                    </div>
+                    <span className="font-medium">创建新笔记盒</span>
+                  </button>
+                </>
+              )}
+            </div>
+          </div>,
+          document.body
+        )}
 
       {/* 删除确认弹窗 */}
-      <ConfirmDeleteModal 
+      <ConfirmDeleteModal
         isOpen={showDeleteConfirm}
         onClose={() => {
           setShowDeleteConfirm(false);

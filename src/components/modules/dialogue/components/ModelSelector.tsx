@@ -6,9 +6,9 @@ import { useAppStore } from '@/stores';
 export const ModelSelector: React.FC = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  
+
   const { aiConfig, setCurrentAiProvider, updateAiConfig, setSettingsModalOpen } = useAppStore();
-  
+
   const currentProvider = aiConfig.currentProvider;
   const currentConfig = aiConfig[currentProvider];
   const currentModel = getUnifiedModel(currentConfig.model);
@@ -31,7 +31,7 @@ export const ModelSelector: React.FC = () => {
     if (providerId !== currentProvider) {
       setCurrentAiProvider(providerId as any);
     }
-    
+
     updateAiConfig(providerId as any, { model: modelId });
     setShowDropdown(false);
   };
@@ -73,35 +73,45 @@ export const ModelSelector: React.FC = () => {
           <div className="p-2">
             {Object.entries(AI_PROVIDERS).map(([providerId, provider]) => {
               const providerConfig = aiConfig[providerId as keyof typeof aiConfig];
-              if (!providerConfig || typeof providerConfig === 'string' || Array.isArray(providerConfig) || !providerConfig.enabled) {
+              if (
+                !providerConfig ||
+                typeof providerConfig === 'string' ||
+                Array.isArray(providerConfig) ||
+                !providerConfig.enabled
+              ) {
                 return null;
               }
 
-              const availableModels = UNIFIED_MODELS.filter(model => model.provider === providerId);
-              
+              const availableModels = UNIFIED_MODELS.filter(
+                (model) => model.provider === providerId
+              );
+
               return (
                 <div key={providerId} className="mb-3">
                   <div className="text-xs theme-text-tertiary font-medium px-2 mb-1">
                     {provider.name}
                   </div>
-                  
-                  {availableModels.map(model => {
-                    const isSelected = currentProvider === providerId && currentConfig.model === model.id;
-                    
+
+                  {availableModels.map((model) => {
+                    const isSelected =
+                      currentProvider === providerId && currentConfig.model === model.id;
+
                     return (
                       <button
                         key={model.id}
                         onClick={() => handleModelChange(providerId, model.id)}
                         className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
-                          isSelected 
-                            ? 'theme-bg-accent text-white' 
+                          isSelected
+                            ? 'theme-bg-accent text-white'
                             : 'hover:theme-bg-secondary theme-text-primary'
                         }`}
                       >
                         <div className="font-medium">{model.name}</div>
-                        <div className={`text-xs ${
-                          isSelected ? 'text-white/70' : 'theme-text-tertiary'
-                        }`}>
+                        <div
+                          className={`text-xs ${
+                            isSelected ? 'text-white/70' : 'theme-text-tertiary'
+                          }`}
+                        >
                           {model.description}
                         </div>
                       </button>
