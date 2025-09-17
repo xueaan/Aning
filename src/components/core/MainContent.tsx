@@ -35,6 +35,7 @@ const DialogueRoom = React.lazy(() =>
   import('@/components/modules/dialogue').then((m) => ({ default: m.DialogueRoom }))
 );
 const BookShelf = React.lazy(() => import('@/pages/BookShelf'));
+const LexicalEditorPage = React.lazy(() => import('@/pages/LexicalEditor'));
 
 import { DatePicker } from '../common/DatePicker';
 import { PageTransition } from '../common/PageTransition';
@@ -60,6 +61,7 @@ import {
   BarChart3,
 } from 'lucide-react';
 import { KnowledgeBaseSelector } from '@/components/common/KnowledgeBaseSelector';
+import { TaskViewTabs } from '@/components/modules/taskbox/TaskViewTabs';
 import { CardBoxSelector } from '@/components/common/CardBoxSelector';
 import { CreateKnowledgeBaseModal } from '@/components/modals/CreateKnowledgeBaseModal';
 import { EditKnowledgeBaseModal } from '@/components/modals/EditKnowledgeBaseModal';
@@ -240,8 +242,8 @@ export const MainContent: React.FC = () => {
       dialogue: '',
       mindboard: '',
       bookshelf: '',
-    };
-    return titles[currentModule] || '';
+    } as Record<string, string>;
+    return titles[currentModule as unknown as string] || '';
   };
 
   // 格式化日期显示
@@ -409,6 +411,17 @@ export const MainContent: React.FC = () => {
             {currentModule === 'taskbox' && (
               <>
                 {/* 任务类型按钮组 - 移动到左侧 */}
+                <TaskViewTabs
+                  current={currentTaskView as any}
+                  onChange={handleTaskViewChange}
+                  counts={{
+                    inbox: inboxCount,
+                    today: todayCount,
+                    upcoming: upcomingCount,
+                    overdue: overdueCount,
+                    completed: completedCount,
+                  }}
+                />
                 <div className="flex items-center gap-1 ml-2">
                   {/* 收件箱 */}
                   <button
@@ -887,6 +900,8 @@ export const MainContent: React.FC = () => {
               <MindBoard />
             ) : currentModule === 'bookshelf' ? (
               <BookShelf />
+            ) : currentModule === 'lexical' ? (
+              <LexicalEditorPage />
             ) : (
               <div className="p-6">
                 <DefaultModuleContent module={getModuleTitle()} />

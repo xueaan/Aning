@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAppStore } from '@/stores';
 import { AppModule } from '@/types';
@@ -27,6 +27,8 @@ import { TodoWidget } from '@/components/widgets/TodoWidget';
 import { sidebarVariants, listContainerVariants } from '@/config/animation';
 
 const modules = [
+  { id: 'lexical', name: 'Lexical 编辑器', icon: Edit2 },
+
   { id: 'home', name: '标签页', icon: Compass },
   { id: 'timeline', name: '时光记', icon: Clock },
   { id: 'knowledge', name: '知识库', icon: SquareLibrary },
@@ -294,3 +296,4 @@ export const Sidebar: React.FC = () => {
     </motion.div>
   );
 };
+
