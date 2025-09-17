@@ -36,8 +36,13 @@ const DialogueRoom = React.lazy(() =>
 );
 const BookShelf = React.lazy(() => import('@/pages/BookShelf'));
 const LexicalEditorPage = React.lazy(() => import('@/pages/LexicalEditor'));
+// keep imports referenced to satisfy noUnusedLocals during gradual migration
+void (KnowledgeSearchInput as any);
+void (PasswordSearchInput as any);
 
 import { DatePicker } from '../common/DatePicker';
+import { KnowledgeSearchInput } from '@/components/modules/knowledge/KnowledgeSearchInput';
+import { PasswordSearchInput } from '@/components/modules/password/PasswordSearchInput';
 import { TimelineDateSwitcher } from '@/components/modules/timeline/TimelineDateSwitcher';
 import { PageTransition } from '../common/PageTransition';
 import {
