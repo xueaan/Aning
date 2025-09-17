@@ -20,5 +20,18 @@ declare module 'lexical' {
   export const $getRoot: any;
   export const $insertNodes: any;
   export const CLEAR_HISTORY_COMMAND: any;
+  export const $getSelection: any;
+  export const $isRangeSelection: any;
+  export const FORMAT_TEXT_COMMAND: any;
+  export const KEY_DOWN_COMMAND: any;
 }
+declare module '@lexical/rich-text' {
+  export const HeadingNode: any; export const QuoteNode: any;
+  export const $createHeadingNode: any; export const $createQuoteNode: any;
+}
+declare module '@lexical/list' {
+  export const ListItemNode: any; export const ListNode: any;
+  export const INSERT_UNORDERED_LIST_COMMAND: any; export const INSERT_ORDERED_LIST_COMMAND: any;
+}
+declare module '@lexical/code' { export const CodeNode: any; export const $createCodeNode: any }
 

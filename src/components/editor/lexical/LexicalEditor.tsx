@@ -1,23 +1,25 @@
 /* @ts-nocheck */
+/* @ts-nocheck */
 import React, { useCallback, useMemo, useState } from 'react';
-import {
-  LexicalComposer,
-  RichTextPlugin,
-  ContentEditable,
-  HistoryPlugin,
-} from '@lexical/react/LexicalComposer';
+import { LexicalComposer } from '@lexical/react/LexicalComposer';
+import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
+import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
+import { ContentEditable } from '@lexical/react/LexicalContentEditable';
+import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
 import { ListItemNode, ListNode } from '@lexical/list';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
-import { CodePlugin } from '@lexical/react/LexicalCodePlugin';
 import { CodeNode } from '@lexical/code';
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $generateHtmlFromNodes } from '@lexical/html';
 import { $insertNodes } from 'lexical';
+import FloatingToolbar from './plugins/FloatingToolbar';
+import SlashMenu from './plugins/SlashMenu';
 
 type TableSize = { rows: number; cols: number };
 
@@ -46,6 +48,15 @@ const Toolbar: React.FC<{ onInsertTable: (size: TableSize) => void }> = ({ onIns
       ))}
     </div>
   );
+};
+
+const CaptureEditorPlugin: React.FC = () => {
+  const [editor] = useLexicalComposerContext();
+  useMemo(() => {
+    (window as any).__LEXICAL_EDITOR__ = editor;
+    return editor;
+  }, [editor]);
+  return null;
 };
 
 export const LexicalEditor: React.FC = () => {
@@ -116,14 +127,19 @@ export const LexicalEditor: React.FC = () => {
               if (editor) handleInsertTable(editor, s);
             }} />
             <div className="p-3 flex-1 overflow-auto">
-              <RichTextPlugin contentEditable={<ContentEditable className="min-h-[260px] outline-none" />} placeholder={<Placeholder />} />
+              <RichTextPlugin contentEditable={<ContentEditable className="min-h-[260px] outline-none" />} placeholder={<Placeholder />} ErrorBoundary={LexicalErrorBoundary} />
               <HistoryPlugin />
               <ListPlugin />
               <LinkPlugin />
-              <CodePlugin />
               <TablePlugin />
               <AutoFocusPlugin />
               <OnChangePlugin onChange={handleChange} />
+              <CaptureEditorPlugin />
+              <FloatingToolbar />
+              <SlashMenu onInsertTable={(r,c)=>{
+                const editor = (window as any).__LEXICAL_EDITOR__;
+                if (editor) handleInsertTable(editor, {rows:r, cols:c});
+              }} />
             </div>
           </div>
         </LexicalComposer>
@@ -137,3 +153,5 @@ export const LexicalEditor: React.FC = () => {
 };
 
 export default LexicalEditor;
+
+

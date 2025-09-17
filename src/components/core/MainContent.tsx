@@ -38,6 +38,7 @@ const BookShelf = React.lazy(() => import('@/pages/BookShelf'));
 const LexicalEditorPage = React.lazy(() => import('@/pages/LexicalEditor'));
 
 import { DatePicker } from '../common/DatePicker';
+import { TimelineDateSwitcher } from '@/components/modules/timeline/TimelineDateSwitcher';
 import { PageTransition } from '../common/PageTransition';
 import {
   Calendar,
@@ -625,6 +626,12 @@ export const MainContent: React.FC = () => {
           {currentModule === 'timeline' ? (
             <>
               {/* 日期导航区 */}
+              <TimelineDateSwitcher
+                currentDate={currentDate}
+                onPrev={() => changeDate(-1)}
+                onNext={() => changeDate(1)}
+                onChange={setCurrentDate}
+              />
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => changeDate(-1)}
@@ -977,5 +984,6 @@ const DefaultModuleContent: React.FC<{ module: string }> = React.memo(({ module 
 });
 
 DefaultModuleContent.displayName = 'DefaultModuleContent';
+
 
 

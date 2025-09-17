@@ -57,6 +57,7 @@
     "@lexical/table": "^0.16.0",
     "@lexical/code": "^0.16.0",
     "@lexical/markdown": "^0.16.0",
+    "@lexical/html": "^0.16.0",
     "prosemirror-tables": "^1.8.1",
     "react": "^18.3.0",
     "react-dnd": "^16.0.1",
@@ -94,3 +95,4 @@
     "vite": "^5.4.0"
   }
 }
+
