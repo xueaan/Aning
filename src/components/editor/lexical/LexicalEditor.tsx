@@ -17,8 +17,9 @@ import { CodeNode } from '@lexical/code';
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $generateHtmlFromNodes } from '@lexical/html';
-import { $insertNodes } from 'lexical';
+import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
+import { $getSelection, $isRangeSelection, $getRoot } from 'lexical';
+import { processImageUpload } from '@/utils/imageUtils';
 import FloatingToolbar from './plugins/FloatingToolbar';
 import SlashMenu from './plugins/SlashMenu';
 
@@ -115,8 +116,54 @@ export const LexicalEditor: React.FC = () => {
         }
         table.append(row);
       }
-      $insertNodes([table]);
+
+      const selection = $getSelection();
+      if ($isRangeSelection(selection)) {
+        try {
+          const anchorTop = selection.anchor.getNode().getTopLevelElementOrThrow();
+          anchorTop.insertAfter(table);
+        } catch {
+          $getRoot().append(table);
+        }
+      } else {
+        $getRoot().append(table);
+      }
+
+      // 将光标放到表格第一个单元格
+      try {
+        const firstCell = table.getFirstChild();
+        // @ts-ignore
+        firstCell?.select?.();
+      } catch {}
     });
+  }, []);
+
+  const handleInsertImage = useCallback(async (editor: any) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = async (e: any) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      try {
+        const base64 = await processImageUpload(file, { quality: 0.9, maxWidth: 1600, maxHeight: 1200, maxSize: 8 });
+        editor.update(() => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(`<img src="${base64}" alt="${file.name || ''}" />`, 'text/html');
+          const nodes = $generateNodesFromDOM(editor, doc);
+          const selection = $getSelection();
+          if ($isRangeSelection(selection)) {
+            selection.insertNodes(nodes);
+          } else {
+            const root = $getRoot();
+            nodes.forEach((n: any) => root.append(n));
+          }
+        });
+      } catch (err) {
+        console.error('[Lexical] image insert failed:', err);
+      }
+    };
+    input.click();
   }, []);
 
   return (
@@ -142,6 +189,12 @@ export const LexicalEditor: React.FC = () => {
                 const editor = (window as any).__LEXICAL_EDITOR__;
                 if (editor) handleInsertTable(editor, {rows:r, cols:c});
               }} />
+              <div className="mt-2">
+                <button className="px-2 py-1 text-xs rounded theme-bg-secondary hover:opacity-80" onClick={() => {
+                  const editor = (window as any).__LEXICAL_EDITOR__;
+                  if (editor) handleInsertImage(editor);
+                }}>插入图片</button>
+              </div>
             </div>
           </div>
         </LexicalComposer>

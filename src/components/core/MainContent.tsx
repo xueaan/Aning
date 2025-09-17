@@ -637,7 +637,7 @@ export const MainContent: React.FC = () => {
                 onNext={() => changeDate(1)}
                 onChange={setCurrentDate}
               />
-              <div className="flex items-center gap-1">
+              <div className="hidden flex items-center gap-1">
                 <button
                   onClick={() => changeDate(-1)}
                   className="titlebar-nav-button"

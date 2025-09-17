@@ -11,7 +11,7 @@ declare module '@lexical/react/LexicalTablePlugin' { export const TablePlugin: a
 declare module '@lexical/react/LexicalCodePlugin' { export const CodePlugin: any }
 declare module '@lexical/react/LexicalAutoFocusPlugin' { export const AutoFocusPlugin: any }
 declare module '@lexical/react/LexicalOnChangePlugin' { export const OnChangePlugin: any }
-declare module '@lexical/html' { export const $generateHtmlFromNodes: any }
+declare module '@lexical/html' { export const $generateHtmlFromNodes: any; export const $generateNodesFromDOM: any }
 declare module '@lexical/rich-text' { export const HeadingNode: any; export const QuoteNode: any }
 declare module '@lexical/list' { export const ListItemNode: any; export const ListNode: any }
 declare module '@lexical/table' { export const TableCellNode: any; export const TableNode: any; export const TableRowNode: any }

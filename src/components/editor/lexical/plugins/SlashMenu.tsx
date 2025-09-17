@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $createParagraphNode, $getSelection, $isRangeSelection, KEY_DOWN_COMMAND } from 'lexical';
+import { ParagraphNode, $getSelection, $isRangeSelection, KEY_DOWN_COMMAND, $getRoot } from 'lexical';
 import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text';
 import { INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND } from '@lexical/list';
 import { $createCodeNode } from '@lexical/code';
@@ -23,17 +23,33 @@ export const SlashMenu: React.FC<{ onInsertTable: (rows: number, cols: number) =
   const [pos, setPos] = useState({ top: 0, left: 0 });
   const [query, setQuery] = useState('');
 
+  const safeInsertTop = (createNode: () => any) => {
+    editor.update(() => {
+      const sel = $getSelection();
+      const node = createNode();
+      if ($isRangeSelection(sel)) {
+        try {
+          const top = sel.anchor.getNode().getTopLevelElementOrThrow();
+          top.insertAfter(node);
+          node.select?.();
+          return;
+        } catch {}
+      }
+      $getRoot().append(node);
+      node.select?.();
+    });
+  };
+
   const items = useMemo(
     () => [
-      { id: 'p', label: '段落', action: () => editor.update(() => { const sel = $getSelection(); if ($isRangeSelection(sel)) sel.insertNodes([$createParagraphNode()]); }) },
-      { id: 'h1', label: '标题 1', action: () => editor.update(() => { const sel = $getSelection(); if ($isRangeSelection(sel)) sel.insertNodes([$createHeadingNode('h1')]); }) },
-      { id: 'h2', label: '标题 2', action: () => editor.update(() => { const sel = $getSelection(); if ($isRangeSelection(sel)) sel.insertNodes([$createHeadingNode('h2')]); }) },
-      { id: 'h3', label: '标题 3', action: () => editor.update(() => { const sel = $getSelection(); if ($isRangeSelection(sel)) sel.insertNodes([$createHeadingNode('h3')]); }) },
+      { id: 'h1', label: '标题 1', action: () => safeInsertTop(() => $createHeadingNode('h1')) },
+      { id: 'h2', label: '标题 2', action: () => safeInsertTop(() => $createHeadingNode('h2')) },
+      { id: 'h3', label: '标题 3', action: () => safeInsertTop(() => $createHeadingNode('h3')) },
       { id: 'ul', label: '无序列表', action: () => editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined) },
       { id: 'ol', label: '有序列表', action: () => editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined) },
-      { id: 'blockquote', label: '引用', action: () => editor.update(() => { const sel = $getSelection(); if ($isRangeSelection(sel)) sel.insertNodes([$createQuoteNode()]); }) },
-      { id: 'code', label: '代码块', action: () => editor.update(() => { const sel = $getSelection(); if ($isRangeSelection(sel)) sel.insertNodes([$createCodeNode()]); }) },
-      { id: 'table', label: '表格…', action: () => {} },
+      { id: 'blockquote', label: '引用', action: () => safeInsertTop(() => $createQuoteNode()) },
+      { id: 'code', label: '代码块', action: () => safeInsertTop(() => $createCodeNode()) },
+      { id: 'table', label: '表格 2×2', action: () => onInsertTable(2, 2) },
     ],
     [editor]
   );
