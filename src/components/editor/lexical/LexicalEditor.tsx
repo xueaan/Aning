@@ -9,6 +9,7 @@ import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
+import { LinkNode } from '@lexical/link';
 import { ListItemNode, ListNode } from '@lexical/list';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
@@ -70,6 +71,7 @@ export const LexicalEditor: React.FC = () => {
         QuoteNode,
         ListNode,
         ListItemNode,
+        LinkNode,
         CodeNode,
         TableNode,
         TableRowNode,

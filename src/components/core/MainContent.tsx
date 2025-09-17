@@ -669,8 +669,12 @@ export const MainContent: React.FC = () => {
           {/* Password 搜索和视图控制 */}
           {currentModule === 'password' && (
             <div className="flex items-center gap-2">
+              <PasswordSearchInput
+                value={searchQuery}
+                onChange={(v) => (v ? searchEntries(v) : clearSearch())}
+              />
               {/* 搜索框 */}
-              <div className="relative">
+              <div className="relative hidden">
                 <Search
                   size={12}
                   className="absolute left-2 top-1/2 transform -translate-y-1/2 theme-text-tertiary pointer-events-none"
@@ -698,8 +702,12 @@ export const MainContent: React.FC = () => {
           {/* Knowledge 知识库专属控制 */}
           {currentModule === 'knowledge' && (
             <div className="flex items-center gap-2">
+              <KnowledgeSearchInput
+                value={knowledgeSearchQuery}
+                onChange={setKnowledgeSearchQuery}
+              />
               {/* 页面搜索框 */}
-              <div className="relative">
+              <div className="relative hidden">
                 <Search
                   size={12}
                   className="absolute left-2.5 top-1/2 transform -translate-y-1/2 theme-text-tertiary pointer-events-none"
