@@ -92,7 +92,7 @@ export const FloatingMenu: React.FC<FloatingMenuProps> = ({ editor }) => {
         <Quote size={16} />
       </button>
       <button
-        onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+        onClick={() => editor.chain().focus().toggleNode('codeBlock', 'paragraph').run()}
         className="notion-floating-button"
         title="代码块"
       >

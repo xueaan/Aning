@@ -139,12 +139,13 @@ export const TypewriterMessage: React.FC<TypewriterMessageProps> = ({
         </button>
       )}
       <div
-        className={`prose prose-sm max-w-none
-                      prose-p:my-2
-                      prose-headings:font-semibold
-                      prose-ul:my-2
-                      prose-ol:my-2
-                      prose-li:my-0.5
+        className={`prose max-w-none
+                      prose-p:my-2 prose-p:text-[0.95rem]
+                      prose-headings:font-semibold prose-headings:leading-snug prose-headings:my-2
+                      prose-headings:text-[1.05rem]
+                      prose-h1:text-[1.1rem] prose-h2:text-[1.05rem] prose-h3:text-[1.0rem] prose-h4:text-[0.95rem]
+                      prose-ul:my-2 prose-ol:my-2
+                      prose-li:my-1
                       prose-pre:my-3
                       prose-code:text-sm
                       prose-blockquote:my-3

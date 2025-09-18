@@ -60,12 +60,12 @@ export function filterAIResponse(content: string, currentAgent?: AiAgent): strin
       );
   }
 
-  // 3. 清理多余的空格和换行
+  // 3. 格式与换行保留：不再压缩 Markdown 换行/空格
   filteredContent = filteredContent
-    .replace(/\s+/g, ' ')
-    .replace(/\n\s*\n/g, '\n')
+    .replace(/\r\n/g, '\n')
+    .replace(/\u00A0/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
     .trim();
-
   // 4. 如果内容被过度过滤导致为空，提供默认回复
   if (!filteredContent || filteredContent.length < 3) {
     const agentRole = currentAgent ? getAgentRoleName(currentAgent.name) : '专业顾问';

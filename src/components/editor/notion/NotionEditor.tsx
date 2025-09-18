@@ -5,6 +5,7 @@ import { getNotionExtensions } from './extensions';
 import { SlashCommandMenu } from './components/SlashCommandMenu';
 import { NotionFloatingMenu } from './components/NotionFloatingMenu';
 import { NotionBubbleMenu } from './components/NotionBubbleMenu';
+import { NotionContextMenu } from './components/NotionContextMenu';
 import { processImageUpload } from '@/utils/imageUtils';
 import './styles/notion.css';
 
@@ -53,9 +54,10 @@ const NotionEditor = forwardRef<NotionEditorRef, NotionEditorProps>(
     const [, setContent] = useState(value);
     const [showSlashMenu, setShowSlashMenu] = useState(false);
     const [slashMenuPos, setSlashMenuPos] = useState({ top: 0, left: 0 });
+    const [showContextMenu, setShowContextMenu] = useState(false);
+    const [contextMenuPos, setContextMenuPos] = useState({ top: 0, left: 0 });
+    const [selectedNode, setSelectedNode] = useState<any>(null);
     const containerRef = useRef<HTMLDivElement>(null);
-    const [showBubbleMenu, setShowBubbleMenu] = useState(false);
-    const [bubbleMenuPos, setBubbleMenuPos] = useState({ top: 0, left: 0 });
 
     // 初始化编辑器
     const editor = useEditor({
@@ -87,25 +89,31 @@ const NotionEditor = forwardRef<NotionEditorRef, NotionEditorProps>(
         attributes: {
           class: 'notion-editor-content',
           'data-placeholder': placeholder,
+          spellcheck: 'false',
         },
-      },
-      onSelectionUpdate: ({ editor }) => {
-        // 选中文本时显示气泡菜单
-        const { selection } = editor.state;
-        const { from, to } = selection;
-        if (from !== to) {
-          const coords = editor.view.coordsAtPos(from);
-          if (containerRef.current) {
-            const rect = containerRef.current.getBoundingClientRect();
-            setBubbleMenuPos({
-              top: coords.top - rect.top - 50,
-              left: coords.left - rect.left,
-            });
-            setShowBubbleMenu(true);
-          }
-        } else {
-          setShowBubbleMenu(false);
-        }
+        handleDOMEvents: {
+          // 右键菜单
+          contextmenu: (view, event) => {
+            event.preventDefault();
+            const pos = view.posAtCoords({ left: event.clientX, top: event.clientY });
+            if (pos && containerRef.current) {
+              const node = view.state.doc.nodeAt(pos.pos);
+              const containerRect = containerRef.current.getBoundingClientRect();
+              setSelectedNode(node);
+              setContextMenuPos({
+                top: event.clientY - containerRect.top,
+                left: event.clientX - containerRect.left,
+              });
+              setShowContextMenu(true);
+            }
+            return true;
+          },
+          // 点击其他地方关闭菜单
+          click: () => {
+            setShowContextMenu(false);
+            return false;
+          },
+        },
       },
     });
 
@@ -195,8 +203,7 @@ const NotionEditor = forwardRef<NotionEditorRef, NotionEditorProps>(
       },
 
       setTextAlign: (align: 'left' | 'center' | 'right') => {
-        // Text align needs TextAlign extension
-        (editor?.chain().focus() as any).setTextAlign?.(align).run();
+        editor?.chain().focus().setTextAlign(align).run();
       },
 
       toggleBulletList: () => {
@@ -220,7 +227,7 @@ const NotionEditor = forwardRef<NotionEditorRef, NotionEditorProps>(
       },
 
       toggleCodeBlock: () => {
-        editor?.chain().focus().toggleCodeBlock().run();
+        editor?.chain().focus().toggleNode('codeBlock', 'paragraph').run();
       },
 
       isActive: (name: string, attrs?: any) => {
@@ -300,36 +307,40 @@ const NotionEditor = forwardRef<NotionEditorRef, NotionEditorProps>(
         className={`notion-editor-container ${className} ${theme === 'dark' ? 'dark' : ''}`}
         style={{ height: height ? `${height}px` : '100%', position: 'relative' }}
       >
-        {/* 固定工具栏 - 始终显示在顶部 */}
-        {editor && (
-          <div className="notion-toolbar-fixed">
-            <NotionFloatingMenu editor={editor} />
-          </div>
-        )}
-
+        {/* Editor Content */}
         <EditorContent editor={editor} className="notion-editor" />
 
-        {/* 气泡工具栏 - 选中文本时显示 */}
-        {showBubbleMenu && editor && (
-          <div
-            className="notion-bubble-wrapper"
-            style={{
-              position: 'absolute',
-              left: bubbleMenuPos.left,
-              top: bubbleMenuPos.top,
-              zIndex: 1000,
-            }}
-          >
+        {/* Bubble Menu - appears on text selection */}
+        {editor && editor.state.selection.from !== editor.state.selection.to && (
+          <div className="notion-bubble-menu" style={{ display: 'none' }}>
             <NotionBubbleMenu editor={editor} />
           </div>
         )}
 
+        {/* Floating Menu - appears on empty lines */}
+        {editor && (
+          <div className="notion-floating-menu" style={{ display: 'none' }}>
+            <NotionFloatingMenu editor={editor} />
+          </div>
+        )}
+
+        {/* Slash Command Menu */}
         {showSlashMenu && (
           <SlashCommandMenu
             editor={editor}
             position={slashMenuPos}
             onClose={() => setShowSlashMenu(false)}
             isInModal={className.includes('modal') || containerRef.current?.closest('.feather-glass-modal') !== null}
+          />
+        )}
+
+        {/* Context Menu */}
+        {showContextMenu && (
+          <NotionContextMenu
+            editor={editor}
+            position={contextMenuPos}
+            node={selectedNode}
+            onClose={() => setShowContextMenu(false)}
           />
         )}
       </div>

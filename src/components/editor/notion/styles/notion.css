@@ -61,14 +61,46 @@
   padding-left: 3rem;
 }
 
-/* 确保文本可选中 */
+/* CRITICAL FIX: 确保文本可选中 - 最高优先级 */
+.ProseMirror,
+.ProseMirror * {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+}
+
+/* 覆盖任何可能阻止选择的样式 */
+.notion-editor *,
 .notion-editor-content * {
   user-select: text !important;
   -webkit-user-select: text !important;
+  pointer-events: auto !important;
 }
 
-.notion-editor-content:focus {
+/* ProseMirror 核心样式 */
+.ProseMirror {
+  position: relative;
   outline: none;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  white-space: break-spaces;
+  -webkit-font-variant-ligatures: none;
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0;
+}
+
+.ProseMirror:focus {
+  outline: none;
+}
+
+/* 选中状态样式 */
+.ProseMirror ::selection {
+  background: rgba(var(--accent), 0.2);
+}
+
+.ProseMirror-selectednode {
+  outline: 2px solid rgba(var(--accent), 0.5);
 }
 
 /* 占位符 */
@@ -102,12 +134,60 @@
   position: relative;
 }
 
-/* ==================== 拖拽手柄 ==================== */
+/* ==================== 官方 Tiptap DragHandle 样式 ==================== */
+/* Tiptap 官方拖拽手柄 */
+.drag-handle {
+  position: absolute;
+  left: -40px;
+  top: 2px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 10;
+  background: transparent;
+  border-radius: 4px;
+}
+
+.drag-handle::before {
+  content: '';
+  display: block;
+  width: 12px;
+  height: 20px;
+  background-image: radial-gradient(circle, rgba(var(--text-tertiary), 0.4) 1.5px, transparent 1.5px);
+  background-size: 6px 6px;
+  background-position: 0 0;
+}
+
+/* 显示拖拽手柄 - 鼠标悬停 */
+.ProseMirror .drag-handle {
+  opacity: 0;
+}
+
+.ProseMirror:hover .drag-handle,
+.drag-handle:hover {
+  opacity: 1;
+}
+
+.drag-handle:hover {
+  background: rgba(var(--bg-tertiary), 0.5);
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+  background: rgba(var(--accent), 0.1);
+}
+
+/* 自定义拖拽手柄（备用） */
 .notion-drag-handle {
   position: absolute;
   left: -45px;
   top: 2px;
-  display: none; /* 默认隐藏，通过JS控制显示 */
+  display: flex;
   align-items: center;
   gap: 4px;
   transition: all 0.2s;
@@ -115,8 +195,13 @@
   padding: 2px;
   border-radius: 6px;
   z-index: 10;
+  opacity: 0;
 }
 
+.notion-block:hover .notion-drag-handle,
+.notion-drag-handle:hover {
+  opacity: 1;
+}
 
 .notion-drag-handle:hover {
   background: rgba(255, 255, 255, 0.08);
@@ -740,6 +825,116 @@ h3.notion-heading {
 
 .notion-bubble-link-confirm:hover {
   background: rgba(var(--accent), 1);
+}
+
+/* ==================== Bubble Menu 样式 ==================== */
+.notion-bubble-menu {
+  background: rgba(var(--bg-primary), 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(var(--border), 0.3);
+  border-radius: 8px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10001;
+}
+
+/* ==================== Floating Menu 样式 ==================== */
+.notion-floating-menu {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  background: rgba(var(--bg-primary), 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(var(--border), 0.3);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10000;
+}
+
+.notion-floating-menu button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: rgba(var(--text-secondary), 0.8);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.notion-floating-menu button:hover {
+  background: rgba(var(--accent), 0.1);
+  color: rgba(var(--accent), 1);
+}
+
+/* ==================== Context Menu 样式 ==================== */
+.notion-context-menu {
+  min-width: 200px;
+  padding: 4px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.notion-context-menu-section {
+  padding: 4px 0;
+}
+
+.notion-context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: rgba(var(--text-primary), 0.9);
+  font-size: 14px;
+  text-align: left;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.notion-context-menu-item:hover {
+  background: rgba(var(--accent), 0.1);
+}
+
+.notion-context-menu-item.danger {
+  color: rgba(255, 59, 48, 0.9);
+}
+
+.notion-context-menu-item.danger:hover {
+  background: rgba(255, 59, 48, 0.1);
+}
+
+.notion-context-menu-item kbd {
+  margin-left: auto;
+  padding: 2px 6px;
+  background: rgba(var(--bg-tertiary), 0.5);
+  border-radius: 3px;
+  font-size: 11px;
+  color: rgba(var(--text-secondary), 0.7);
+}
+
+.notion-context-menu-divider {
+  height: 1px;
+  background: rgba(var(--border), 0.2);
+  margin: 4px 8px;
+}
+
+.notion-context-menu-label {
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(var(--text-secondary), 0.6);
+  text-transform: uppercase;
 }
 
 /* ==================== 深色模式 ==================== */

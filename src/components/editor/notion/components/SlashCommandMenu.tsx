@@ -216,7 +216,7 @@ const commandItems: CommandItem[] = [
     category: 'media',
     searchTerms: ['code', 'codeblock', '代码'],
     command: (editor) => {
-      editor.chain().focus().toggleCodeBlock().run();
+      editor.chain().focus().toggleNode('codeBlock', 'paragraph').run();
     },
   },
   {

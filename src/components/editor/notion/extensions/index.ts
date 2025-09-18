@@ -13,7 +13,7 @@ import { TableRow } from '@tiptap/extension-table-row';
 import { TableCell } from '@tiptap/extension-table-cell';
 import { TableHeader } from '@tiptap/extension-table-header';
 import { Image } from '@tiptap/extension-image';
-// import { DragHandle } from '@tiptap/extension-drag-handle'; // Temporarily disabled due to RangeError
+import { DragHandle } from '@tiptap/extension-drag-handle';
 import { Mention } from '@tiptap/extension-mention';
 import { Mathematics } from '@tiptap/extension-mathematics';
 
@@ -21,7 +21,6 @@ import { Mathematics } from '@tiptap/extension-mathematics';
 import { BlockNode } from './BlockNode';
 import { SlashCommand } from './SlashCommand';
 import { UniqueID } from './UniqueID';
-import { NotionDragDrop } from './NotionDragDrop';
 
 interface ExtensionOptions {
   placeholder?: string;
@@ -219,9 +218,12 @@ export function getNotionExtensions(options: ExtensionOptions = {}) {
       onSlashCommand: options.onSlashCommand,
       onCloseSlashCommand: options.onCloseSlashCommand,
     }),
-    NotionDragDrop,
-
-    // 拖拽手柄 - 临时禁用，使用 NotionDragDrop 替代
-    // DragHandle.configure({...}), // Disabled due to RangeError in modal context
+    // 官方拖拽手柄
+    DragHandle.configure({
+      onNodeChange: () => {
+        // Handle node selection
+        return true;
+      },
+    })
   ];
 }
