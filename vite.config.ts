@@ -26,8 +26,8 @@ export default defineConfig({
   // Tauri expects a fixed port, fail if that port is not available
   server: {
     host: host || "0.0.0.0",
-    port: 5000,
-    strictPort: false,
+    port: 5003,
+    strictPort: true,
     // 改进 HMR 配置，避免网络连接问题
     hmr: host
       ? {

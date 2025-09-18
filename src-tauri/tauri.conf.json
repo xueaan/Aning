@@ -5,13 +5,19 @@
   "build": {
     "beforeDevCommand": "pnpm dev",
     "beforeBuildCommand": "pnpm build",
-    "devUrl": "http://localhost:5000",
+    "devUrl": "http://localhost:5003",
     "frontendDist": "../dist"
   },
   "bundle": {
     "active": true,
-    "targets": "nsis",
-    "icon": ["icons/icon.ico"],
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.png",
+      "icons/icon.ico"
+    ],
     "windows": {
       "certificateThumbprint": null,
       "digestAlgorithm": "sha256",
@@ -22,6 +28,13 @@
         "displayLanguageSelector": false,
         "compression": "lzma"
       }
+    },
+    "macOS": {
+      "frameworks": [],
+      "minimumSystemVersion": "10.13",
+      "exceptionDomain": "",
+      "signingIdentity": null,
+      "entitlements": null
     },
     "longDescription": "Anning - 智能笔记系统，本地优先的个人知识管理平台，提供模块化的笔记体验",
     "shortDescription": "Anning 智能笔记系统"
