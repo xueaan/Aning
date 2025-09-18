@@ -1,0 +1,26 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="240" fill="url(#gradient)" stroke="#4f46e5" stroke-width="8"/>
+
+  <!-- Mountain silhouette representing peace/tranquility -->
+  <path d="M80 350 L160 280 L220 320 L280 260 L340 300 L420 240 L480 280 L480 400 L80 400 Z"
+        fill="#ffffff" opacity="0.9"/>
+
+  <!-- Smaller mountain layer -->
+  <path d="M120 380 L180 330 L240 360 L300 310 L360 340 L420 300 L480 330 L480 400 L120 400 Z"
+        fill="#ffffff" opacity="0.6"/>
+
+  <!-- Sun/moon circle -->
+  <circle cx="180" cy="160" r="45" fill="#fbbf24" opacity="0.9"/>
+
+  <!-- Text "安" stylized -->
+  <text x="256" y="200" font-family="serif" font-size="120" font-weight="bold"
+        text-anchor="middle" fill="#ffffff" opacity="0.95">安</text>
+</svg>
