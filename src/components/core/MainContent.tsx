@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense, useCallback, useMemo } from 'react';
+﻿import React, { useState, useEffect, Suspense, useCallback, useMemo } from 'react';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import {
   useAppStore,
@@ -35,26 +35,19 @@ const DialogueRoom = React.lazy(() =>
   import('@/components/modules/dialogue').then((m) => ({ default: m.DialogueRoom }))
 );
 const BookShelf = React.lazy(() => import('@/pages/BookShelf'));
-const LexicalEditorPage = React.lazy(() => import('@/pages/LexicalEditor'));
 // keep imports referenced to satisfy noUnusedLocals during gradual migration
 void (KnowledgeSearchInput as any);
 void (PasswordSearchInput as any);
 
-import { DatePicker } from '../common/DatePicker';
 import { KnowledgeSearchInput } from '@/components/modules/knowledge/KnowledgeSearchInput';
 import { PasswordSearchInput } from '@/components/modules/password/PasswordSearchInput';
 import { TimelineDateSwitcher } from '@/components/modules/timeline/TimelineDateSwitcher';
 import { PageTransition } from '../common/PageTransition';
 import {
-  Calendar,
-  Clock,
   Search,
   PanelLeftOpen,
   ChevronLeft,
   ChevronRight,
-  Inbox,
-  AlertTriangle,
-  Check,
   Chrome,
   MonitorStop,
   LayoutGrid,
@@ -75,17 +68,16 @@ import { EditCardBoxModal } from '@/components/modals/EditCardBoxModal';
 import { CreateCardBoxModal } from '@/components/modals/CreateCardBoxModal';
 import { HabitForm } from '@/components/features/habit/HabitForm';
 import { isTauriEnvironment, showBrowserLimitation } from '@/utils/environmentUtils';
+import { WindowControls } from '@/components/modules/window/WindowControls';
 
 export const MainContent: React.FC = () => {
-  const [isMaximized, setIsMaximized] = useState(false);
   const [appWindow, setAppWindow] = useState<any>(null);
-  const [isTauriEnv, setIsTauriEnv] = useState(false);
+  const [isMaximized, setIsMaximized] = useState(false);
 
   // 在 useEffect 中安全地获取 webview window
   useEffect(() => {
     const initializeWindow = () => {
       const isInTauri = isTauriEnvironment();
-      setIsTauriEnv(isInTauri);
 
       if (isInTauri) {
         try {
@@ -101,6 +93,64 @@ export const MainContent: React.FC = () => {
 
     initializeWindow();
   }, []);
+
+  // 监听窗口最大化状态
+  useEffect(() => {
+    if (!appWindow) return;
+
+    const checkMaximized = async () => {
+      try {
+        const maximized = await appWindow.isMaximized();
+        setIsMaximized(maximized);
+      } catch (error) {
+        console.error('Failed to check maximized state:', error);
+      }
+    };
+
+    checkMaximized();
+
+    // 监听窗口大小变化事件
+    const unlisten = appWindow.onResized?.(async () => {
+      checkMaximized();
+    });
+
+    return () => {
+      unlisten?.then((fn: any) => fn?.());
+    };
+  }, [appWindow]);
+
+  // 窗口控制函数
+  const handleMinimize = useCallback(async () => {
+    if (appWindow) {
+      try {
+        await appWindow.minimize();
+      } catch (error) {
+        console.error('Failed to minimize window:', error);
+      }
+    }
+  }, [appWindow]);
+
+  const handleMaximize = useCallback(async () => {
+    if (appWindow) {
+      try {
+        await appWindow.toggleMaximize();
+        const maximized = await appWindow.isMaximized();
+        setIsMaximized(maximized);
+      } catch (error) {
+        console.error('Failed to toggle maximize:', error);
+      }
+    }
+  }, [appWindow]);
+
+  const handleClose = useCallback(async () => {
+    if (appWindow) {
+      try {
+        await appWindow.close();
+      } catch (error) {
+        console.error('Failed to close window:', error);
+      }
+    }
+  }, [appWindow]);
 
   const {
     currentModule,
@@ -173,8 +223,7 @@ export const MainContent: React.FC = () => {
 
     const checkMaximized = async () => {
       try {
-        const maximized = await appWindow.isMaximized();
-        setIsMaximized(maximized);
+        await appWindow.isMaximized();
       } catch (error) {
         console.error('检查窗口状态失败:', error);
       }
@@ -184,8 +233,7 @@ export const MainContent: React.FC = () => {
 
     const unlisten = appWindow.listen('tauri://resize', async () => {
       try {
-        const maximized = await appWindow.isMaximized();
-        setIsMaximized(maximized);
+        await appWindow.isMaximized();
       } catch (error) {
         console.error('监听窗口状态变化失败:', error);
       }
@@ -195,31 +243,6 @@ export const MainContent: React.FC = () => {
       unlisten.then((fn: () => void) => fn());
     };
   }, [appWindow]);
-
-  // 窗口控制函数
-  const handleMinimize = () => {
-    if (appWindow) {
-      appWindow.minimize();
-    } else {
-      // Window controls only available in Tauri environment
-    }
-  };
-
-  const handleMaximize = () => {
-    if (appWindow) {
-      appWindow.toggleMaximize();
-    } else {
-      // Window controls only available in Tauri environment
-    }
-  };
-
-  const handleClose = () => {
-    if (appWindow) {
-      appWindow.hide();
-    } else {
-      // Window controls only available in Tauri environment
-    }
-  };
 
   // Knowledge 相关状态
   const [showKnowledgeCreateModal, setShowKnowledgeCreateModal] = useState(false);
@@ -428,127 +451,6 @@ export const MainContent: React.FC = () => {
                     completed: completedCount,
                   }}
                 />
-                <div className="flex items-center gap-1 ml-2">
-                  {/* 收件箱 */}
-                  <button
-                    onClick={() => handleTaskViewChange('inbox')}
-                    className={`relative px-3 py-1.5 rounded-md text-xs font-medium transition-all theme-border ${
-                      currentTaskView === 'inbox'
-                        ? 'theme-bg-accent theme-text-smart-contrast shadow-md'
-                        : 'theme-text-primary hover:theme-bg-secondary/50, hover:theme-text-primary backdrop-blur-sm'
-                    }`}
-                    title="收件箱"
-                  >
-                    <Inbox size={16} />
-                    {inboxCount > 0 && (
-                      <span
-                        className={`absolute -top-1 -right-1 min-w-[16px] h-4 text-[10px] rounded-full flex items-center justify-center font-medium ${
-                          currentTaskView === 'inbox'
-                            ? 'theme-bg-accent-contrast/30 theme-text-smart-contrast'
-                            : 'theme-bg-accent/20 theme-text-accent'
-                        }`}
-                      >
-                        {inboxCount > 99 ? '99' : inboxCount}
-                      </span>
-                    )}
-                  </button>
-
-                  {/* 今天 */}
-                  <button
-                    onClick={() => handleTaskViewChange('today')}
-                    className={`relative px-1.5 py-1.5 rounded-md text-xs font-medium transition-all theme-border ${
-                      currentTaskView === 'today'
-                        ? 'status-success theme-text-smart-contrast shadow-md'
-                        : 'theme-text-primary hover:theme-bg-secondary/50, hover:theme-text-primary backdrop-blur-sm'
-                    }`}
-                    title="今天"
-                  >
-                    <Calendar size={16} />
-                    {todayCount > 0 && (
-                      <span
-                        className={`absolute -top-1 -right-1 min-w-[16px] h-4 text-[10px] rounded-full flex items-center justify-center font-medium ${
-                          currentTaskView === 'today'
-                            ? 'theme-bg-accent-contrast/30 theme-text-smart-contrast'
-                            : 'status-success/20 theme-text-success'
-                        }`}
-                      >
-                        {todayCount > 99 ? '99' : todayCount}
-                      </span>
-                    )}
-                  </button>
-
-                  {/* 即将到期 */}
-                  <button
-                    onClick={() => handleTaskViewChange('upcoming')}
-                    className={`relative px-3 py-1.5 rounded-md text-xs font-medium transition-all theme-border ${
-                      currentTaskView === 'upcoming'
-                        ? 'status-warning theme-text-smart-contrast shadow-md'
-                        : 'theme-text-primary hover:theme-bg-secondary/50, hover:theme-text-primary backdrop-blur-sm'
-                    }`}
-                    title="即将到期"
-                  >
-                    <Clock size={16} />
-                    {upcomingCount > 0 && (
-                      <span
-                        className={`absolute -top-1 -right-1 min-w-[16px] h-4 text-[10px] rounded-full flex items-center justify-center font-medium ${
-                          currentTaskView === 'upcoming'
-                            ? 'theme-bg-accent-contrast/30 theme-text-smart-contrast'
-                            : 'status-warning/20 theme-text-warning'
-                        }`}
-                      >
-                        {upcomingCount > 99 ? '99' : upcomingCount}
-                      </span>
-                    )}
-                  </button>
-
-                  {/* 逾期 */}
-                  <button
-                    onClick={() => handleTaskViewChange('overdue')}
-                    className={`relative px-3 py-1.5 rounded-md text-xs font-medium transition-all theme-border ${
-                      currentTaskView === 'overdue'
-                        ? 'status-error theme-text-smart-contrast shadow-md'
-                        : 'theme-text-primary hover:theme-bg-secondary/50, hover:theme-text-primary backdrop-blur-sm'
-                    }`}
-                    title="逾期"
-                  >
-                    <AlertTriangle size={16} />
-                    {overdueCount > 0 && (
-                      <span
-                        className={`absolute -top-1 -right-1 min-w-[16px] h-4 text-[10px] rounded-full flex items-center justify-center font-medium ${
-                          currentTaskView === 'overdue'
-                            ? 'theme-bg-accent-contrast/30 theme-text-smart-contrast'
-                            : 'status-error/20 theme-text-error'
-                        }`}
-                      >
-                        {overdueCount > 99 ? '99' : overdueCount}
-                      </span>
-                    )}
-                  </button>
-
-                  {/* 已完成 */}
-                  <button
-                    onClick={() => handleTaskViewChange('completed')}
-                    className={`relative px-3 py-1.5 rounded-md text-xs font-medium transition-all theme-border ${
-                      currentTaskView === 'completed'
-                        ? 'status-info theme-text-smart-contrast shadow-md'
-                        : 'theme-text-primary hover:theme-bg-secondary/50, hover:theme-text-primary backdrop-blur-sm'
-                    }`}
-                    title="已完成"
-                  >
-                    <Check size={16} />
-                    {completedCount > 0 && (
-                      <span
-                        className={`absolute -top-1 -right-1 min-w-[16px] h-4 text-[10px] rounded-full flex items-center justify-center font-medium ${
-                          currentTaskView === 'completed'
-                            ? 'theme-bg-accent-contrast/30 theme-text-smart-contrast'
-                            : 'status-info/20 theme-text-info'
-                        }`}
-                      >
-                        {completedCount > 99 ? '99' : completedCount}
-                      </span>
-                    )}
-                  </button>
-                </div>
               </>
             )}
 
@@ -637,31 +539,6 @@ export const MainContent: React.FC = () => {
                 onNext={() => changeDate(1)}
                 onChange={setCurrentDate}
               />
-              <div className="hidden flex items-center gap-1">
-                <button
-                  onClick={() => changeDate(-1)}
-                  className="titlebar-nav-button"
-                  title="前一天"
-                >
-                  <ChevronLeft size={16} />
-                </button>
-
-                <DatePicker
-                  value={currentDate.toISOString().split('T')[0]}
-                  onChange={(dateString: string) => {
-                    setCurrentDate(new Date(dateString));
-                  }}
-                />
-
-                <button
-                  onClick={() => changeDate(1)}
-                  className="titlebar-nav-button"
-                  title="后一天"
-                >
-                  <ChevronRight size={16} />
-                </button>
-              </div>
-
               <div className="w-px h-4 bg-border-primary mx-1"></div>
             </>
           ) : null}
@@ -674,28 +551,6 @@ export const MainContent: React.FC = () => {
                 onChange={(v) => (v ? searchEntries(v) : clearSearch())}
               />
               {/* 搜索框 */}
-              <div className="relative hidden">
-                <Search
-                  size={12}
-                  className="absolute left-2 top-1/2 transform -translate-y-1/2 theme-text-tertiary pointer-events-none"
-                />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => searchEntries(e.target.value)}
-                  placeholder="搜索密码..."
-                  className="pl-6 pr-8 py-1 w-32 rounded-md text-xs focus: outline-none focus:ring-1 focus:theme-ring-accent transition-all duration-200 theme-text-primary placeholder:theme-text-tertiary focus:w-40 bg-white/10 dark:bg-gray-900/20 backdrop-filter backdrop-blur-xl backdrop-saturate-150 border border-white/20 dark:border-gray-700/30 hover:bg-white/15 dark:hover:bg-gray-900/30 focus:bg-white/20 , dark:focus:bg-gray-900/40 shadow-lg shadow-black/5,dark:shadow-black/20"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={clearSearch}
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 theme-text-tertiary hover:theme-text-primary p-0.5 rounded-sm, hover:theme-bg-secondary/50 transition-colors"
-                    title="清除搜索"
-                  >
-                    <X size={16} />
-                  </button>
-                )}
-              </div>
             </div>
           )}
 
@@ -707,28 +562,6 @@ export const MainContent: React.FC = () => {
                 onChange={setKnowledgeSearchQuery}
               />
               {/* 页面搜索框 */}
-              <div className="relative hidden">
-                <Search
-                  size={12}
-                  className="absolute left-2.5 top-1/2 transform -translate-y-1/2 theme-text-tertiary pointer-events-none"
-                />
-                <input
-                  type="text"
-                  placeholder="搜索页面..."
-                  value={knowledgeSearchQuery}
-                  onChange={(e) => setKnowledgeSearchQuery(e.target.value)}
-                  className="pl-8 pr-8 py-1.5 w-48 rounded-md text-xs focus: outline-none focus:ring-1 focus:theme-ring-accent transition-all duration-200 theme-text-primary placeholder:theme-text-tertiary focus:w-56 bg-white/10 dark:bg-gray-900/20 backdrop-filter backdrop-blur-xl backdrop-saturate-150 border border-white/20 dark:border-gray-700/30 hover:bg-white/15 dark:hover:bg-gray-900/30 focus:bg-white/20 , dark:focus:bg-gray-900/40 shadow-lg shadow-black/5,dark:shadow-black/20"
-                />
-                {knowledgeSearchQuery && (
-                  <button
-                    onClick={() => setKnowledgeSearchQuery('')}
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 theme-text-tertiary hover:theme-text-primary p-0.5 rounded-sm, hover:theme-bg-secondary/50 transition-colors"
-                    title="清除搜索"
-                  >
-                    <X size={16} />
-                  </button>
-                )}
-              </div>
             </div>
           )}
 
@@ -838,50 +671,13 @@ export const MainContent: React.FC = () => {
           )}
 
           {/* 窗口控制按钮 - 仅在Tauri环境中显示 */}
-          {isTauriEnv && appWindow && (
-            <div className="flex items-center gap-1 ml-2">
-              {/* 最小化按钮 */}
-              <button
-                className="titlebar-button titlebar-button-minimize"
-                onClick={handleMinimize}
-                aria-label="最小化"
-              >
-                <svg width="10" height="1" viewBox="0 0 10 1">
-                  <rect width="10" height="1" fill="currentColor" />
-                </svg>
-              </button>
-
-              {/* 最大化按钮 */}
-              <button
-                className="titlebar-button titlebar-button-maximize"
-                onClick={handleMaximize}
-                aria-label={isMaximized ? '还原' : '最大化'}
-              >
-                <svg width="10" height="10" viewBox="0 0 10 10">
-                  <rect
-                    x="0.5"
-                    y="0.5"
-                    width="9"
-                    height="9"
-                    stroke="currentColor"
-                    strokeWidth="1"
-                    fill="none"
-                  />
-                </svg>
-              </button>
-
-              {/* 关闭按钮 */}
-              <button
-                className="titlebar-button titlebar-button-close"
-                onClick={handleClose}
-                aria-label="关闭"
-              >
-                <svg width="10" height="10" viewBox="0 0 10 10">
-                  <path d="M 0 0 L 10 10 M 10 0 L 0 10" stroke="currentColor" strokeWidth="1.5" />
-                </svg>
-              </button>
-            </div>
-          )}
+          <WindowControls
+            isTauriEnv={isTauriEnvironment()}
+            onMinimize={handleMinimize}
+            onMaximize={handleMaximize}
+            onClose={handleClose}
+            isMaximized={isMaximized}
+          />
         </div>
       </header>
 
@@ -920,8 +716,6 @@ export const MainContent: React.FC = () => {
               <MindBoard />
             ) : currentModule === 'bookshelf' ? (
               <BookShelf />
-            ) : currentModule === 'lexical' ? (
-              <LexicalEditorPage />
             ) : (
               <div className="p-6">
                 <DefaultModuleContent module={getModuleTitle()} />
@@ -997,6 +791,7 @@ const DefaultModuleContent: React.FC<{ module: string }> = React.memo(({ module 
 });
 
 DefaultModuleContent.displayName = 'DefaultModuleContent';
+
 
 
 

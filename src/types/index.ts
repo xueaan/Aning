@@ -90,8 +90,7 @@ export type AppModule =
   | 'habit'
   | 'password'
   | 'dialogue'
-  | 'bookshelf'
-  | 'lexical';
+  | 'bookshelf';
 
 // Tauri 命令返回类型
 export interface TauriResponse<T = any> {

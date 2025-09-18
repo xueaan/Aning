@@ -388,7 +388,7 @@ export class DatabaseAPI {
       if (filters?.status) {
         return await invokeTauri('get_tasks_by_status', { status: filters.status });
       } else if (filters?.projectId) {
-        return await invokeTauri('get_tasks_by_project', { project_id: filters.projectId });
+        return await invokeTauri('get_tasks_by_project', { projectId: filters.projectId });
       } else {
         return await invokeTauri('get_all_tasks');
       }

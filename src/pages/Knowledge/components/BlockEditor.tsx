@@ -3,7 +3,8 @@ import type { Block as BackendBlock } from '@/types';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/stores';
 import { useKnowledgeOperations } from '@/stores/knowledgeStore';
-import { NovelEditor, type NovelEditorRef } from '@/components/editor/Novel';
+// 使用新的 Notion 风格编辑器
+import { NovelEditor, type NovelEditorRef } from '@/components/editor/notion';
 import { RichEditorToolbar } from '@/components/editor/RichEditorToolbar';
 import { Eye, FolderOpen } from 'lucide-react';
 import { debounce } from '@/utils/debounce';

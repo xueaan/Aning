@@ -1,6 +1,7 @@
 ﻿import React, { useState, useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
-import { NovelEditor, type NovelEditorRef } from '@/components/editor/Novel';
+// 使用新的 Notion 风格编辑器
+import { NovelEditor, type NovelEditorRef } from '@/components/editor/notion';
 
 interface NoteEditModalProps {
   isOpen: boolean;
@@ -66,7 +67,7 @@ export const NoteEditModal: React.FC<NoteEditModalProps> = ({
     <div className="feather-glass-modal-backdrop" onClick={onClose}>
       {/* 模态框内容 */}
       <div
-        className="feather-glass-modal w-full max-w-4xl max-h-[80vh] flex flex-col rounded-xl shadow-2xl"
+        className="feather-glass-modal w-full max-w-5xl h-[85vh] flex flex-col rounded-xl shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* 头部 */}
@@ -82,27 +83,26 @@ export const NoteEditModal: React.FC<NoteEditModalProps> = ({
             <X size={16} />
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 overflow-hidden flex flex-col p-4 space-y-4">
           {/* 标题输入 */}
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="笔记标题（可选）"
-            className="w-full px-3 py-2 rounded-lg text-sm outline-none feather-glass-content theme-text-primary placeholder:theme-text-tertiary"
+            className="w-full px-3 py-2 rounded-lg text-sm outline-none feather-glass-content theme-text-primary placeholder:theme-text-tertiary flex-shrink-0"
           />
 
-          {/* 内容编辑器 */}
-          <div className="min-h-[300px] border rounded-lg theme-card-glass">
+          {/* 内容编辑器 - 占满剩余空间 */}
+          <div className="flex-1 overflow-hidden rounded-lg border theme-border-secondary feather-glass-content">
             <NovelEditor
               ref={editorRef}
               value={content}
               onChange={setContent}
               onSave={handleSave}
-              placeholder="开始写点什么..."
-              height={350}
+              placeholder="输入 '/' 查看命令，或开始写点什么..."
               theme={theme}
-              className="w-full p-2"
+              className="h-full"
             />
           </div>
         </div>

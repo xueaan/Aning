@@ -1,7 +1,8 @@
 ﻿import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { ArrowLeft, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { NovelEditor, type NovelEditorRef } from '@/components/editor/Novel';
+// 使用新的 Notion 风格编辑器
+import { NovelEditor, type NovelEditorRef } from '@/components/editor/notion';
 import { RichEditorToolbar } from '@/components/editor/RichEditorToolbar';
 import { type Card } from '@/stores';
 import { debounce } from '@/utils/debounce';

@@ -24,9 +24,9 @@ const mapKeysToSnakeCase = (args: any): any => {
   return out;
 };
 
-// Typed invoke with arg key normalization
+// Typed invoke - Tauri 2.0 handles parameter name conversion automatically
 export const invokeTauri = async <T>(command: string, args?: any): Promise<T> => {
-  return invoke<T>(command, mapKeysToSnakeCase(args));
+  return invoke<T>(command, args);
 };
 
 /**
@@ -47,7 +47,7 @@ export const safeInvoke = async <T>(
   }
 
   try {
-    return await invoke<T>(command, mapKeysToSnakeCase(args));
+    return await invoke<T>(command, args);
   } catch (error) {
     console.error(`Tauri invoke "${command}" 失败:`, error);
     return fallbackValue ?? null;
